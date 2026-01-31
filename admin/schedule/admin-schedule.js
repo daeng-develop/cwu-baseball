@@ -3,19 +3,44 @@
 // 1. 설정 파일에서 db와 storage 가져오기
 import { db, storage } from "../../firebase.js";
 
-// [이벤트용 변수]
+// [이벤트(행사)용 변수]
 let isEditMode = false;
 let currentEditId = null;
 let currentKeptPhotos = [];
 let photosPendingDelete = [];
 
+// [경기(Match)용 변수]
+let isMatchEditMode = false;
+let currentMatchEditId = null;
+
 document.addEventListener("DOMContentLoaded", () => {
     // ---------------------------------------------
     // 1. 경기 일정 (Match) 이벤트 리스너
     // ---------------------------------------------
+    // 등록 버튼
     const matchRegisterBtn = document.querySelector('.btn-register-match');
     if (matchRegisterBtn) {
         matchRegisterBtn.addEventListener('click', register_match);
+    }
+    
+    // 수정 저장 버튼
+    const matchUpdateBtn = document.querySelector('#match-tab .btn-edit');
+    if (matchUpdateBtn) {
+        matchUpdateBtn.addEventListener('click', update_match);
+        // HTML에 style="display:none"이 있지만 확실히 숨김 처리
+        matchUpdateBtn.style.display = 'none'; 
+    }
+
+    // 취소 버튼
+    const matchCancelBtn = document.querySelector('#match-tab .btn-cancel');
+    if (matchCancelBtn) {
+        matchCancelBtn.addEventListener('click', () => {
+            if (isMatchEditMode) {
+                if (confirm("경기 수정을 취소하시겠습니까?")) window.location.reload();
+            } else {
+                window.location.reload();
+            }
+        });
     }
     
     // 페이지 로드 시 경기 목록 불러오기
@@ -40,9 +65,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (eventCancelBtn) {
         eventCancelBtn.addEventListener('click', () => {
             if (isEditMode) {
-                if (confirm("수정을 취소하시겠습니까?")) location.reload();
+                if (confirm("행사 수정을 취소하시겠습니까?")) window.location.reload();
             } else {
-                location.reload();
+                window.location.reload();
             }
         });
     }
@@ -63,7 +88,7 @@ async function register_match() {
     const dateVal = document.getElementById('match-date').value;
     const title = document.getElementById('match-title').value.trim();
     const opponent = document.getElementById('match-opponent').value.trim();
-    const location = document.getElementById('match-location').value.trim();
+    const location = document.getElementById('match-location').value.trim(); // 여기서 변수명 location 사용
     const homeAway = document.getElementById('match-home-away').value;
     const status = document.getElementById('match-status').value;
 
@@ -94,7 +119,7 @@ async function register_match() {
         await db.collection("match").doc(docId).set(matchData);
 
         alert(`[${dateVal}] ${title} vs ${opponent} 경기 일정이 등록되었습니다.`);
-        window.location.reload();
+        window.location.reload(); // ✅ window.location.reload() 사용
 
     } catch (error) {
         console.error("경기 등록 에러:", error);
@@ -125,17 +150,8 @@ async function loadMatchList() {
 
         snapshot.forEach(doc => {
             const data = doc.data();
-            const id = doc.id;
+            const id = doc.id; // YYYYMMDD
             
-            // 상태 텍스트 변환 (영어 -> 한글)
-            let statusText = "";
-            switch(data.status) {
-                case "before": statusText = "경기전"; break;
-                case "end": statusText = "종료"; break;
-                case "rain_cancel": statusText = "우천취소"; break;
-                default: statusText = data.status;
-            }
-
             html += `
                 <tr>
                     <td>${count}</td>
@@ -145,6 +161,7 @@ async function loadMatchList() {
                         <span style="color:#666; font-size:0.9em;">(vs ${data.opponent})</span>
                     </td>
                     <td>
+                        <button class="btn-list edit" onclick="prepareEditMatch('${id}')">수정</button>
                         <button class="btn-list delete" onclick="deleteMatch('${id}', '${data.title}')">삭제</button>
                     </td>
                 </tr>
@@ -160,7 +177,101 @@ async function loadMatchList() {
     }
 }
 
-// 3. 경기 삭제 함수 (전역)
+// 3. 경기 수정 준비 (데이터 불러와서 폼에 채우기)
+window.prepareEditMatch = async function(docId) {
+    try {
+        const doc = await db.collection("match").doc(docId).get();
+        if (!doc.exists) {
+            alert("해당 경기를 찾을 수 없습니다.");
+            return;
+        }
+        const data = doc.data();
+
+        // 1. 폼에 데이터 채우기
+        document.getElementById('match-date').value = data.date;
+        document.getElementById('match-title').value = data.title;
+        document.getElementById('match-opponent').value = data.opponent;
+        document.getElementById('match-location').value = data.location;
+        document.getElementById('match-home-away').value = data.homeAway;
+        document.getElementById('match-status').value = data.status;
+
+        // 2. 수정 모드 설정
+        isMatchEditMode = true;
+        currentMatchEditId = docId;
+
+        // 3. 버튼 교체 (등록 -> 수정 내용 저장)
+        document.querySelector('.btn-register-match').style.display = 'none';
+        
+        const updateBtn = document.querySelector('#match-tab .btn-edit');
+        updateBtn.style.display = 'inline-block'; // 보이게 설정
+        updateBtn.innerText = "수정 내용 저장";
+
+        // 4. 스크롤 이동 및 알림
+        document.querySelector('#match-tab .form-container').scrollIntoView({ behavior: 'smooth' });
+        alert(`${data.date} 경기 수정 모드입니다.`);
+
+    } catch (error) {
+        console.error("경기 수정 준비 실패:", error);
+        alert("데이터를 불러오는 중 오류가 발생했습니다.");
+    }
+};
+
+// 4. 경기 수정 저장 함수
+async function update_match() {
+    if (!isMatchEditMode || !currentMatchEditId) return;
+
+    const dateVal = document.getElementById('match-date').value;
+    const title = document.getElementById('match-title').value.trim();
+    const opponent = document.getElementById('match-opponent').value.trim();
+    const location = document.getElementById('match-location').value.trim(); // ⚠️ 여기서 location 변수가 생김
+    const homeAway = document.getElementById('match-home-away').value;
+    const status = document.getElementById('match-status').value;
+
+    if (!dateVal || !title || !opponent || !location) {
+        alert("필수 정보를 모두 입력해주세요.");
+        return;
+    }
+
+    const newDocId = dateVal.replaceAll('-', ''); // YYYYMMDD
+    const isDateChanged = (newDocId !== currentMatchEditId);
+
+    const updateBtn = document.querySelector('#match-tab .btn-edit');
+    updateBtn.disabled = true;
+    updateBtn.innerText = "저장 중...";
+
+    try {
+        const matchData = {
+            date: dateVal,
+            title: title,
+            opponent: opponent,
+            location: location,
+            homeAway: homeAway,
+            status: status,
+            updatedAt: new Date()
+        };
+
+        if (isDateChanged) {
+            // 날짜가 변경됨 -> 새 문서(ID) 생성 후 기존 문서 삭제
+            await db.collection("match").doc(newDocId).set(matchData);
+            await db.collection("match").doc(currentMatchEditId).delete();
+            alert(`날짜가 변경되어 일정이 이동되었습니다.\n(${currentMatchEditId} -> ${newDocId})`);
+        } else {
+            // 날짜 변경 없음 -> 기존 문서 업데이트
+            await db.collection("match").doc(currentMatchEditId).update(matchData);
+            alert("경기 일정이 수정되었습니다.");
+        }
+
+        window.location.reload(); // ✅ [수정완료] location.reload() -> window.location.reload()
+
+    } catch (error) {
+        console.error("경기 수정 실패:", error);
+        alert("수정 중 오류 발생: " + error.message);
+        updateBtn.disabled = false;
+        updateBtn.innerText = "수정 내용 저장";
+    }
+}
+
+// 5. 경기 삭제 함수
 window.deleteMatch = async function(docId, title) {
     if (!confirm(`'${title}' 경기를 삭제하시겠습니까?`)) return;
 
@@ -176,7 +287,7 @@ window.deleteMatch = async function(docId, title) {
 
 
 // =========================================================
-// [PART 2] 행사 일정 (Event) 관련 함수 (기존 유지)
+// [PART 2] 행사 일정 (Event) 관련 함수
 // =========================================================
 
 async function register_event() {
@@ -190,7 +301,7 @@ async function register_event() {
 
     const dateVal = dateInput.value; 
     const title = titleInput.value.trim();
-    const location = locationInput.value.trim();
+    const location = locationInput.value.trim(); // 여기서도 location 변수 사용
     const files = fileInput.files; 
 
     // 2. 텍스트 유효성 검사
@@ -245,7 +356,7 @@ async function register_event() {
         await db.collection("event").doc(yymmdd).set(eventData);
 
         alert(`[${dateVal}] ${title} 행사가 등록되었습니다!`);
-        window.location.reload(); 
+        window.location.reload(); // ✅ window.location.reload() 사용
 
     } catch (error) {
         console.error("에러 발생:", error);
@@ -349,7 +460,7 @@ window.prepareEditEvent = async function(docId) {
         updateBtn.style.display = 'inline-block';
         updateBtn.innerText = "수정 내용 저장";
 
-        document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth' });
+        document.querySelector('#event-tab .form-container').scrollIntoView({ behavior: 'smooth' });
         alert(`${data.date} 수정 모드입니다.\n사진의 'X' 버튼을 누르면 저장 시 삭제됩니다.`);
 
     } catch (error) {
@@ -443,7 +554,7 @@ async function update_event() {
             alert("수정되었습니다.");
         }
 
-        location.reload();
+        window.location.reload(); // ✅ window.location.reload() 사용
 
     } catch (error) {
         console.error("수정 실패:", error);
