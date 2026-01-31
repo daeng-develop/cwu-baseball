@@ -4,8 +4,9 @@
 import { db, storage } from "../../firebase.js";
 
 let isEditMode = false;
-let currentEditId = null; // 수정 중인 문서 ID (예: 260201)
-let originalPhotoUrls = []; // 기존에 있던 사진 URL들
+let currentEditId = null;
+let currentKeptPhotos = [];   // 현재 화면에 남겨둔(유지할) 사진 URL들
+let photosPendingDelete = []; // 삭제하려고 X표 누른 사진 URL들
 
 document.addEventListener("DOMContentLoaded", () => {
     // 1. 등록 버튼 (기존)
@@ -217,9 +218,8 @@ window.deleteEvent = async function (docId, title) {
 // ==========================================
 // 4. 행사 수정 함수 (전역 등록)
 // ==========================================
-window.prepareEditEvent = async function (docId) {
+window.prepareEditEvent = async function(docId) {
     try {
-        // 1. DB에서 데이터 가져오기
         const doc = await db.collection("event").doc(docId).get();
         if (!doc.exists) {
             alert("해당 데이터를 찾을 수 없습니다.");
@@ -227,151 +227,188 @@ window.prepareEditEvent = async function (docId) {
         }
         const data = doc.data();
 
-        // 2. 입력창에 값 채우기
+        // 입력창 채우기
         document.getElementById('event-date').value = data.date;
         document.getElementById('event-title').value = data.title;
         document.getElementById('event-location').value = data.location;
-
-        // 3. 상태 변수 업데이트
+        
+        // --- [사진 처리 로직] ---
         isEditMode = true;
         currentEditId = docId;
-        originalPhotoUrls = data.photos || []; // 기존 사진 목록 저장
+        
+        // 1. 초기화: 유지할 사진은 DB값 그대로, 삭제할 사진은 없음
+        currentKeptPhotos = data.photo || []; 
+        photosPendingDelete = [];
+        
+        // 2. 미리보기 영역 그리기
+        renderPhotoPreviews();
 
-        // 4. 버튼 교체 (등록 버튼 숨기고, 수정 버튼 보이기)
+        // 3. UI 변경 (등록버튼 숨김, 수정버튼 보임)
         document.querySelector('.btn-register-event').style.display = 'none';
-
+        
         const updateBtn = document.querySelector('#event-tab .btn-edit');
         updateBtn.style.display = 'inline-block';
-        updateBtn.innerText = "수정 내용 저장"; // 텍스트 명확하게 변경
+        updateBtn.innerText = "수정 내용 저장";
 
-        // 5. 화면 스크롤을 폼으로 이동
         document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth' });
-
-        alert(`${data.date} 수정 모드입니다. 내용을 변경하고 '수정 내용 저장'을 눌러주세요.`);
+        alert(`${data.date} 수정 모드입니다.\n사진의 'X' 버튼을 누르면 저장 시 삭제됩니다.`);
 
     } catch (error) {
         console.error("수정 준비 실패:", error);
-        alert("데이터를 불러오는 중 오류가 발생했습니다.");
+        alert("데이터 로딩 중 오류 발생");
     }
 };
 
 async function update_event() {
     if (!isEditMode || !currentEditId) return;
 
-    console.log("수정 저장 시작...");
-
-    const dateInput = document.getElementById('event-date');
-    const titleInput = document.getElementById('event-title');
-    const locationInput = document.getElementById('event-location');
-    const fileInput = document.getElementById('event-photos');
-
-    const newDate = dateInput.value;
-    const newTitle = titleInput.value.trim();
-    const newLocation = locationInput.value.trim();
-    const newFiles = fileInput.files;
+    // 입력값 확인
+    const newDate = document.getElementById('event-date').value;
+    const newTitle = document.getElementById('event-title').value.trim();
+    const newLocation = document.getElementById('event-location').value.trim();
+    const newFiles = document.getElementById('event-photos').files;
 
     if (!newDate || !newTitle || !newLocation) {
         alert("필수 정보를 모두 입력해주세요.");
         return;
     }
 
-    // 새 문서 ID 생성 (YYMMDD)
     const newDocId = newDate.replaceAll('-', '').substring(2);
-    const isDateChanged = (newDocId !== currentEditId); // 날짜가 바뀌었는지 확인
+    const isDateChanged = (newDocId !== currentEditId);
+
+    const updateBtn = document.querySelector('#event-tab .btn-edit');
+    updateBtn.disabled = true;
+    updateBtn.innerText = "저장 중... (삭제 및 이동 처리 중)";
 
     try {
-        const updateBtn = document.querySelector('#event-tab .btn-edit');
-        updateBtn.disabled = true;
-        updateBtn.innerText = "저장 중... (시간이 걸릴 수 있습니다)";
-
-        let finalPhotoUrls = [...originalPhotoUrls]; // 기존 사진에서 시작
-
-        // -------------------------------------------------------
-        // 시나리오 1: 날짜가 변경됨 (대공사: 이사 가야 함)
-        // -------------------------------------------------------
-        if (isDateChanged) {
-            console.log(`날짜 변경 감지: ${currentEditId} -> ${newDocId}`);
-
-            // [1] 기존 스토리지의 파일들을 새 폴더로 이사 (Copy & Delete)
-            // 기존 폴더: event/oldID/
-            // 새 폴더: event/newID/
-
-            // 기존 사진 URL들을 기반으로 파일 이동 처리
-            const movedPhotoUrls = [];
-
-            // 1-1. 기존 파일 이동 (다운로드 -> 업로드 -> 삭제)
-            // 기존 url에서 파일명만 추출해서 이동
-            for (const url of originalPhotoUrls) {
+        // ---------------------------------------------------
+        // 1. 삭제 대기중인 사진들 -> 진짜 스토리지 삭제
+        // ---------------------------------------------------
+        if (photosPendingDelete.length > 0) {
+            console.log("사진 삭제 시작:", photosPendingDelete.length + "장");
+            const deletePromises = photosPendingDelete.map(url => {
                 try {
-                    // Firebase Storage Ref 생성
+                    return storage.refFromURL(url).delete();
+                } catch(e) {
+                    console.warn("이미 삭제되었거나 없는 파일:", e);
+                    return Promise.resolve(); // 에러 나도 무시하고 진행
+                }
+            });
+            await Promise.all(deletePromises);
+        }
+
+        // ---------------------------------------------------
+        // 2. 남은 사진들(currentKeptPhotos) 처리
+        //    (날짜가 바뀌었으면 이사 가야 함)
+        // ---------------------------------------------------
+        let finalPhotoUrls = [...currentKeptPhotos]; // 일단 남은 것들로 시작
+
+        if (isDateChanged && currentKeptPhotos.length > 0) {
+            console.log("날짜 변경! 사진 이사 시작...");
+            const movedUrls = [];
+            
+            for (const url of currentKeptPhotos) {
+                try {
+                    // 다운로드 -> 새 위치 업로드 -> 기존 삭제
                     const oldRef = storage.refFromURL(url);
                     const fileName = oldRef.name;
                     const newPath = `event/${newDocId}/${fileName}`;
 
-                    // 파일 Blob 다운로드
                     const response = await fetch(url);
                     const blob = await response.blob();
-
-                    // 새 위치에 업로드
+                    
                     const snapshot = await storage.ref(newPath).put(blob);
                     const newUrl = await snapshot.ref.getDownloadURL();
-                    movedPhotoUrls.push(newUrl);
-
-                    // 기존 파일 삭제
-                    await oldRef.delete();
+                    movedUrls.push(newUrl);
+                    
+                    await oldRef.delete(); // 구버전 삭제
                 } catch (err) {
-                    console.warn("파일 이동 중 오류(무시):", err);
-                    // 실패해도 일단 진행
+                    console.error("사진 이동 실패 (일부 누락 가능):", err);
                 }
             }
-            finalPhotoUrls = movedPhotoUrls; // URL 목록 교체
+            finalPhotoUrls = movedUrls; // 이사 완료된 URL들로 교체
         }
 
-        // -------------------------------------------------------
-        // [공통] 새 파일 추가 업로드 (있다면)
-        // -------------------------------------------------------
+        // ---------------------------------------------------
+        // 3. 새로 추가된 파일들 업로드
+        // ---------------------------------------------------
         if (newFiles.length > 0) {
+            console.log("새 사진 업로드 중...");
+            // 날짜가 바뀌었으면 새 폴더(newDocId)로, 아니면 기존(currentEditId)로
+            const targetId = isDateChanged ? newDocId : currentEditId;
+            
             const uploadPromises = Array.from(newFiles).map(async (file) => {
-                // 날짜가 바뀌었으면 newDocId 폴더, 아니면 currentEditId 폴더
-                const targetId = isDateChanged ? newDocId : currentEditId;
                 const storagePath = `event/${targetId}/${file.name}`;
-
                 const snapshot = await storage.ref(storagePath).put(file);
                 return await snapshot.ref.getDownloadURL();
             });
-
+            
             const newUploadedUrls = await Promise.all(uploadPromises);
-            finalPhotoUrls = [...finalPhotoUrls, ...newUploadedUrls]; // 뒤에 추가
+            finalPhotoUrls = [...finalPhotoUrls, ...newUploadedUrls]; // 뒤에 붙이기
         }
 
-        // -------------------------------------------------------
-        // DB 업데이트
-        // -------------------------------------------------------
+        // ---------------------------------------------------
+        // 4. DB 저장
+        // ---------------------------------------------------
         const eventData = {
             date: newDate,
             title: newTitle,
             location: newLocation,
-            photos: finalPhotoUrls, // 합쳐진 사진 목록
-            updatedAt: new Date()
+            photo: finalPhotoUrls,
         };
 
         if (isDateChanged) {
-            // 날짜가 바뀌면: 새 문서 생성 -> 기존 문서 삭제
+            // 문서 ID 변경: 새 문서 생성 -> 기존 삭제
             await db.collection("event").doc(newDocId).set(eventData);
             await db.collection("event").doc(currentEditId).delete();
-            alert(`날짜가 변경되어 데이터가 이동되었습니다.\n(${currentEditId} -> ${newDocId})`);
+            alert("날짜 변경 및 사진 정리가 완료되었습니다.");
         } else {
-            // 날짜가 안 바뀌면: 기존 문서 업데이트
+            // 단순 업데이트
             await db.collection("event").doc(currentEditId).update(eventData);
-            alert("수정되었습니다!");
+            alert("수정되었습니다.");
         }
 
-        location.reload(); // 새로고침
+        location.reload();
 
     } catch (error) {
         console.error("수정 실패:", error);
-        alert("수정 중 오류가 발생했습니다: " + error.message);
+        alert("오류 발생: " + error.message);
         updateBtn.disabled = false;
         updateBtn.innerText = "수정 내용 저장";
     }
 }
+
+// 사진 미리보기 그리기
+function renderPhotoPreviews() {
+    const previewBox = document.getElementById('photo-preview-box');
+    previewBox.innerHTML = ""; // 초기화
+
+    if (currentKeptPhotos.length > 0) {
+        previewBox.style.display = 'flex'; // 사진이 있으면 보이기
+        
+        currentKeptPhotos.forEach((url, index) => {
+            const div = document.createElement('div');
+            div.className = 'photo-item';
+            div.innerHTML = `
+                <img src="${url}" alt="사진">
+                <button type="button" class="btn-remove-photo" onclick="removePhotoFromArray(${index})">✕</button>
+            `;
+            previewBox.appendChild(div);
+        });
+    } else {
+        previewBox.style.display = 'none'; // 사진 없으면 숨기기
+    }
+}
+
+// 사진 X 버튼 누르면 호출됨 (전역 등록)
+window.removePhotoFromArray = function(index) {
+    // 1. 삭제 대기 목록에 추가
+    const removedUrl = currentKeptPhotos[index];
+    photosPendingDelete.push(removedUrl);
+    
+    // 2. 유지 목록에서 제거
+    currentKeptPhotos.splice(index, 1);
+    
+    // 3. 화면 다시 그리기
+    renderPhotoPreviews();
+};
