@@ -1,0 +1,175 @@
+/* admin/admin-schedule-style.css */
+
+/* 기본 설정 */
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* 전체 컨테이너 */
+.admin-container {
+    width: 100%;
+    max-width: 600px;
+    background-color: transparent;
+}
+
+/* 헤더 영역 */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.admin-header h2 {
+    margin: 0;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.back-link {
+    text-decoration: none;
+    color: #555;
+    font-weight: bold;
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    transition: 0.2s;
+}
+
+.back-link:hover {
+    background-color: #e9ecef;
+}
+
+/* 탭 메뉴 스타일 */
+.tab-menu {
+    display: flex;
+    background-color: #ddd;
+    border-radius: 10px 10px 0 0;
+    overflow: hidden;
+}
+
+.tab-btn {
+    flex: 1; /* 너비를 똑같이 반반 차지 */
+    border: none;
+    padding: 15px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: #e0e0e0;
+    color: #777;
+    transition: 0.3s;
+}
+
+/* 활성화된 탭 스타일 */
+.tab-btn.active {
+    background-color: #fff; /* 활성화되면 흰색 배경 */
+    color: #001d3d; /* 글자색 진하게 */
+    border-top: 3px solid #001d3d; /* 상단 포인트 컬러 */
+}
+
+/* 탭 내용 영역 (기본적으로 숨김) */
+.tab-content {
+    display: none;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* 활성화된 내용만 보이게 */
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 폼 스타일 */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: #444;
+    font-size: 0.95rem;
+}
+
+.input-field {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box; /* 패딩 포함 크기 계산 */
+    font-family: inherit;
+}
+
+.input-field:focus {
+    border-color: #001d3d;
+    outline: none;
+}
+
+/* 파일 업로드 스타일 */
+.file-upload-box {
+    border: 2px dashed #ccc;
+    padding: 15px;
+    border-radius: 6px;
+    background-color: #fafafa;
+}
+
+.file-help {
+    margin: 5px 0 0 0;
+    font-size: 0.8rem;
+    color: #888;
+}
+
+/* 경고 문구 스타일 */
+.warning-text {
+    font-size: 0.85rem;
+    color: #e63946; /* 붉은색 */
+    margin-top: 8px;
+    line-height: 1.4;
+}
+
+/* 등록 버튼 공통 */
+.submit-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    background-color: #0056b3; /* 경기 일정 버튼 색상 */
+    transition: 0.2s;
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    background-color: #003366;
+    transform: translateY(-2px);
+}
+
+/* 행사 등록 버튼 색상 (다르게 포인트) */
+.event-btn-color {
+    background-color: #2a9d8f; /* 청록색 계열 */
+}
+
+.event-btn-color:hover {
+    background-color: #21867a;
+}

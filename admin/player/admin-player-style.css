@@ -1,0 +1,342 @@
+/* admin-player-style.css */
+
+/* 기본 설정 */
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* 전체 컨테이너 */
+.admin-container {
+    width: 100%;
+    max-width: 700px; /* 입력 필드가 많아서 조금 더 넓게 */
+}
+
+/* 헤더 */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.admin-header h2 {
+    margin: 0;
+    color: #333;
+}
+
+.back-link {
+    text-decoration: none;
+    color: #555;
+    font-weight: bold;
+    padding: 6px 12px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: 0.2s;
+}
+
+.back-link:hover {
+    background-color: #e9ecef;
+}
+
+/* 섹션 타이틀 */
+.section-title {
+    font-size: 1.2rem;
+    color: #001d3d;
+    margin-bottom: 15px;
+    border-left: 5px solid #001d3d;
+    padding-left: 10px;
+}
+
+/* 폼 카드 스타일 */
+.form-card {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* 2열 그리드 레이아웃 (핵심) */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 1:1 비율로 2개씩 */
+    gap: 20px; /* 사이 간격 */
+}
+
+/* 모바일에서는 1열로 변경 */
+@media (max-width: 600px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 입력 그룹 */
+.form-group {
+    margin-bottom: 5px; /* 그리드 gap이 있어서 마진은 최소화 */
+}
+
+/* 사진 칸은 가로 꽉 차게 */
+.full-width {
+    grid-column: 1 / -1; /* 시작부터 끝까지 */
+    margin-top: 10px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #444;
+    font-size: 0.9rem;
+}
+
+.input-field {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.input-field:focus {
+    border-color: #001d3d;
+    outline: none;
+}
+
+/* 단위(cm, kg)가 붙는 입력창 */
+.input-with-unit {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.unit {
+    color: #777;
+    font-weight: 500;
+}
+
+/* 파일 업로드 박스 */
+.file-upload-box {
+    border: 2px dashed #ccc;
+    padding: 10px;
+    border-radius: 6px;
+    background-color: #fafafa;
+    text-align: left;
+}
+.file-upload-box input[type="file"] {
+    margin: 0;
+}
+
+/* 경고 문구 */
+.warning-text {
+    font-size: 0.85rem;
+    color: #e63946;
+    margin-top: 8px;
+    margin-bottom: 0;
+}
+
+/* 구분선 */
+.divider {
+    border: 0;
+    height: 1px;
+    background-color: #ddd;
+    margin: 40px 0;
+}
+
+/* 하단 목록 임시 스타일 */
+.list-placeholder {
+    background-color: #fff;
+    padding: 40px;
+    text-align: center;
+    border-radius: 12px;
+    color: #aaa;
+    border: 1px solid #eee;
+}
+
+/* --- [추가] Select Box 커스텀 디자인 --- */
+
+select.input-field {
+    /* 1. 기본 브라우저 스타일 제거 (가장 중요!) */
+    -webkit-appearance: none;  /* 크롬, 사파리 */
+    -moz-appearance: none;     /* 파이어폭스 */
+    appearance: none;          /* 표준 */
+
+    /* 2. 배경색 및 커스텀 화살표 추가 */
+    background-color: #fff;
+    
+    /* SVG 화살표 아이콘 (회색) */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    
+    background-repeat: no-repeat;
+    background-position: right 12px center; /* 오른쪽에서 12px 떨어진 곳에 중앙 정렬 */
+    background-size: 16px; /* 화살표 크기 */
+
+    /* 3. 텍스트가 화살표와 겹치지 않게 오른쪽 여백 확보 */
+    padding-right: 40px; 
+    
+    cursor: pointer;
+    color: #444;
+    font-weight: 500;
+}
+
+/* 마우스를 올렸을 때 살짝 진해짐 */
+select.input-field:hover {
+    border-color: #888;
+}
+
+/* 클릭했을 때 (포커스) - 테두리 색상 강조 & 화살표 색상 변경(선택사항) */
+select.input-field:focus {
+    border-color: #001d3d;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 29, 61, 0.1); /* 부드러운 파란색 번짐 효과 */
+}
+
+/* --- [수정] 하단 버튼 그룹 디자인 --- */
+
+.action-buttons {
+    display: flex;
+    gap: 10px;       /* 버튼 사이 간격 */
+    margin-top: 25px;
+}
+
+/* 모든 버튼 공통 스타일 */
+.btn {
+    flex: 1;         /* 너비를 1:1:1로 똑같이 배분 */
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: white;    /* 글씨색 흰색 */
+}
+
+/* 1. 등록 버튼 (메인 - 네이비) */
+.btn-register {
+    background-color: #001d3d;
+}
+.btn-register:hover {
+    background-color: #003366;
+    transform: translateY(-2px);
+}
+
+/* 2. 수정 버튼 (포인트 - 청록색/초록) */
+.btn-edit {
+    background-color: #0056b3;
+}
+.btn-edit:hover {
+    background-color:#004494;
+    transform: translateY(-2px);
+}
+
+/* 3. 취소 버튼 (서브 - 회색) */
+.btn-cancel {
+    background-color: #6c757d;
+}
+.btn-cancel:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+
+/* --- [추가] 선수 목록 테이블 디자인 --- */
+
+/* 목록 헤더 (제목 + 연도선택 가로 정렬) */
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+/* 연도 선택 박스 (기존 select 스타일 재사용 + 크기 조절) */
+.year-select {
+    padding: 8px 30px 8px 12px; /* 오른쪽 여백은 화살표 공간 */
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    
+    /* 커스텀 화살표 적용 (기존 select.input-field와 동일) */
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 14px;
+}
+
+/* 테이블 컨테이너 (반응형 스크롤) */
+.table-container {
+    overflow-x: auto; /* 화면이 좁으면 가로 스크롤 생김 */
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* 테이블 기본 스타일 */
+.player-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    font-size: 0.95rem;
+    text-align: center; /* 내용 가운데 정렬 */
+    white-space: nowrap; /* 줄바꿈 방지 */
+}
+
+/* 헤더 셀 (th) */
+.player-table th {
+    background-color: #001d3d; /* 메인 네이비 */
+    color: white;
+    padding: 12px;
+    font-weight: 500;
+    border-bottom: 2px solid #00152e;
+}
+
+/* 데이터 셀 (td) */
+.player-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    color: #444;
+}
+
+/* 마우스 올렸을 때 행 강조 */
+.player-table tr:hover td {
+    background-color: #f8f9fa;
+}
+
+/* --- 관리 버튼 (수정/삭제) --- */
+.btn-list {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin: 0 2px;
+    color: white;
+    transition: 0.2s;
+}
+
+/* 수정 버튼 */
+.btn-list.edit {
+    background-color: #0056b3;
+}
+.btn-list.edit:hover {
+    background-color: #004494;
+}
+
+/* 삭제 버튼 (빨강) */
+.btn-list.delete {
+    background-color: #e63946;
+}
+.btn-list.delete:hover {
+    background-color: #d62828;
+}
