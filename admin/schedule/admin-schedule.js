@@ -3,15 +3,36 @@
 // 1. 설정 파일에서 db와 storage 가져오기
 import { db, storage } from "../../firebase.js";
 
+let isEditMode = false;
+let currentEditId = null; // 수정 중인 문서 ID (예: 260201)
+let originalPhotoUrls = []; // 기존에 있던 사진 URL들
+
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. 행사 등록 버튼 이벤트 연결
+    // 1. 등록 버튼 (기존)
     const eventRegisterBtn = document.querySelector('.btn-register-event');
     if (eventRegisterBtn) {
         eventRegisterBtn.addEventListener('click', register_event);
     }
 
-    // (참고) 경기 일정 등록 버튼 이벤트도 필요하다면 여기서 연결
-    // const matchRegisterBtn = ...
+    // 2. [신규] 수정(저장) 버튼 이벤트 연결
+    // HTML에 있는 <button class="btn btn-edit">를 찾아서 연결
+    const eventUpdateBtn = document.querySelector('#event-tab .btn-edit');
+    if (eventUpdateBtn) {
+        eventUpdateBtn.addEventListener('click', update_event);
+        eventUpdateBtn.style.display = 'none'; // 처음엔 숨김
+    }
+
+    // 3. [신규] 취소 버튼 이벤트 (새로고침 대신 폼 초기화)
+    const eventCancelBtn = document.querySelector('#event-tab .btn-cancel');
+    if (eventCancelBtn) {
+        eventCancelBtn.addEventListener('click', () => {
+            if (isEditMode) {
+                if (confirm("수정을 취소하시겠습니까?")) location.reload();
+            } else {
+                location.reload();
+            }
+        });
+    }
 
     // 페이지 열리면 행사 목록 바로 불러오기
     loadEventList();
@@ -69,7 +90,7 @@ async function register_event() {
         // 4. 문서 ID 생성 (YYMMDD 형식)
         // 예: "2026-01-31" -> "260131"
         const yymmdd = dateVal.replaceAll('-', '').substring(2);
-        
+
         console.log(`문서 ID 생성: ${yymmdd}`);
 
         // --- [1] 스토리지에 사진들 업로드 ---
@@ -77,7 +98,7 @@ async function register_event() {
         const uploadPromises = Array.from(files).map(async (file) => {
             // 경로: event/260131/파일명.jpg
             const storagePath = `event/${yymmdd}/${file.name}`;
-            
+
             // 업로드 (admin-player.js 스타일)
             const snapshot = await storage.ref(storagePath).put(file);
             // 다운로드 URL 가져오기
@@ -106,10 +127,10 @@ async function register_event() {
     } catch (error) {
         console.error("에러 발생:", error);
         alert("등록 중 오류가 발생했습니다: " + error.message);
-        
+
         // 버튼 원상복구
         const registerBtn = document.querySelector('.btn-register-event');
-        if(registerBtn) {
+        if (registerBtn) {
             registerBtn.disabled = false;
             registerBtn.innerText = "행사 일정 등록하기";
         }
@@ -117,7 +138,7 @@ async function register_event() {
 }
 
 // ==========================================
-// 2. [신규] 행사 목록 불러오기 함수
+// 2. 행사 목록 불러오기 함수
 // ==========================================
 async function loadEventList() {
     const tableBody = document.getElementById('event-table-body');
@@ -140,18 +161,18 @@ async function loadEventList() {
         snapshot.forEach(doc => {
             const data = doc.data();
             const id = doc.id; // 문서 ID (예: 260131)
-
             html += `
                 <tr>
                     <td>${count}</td>
                     <td>${data.date}</td>
                     <td>${data.title}</td>
                     <td>
-                        <button class="btn-list edit" onclick="alert('수정 기능 준비중')">수정</button>
+                        <button class="btn-list edit" onclick="prepareEditEvent('${id}')">수정</button>
                         <button class="btn-list delete" onclick="deleteEvent('${id}', '${data.title}')">삭제</button>
                     </td>
                 </tr>
             `;
+
             count++; // 번호 증가
         });
 
@@ -164,9 +185,9 @@ async function loadEventList() {
 }
 
 // ==========================================
-// 3. [신규] 행사 삭제 함수 (전역 등록)
+// 3. 행사 삭제 함수 (전역 등록)
 // ==========================================
-window.deleteEvent = async function(docId, title) {
+window.deleteEvent = async function (docId, title) {
     if (!confirm(`'${title}' 행사를 정말 삭제하시겠습니까?\n포함된 사진들도 모두 삭제됩니다.`)) {
         return;
     }
@@ -176,7 +197,7 @@ window.deleteEvent = async function(docId, title) {
         // (폴더 자체 삭제 기능이 없어서 파일 목록을 가져와서 하나씩 지워야 함)
         const folderRef = storage.ref(`event/${docId}`);
         const listResult = await folderRef.listAll();
-        
+
         const deletePromises = listResult.items.map(itemRef => itemRef.delete());
         await Promise.all(deletePromises);
         console.log("관련 사진 삭제 완료");
@@ -192,3 +213,165 @@ window.deleteEvent = async function(docId, title) {
         alert("삭제 중 오류가 발생했습니다: " + error.message);
     }
 };
+
+// ==========================================
+// 4. 행사 수정 함수 (전역 등록)
+// ==========================================
+window.prepareEditEvent = async function (docId) {
+    try {
+        // 1. DB에서 데이터 가져오기
+        const doc = await db.collection("event").doc(docId).get();
+        if (!doc.exists) {
+            alert("해당 데이터를 찾을 수 없습니다.");
+            return;
+        }
+        const data = doc.data();
+
+        // 2. 입력창에 값 채우기
+        document.getElementById('event-date').value = data.date;
+        document.getElementById('event-title').value = data.title;
+        document.getElementById('event-location').value = data.location;
+
+        // 3. 상태 변수 업데이트
+        isEditMode = true;
+        currentEditId = docId;
+        originalPhotoUrls = data.photos || []; // 기존 사진 목록 저장
+
+        // 4. 버튼 교체 (등록 버튼 숨기고, 수정 버튼 보이기)
+        document.querySelector('.btn-register-event').style.display = 'none';
+
+        const updateBtn = document.querySelector('#event-tab .btn-edit');
+        updateBtn.style.display = 'inline-block';
+        updateBtn.innerText = "수정 내용 저장"; // 텍스트 명확하게 변경
+
+        // 5. 화면 스크롤을 폼으로 이동
+        document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth' });
+
+        alert(`${data.date} 수정 모드입니다. 내용을 변경하고 '수정 내용 저장'을 눌러주세요.`);
+
+    } catch (error) {
+        console.error("수정 준비 실패:", error);
+        alert("데이터를 불러오는 중 오류가 발생했습니다.");
+    }
+};
+
+async function update_event() {
+    if (!isEditMode || !currentEditId) return;
+
+    console.log("수정 저장 시작...");
+
+    const dateInput = document.getElementById('event-date');
+    const titleInput = document.getElementById('event-title');
+    const locationInput = document.getElementById('event-location');
+    const fileInput = document.getElementById('event-photos');
+
+    const newDate = dateInput.value;
+    const newTitle = titleInput.value.trim();
+    const newLocation = locationInput.value.trim();
+    const newFiles = fileInput.files;
+
+    if (!newDate || !newTitle || !newLocation) {
+        alert("필수 정보를 모두 입력해주세요.");
+        return;
+    }
+
+    // 새 문서 ID 생성 (YYMMDD)
+    const newDocId = newDate.replaceAll('-', '').substring(2);
+    const isDateChanged = (newDocId !== currentEditId); // 날짜가 바뀌었는지 확인
+
+    try {
+        const updateBtn = document.querySelector('#event-tab .btn-edit');
+        updateBtn.disabled = true;
+        updateBtn.innerText = "저장 중... (시간이 걸릴 수 있습니다)";
+
+        let finalPhotoUrls = [...originalPhotoUrls]; // 기존 사진에서 시작
+
+        // -------------------------------------------------------
+        // 시나리오 1: 날짜가 변경됨 (대공사: 이사 가야 함)
+        // -------------------------------------------------------
+        if (isDateChanged) {
+            console.log(`날짜 변경 감지: ${currentEditId} -> ${newDocId}`);
+
+            // [1] 기존 스토리지의 파일들을 새 폴더로 이사 (Copy & Delete)
+            // 기존 폴더: event/oldID/
+            // 새 폴더: event/newID/
+
+            // 기존 사진 URL들을 기반으로 파일 이동 처리
+            const movedPhotoUrls = [];
+
+            // 1-1. 기존 파일 이동 (다운로드 -> 업로드 -> 삭제)
+            // 기존 url에서 파일명만 추출해서 이동
+            for (const url of originalPhotoUrls) {
+                try {
+                    // Firebase Storage Ref 생성
+                    const oldRef = storage.refFromURL(url);
+                    const fileName = oldRef.name;
+                    const newPath = `event/${newDocId}/${fileName}`;
+
+                    // 파일 Blob 다운로드
+                    const response = await fetch(url);
+                    const blob = await response.blob();
+
+                    // 새 위치에 업로드
+                    const snapshot = await storage.ref(newPath).put(blob);
+                    const newUrl = await snapshot.ref.getDownloadURL();
+                    movedPhotoUrls.push(newUrl);
+
+                    // 기존 파일 삭제
+                    await oldRef.delete();
+                } catch (err) {
+                    console.warn("파일 이동 중 오류(무시):", err);
+                    // 실패해도 일단 진행
+                }
+            }
+            finalPhotoUrls = movedPhotoUrls; // URL 목록 교체
+        }
+
+        // -------------------------------------------------------
+        // [공통] 새 파일 추가 업로드 (있다면)
+        // -------------------------------------------------------
+        if (newFiles.length > 0) {
+            const uploadPromises = Array.from(newFiles).map(async (file) => {
+                // 날짜가 바뀌었으면 newDocId 폴더, 아니면 currentEditId 폴더
+                const targetId = isDateChanged ? newDocId : currentEditId;
+                const storagePath = `event/${targetId}/${file.name}`;
+
+                const snapshot = await storage.ref(storagePath).put(file);
+                return await snapshot.ref.getDownloadURL();
+            });
+
+            const newUploadedUrls = await Promise.all(uploadPromises);
+            finalPhotoUrls = [...finalPhotoUrls, ...newUploadedUrls]; // 뒤에 추가
+        }
+
+        // -------------------------------------------------------
+        // DB 업데이트
+        // -------------------------------------------------------
+        const eventData = {
+            date: newDate,
+            title: newTitle,
+            location: newLocation,
+            photos: finalPhotoUrls, // 합쳐진 사진 목록
+            updatedAt: new Date()
+        };
+
+        if (isDateChanged) {
+            // 날짜가 바뀌면: 새 문서 생성 -> 기존 문서 삭제
+            await db.collection("event").doc(newDocId).set(eventData);
+            await db.collection("event").doc(currentEditId).delete();
+            alert(`날짜가 변경되어 데이터가 이동되었습니다.\n(${currentEditId} -> ${newDocId})`);
+        } else {
+            // 날짜가 안 바뀌면: 기존 문서 업데이트
+            await db.collection("event").doc(currentEditId).update(eventData);
+            alert("수정되었습니다!");
+        }
+
+        location.reload(); // 새로고침
+
+    } catch (error) {
+        console.error("수정 실패:", error);
+        alert("수정 중 오류가 발생했습니다: " + error.message);
+        updateBtn.disabled = false;
+        updateBtn.innerText = "수정 내용 저장";
+    }
+}
