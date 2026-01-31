@@ -4,10 +4,41 @@ async function draw_menu_tree() {
     /* common.js */
     const pageName = window.location.pathname.split("/").pop();
     const isRoot = pageName === "" || pageName === "index.html";
-
     const pathPrefix = isRoot ? "./" : "../"; 
 
-    // 1. 메뉴 HTML을 먼저 정의합니다. (데이터가 들어갈 곳에 id 부여)
+    // ✅ [설정] 여기에 년도만 추가하면 자동으로 메뉴가 생깁니다!
+    // 예시: const targetYears = ["2027", "2026", "2025"];
+    const targetYears = ["2026"]; 
+
+
+    // 1. [Top Menu용] 년도별 HTML 자동 생성
+    const topMenuEventHtml = targetYears.map(year => `
+        <li>
+            <div class="top-menu-category-level2-label" onclick="toggle_category(this)">
+                <span>${year}년</span>
+                <button class="toggle-btn">▼</button>
+            </div>
+            <ul class="top-menu-category-level3" id="top-event-${year}" style="display: none;">
+                <li><span style="padding:10px; color:#999;">로딩 중...</span></li>
+            </ul>
+        </li>
+    `).join('');
+
+    // 2. [Sidebar용] 년도별 HTML 자동 생성
+    const sidebarEventHtml = targetYears.map(year => `
+        <li>
+            <div class="sidebar-category-level2-group" onclick="toggle_category(this)">
+                <span class="sidebar-sub-label">${year}년</span>
+                <button class="toggle-btn">▼</button>
+            </div>
+            <ul class="sidebar-category-level3" id="sidebar-event-${year}" style="display: none;">
+                <li><span style="padding:10px; color:#999;">로딩 중...</span></li>
+            </ul>
+        </li>
+    `).join('');
+
+
+    // 3. 전체 메뉴 HTML 조립
     const menu_tree_html =`
     <header class="top-menu"> 
         <button class="sidebar-btn" id="sidebar-open">☰</button>
@@ -31,22 +62,22 @@ async function draw_menu_tree() {
             </li>
 
             <li class="top-menu-category">
-                    <div class="top-menu-category-level1" onclick="toggle_category(this)">
-                        <span class="top-menu-category-lv1-label">경기 기록</span>
-                        <button class="toggle-btn">▼</button>
-                    </div>
-                    <ul class="top-menu-category-level2" style="display: none;">
-                        <li>
-                            <div class="top-menu-category-level2-label" onclick="toggle_category(this)">
-                                <span>제59회 대통령기 전국대학야구 대회</span>
-                                <button class="toggle-btn">▼</button>
-                            </div>
-                            <ul class="top-menu-category-level3" style="display: none;">
-                                <li><a href="${pathPrefix}match/match.html#250808">08.08 vs 경남대</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
+                <div class="top-menu-category-level1" onclick="toggle_category(this)">
+                    <span class="top-menu-category-lv1-label">경기 기록</span>
+                    <button class="toggle-btn">▼</button>
+                </div>
+                <ul class="top-menu-category-level2" style="display: none;">
+                    <li>
+                        <div class="top-menu-category-level2-label" onclick="toggle_category(this)">
+                            <span>제59회 대통령기 전국대학야구 대회</span>
+                            <button class="toggle-btn">▼</button>
+                        </div>
+                        <ul class="top-menu-category-level3" style="display: none;">
+                            <li><a href="${pathPrefix}match/match.html#250808">08.08 vs 경남대</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
 
             <li class="top-menu-category">
                 <a href="${pathPrefix}schedule/schedule.html" class="top-menu-category-level1">
@@ -61,19 +92,7 @@ async function draw_menu_tree() {
                 </div>
             
                 <ul class="top-menu-category-level2" style="display: none;">
-                    
-                    <li>
-                        <div class="top-menu-category-level2-label" onclick="toggle_category(this)">
-                            <span>2026년</span>
-                            <button class="toggle-btn">▼</button>
-                        </div>
-                        
-                        <ul class="top-menu-category-level3" id="event-list-2026" style="display: none;">
-                            <li><span style="padding:10px; color:#999;">로딩 중...</span></li>
-                        </ul>
-                    </li>
-
-                </ul>
+                    ${topMenuEventHtml} </ul>
             </li>
         </ul>
     </header>
@@ -83,22 +102,72 @@ async function draw_menu_tree() {
             <h2 class="sidebar-title">MENU</h2>
             <button class="sidebar-close-btn" id="sidebar-close">✕</button>
         </div>
+        
         <ul class="sidebar-links">
-             <li class="sidebar-category">
+            <li class="sidebar-category">
                 <a href="${pathPrefix}index.html" class="sidebar-category-level1 single-link">
                     <span class="sidebar-label">홈</span>
                 </a>
             </li>
-            </ul>
+
+            <li class="sidebar-category">
+                <div class="sidebar-category-level1" onclick="toggle_category(this)">
+                    <span class="sidebar-label">선수 정보</span>
+                    <button class="toggle-btn">▼</button>
+                </div>
+                <ul class="sidebar-category-level2" style="display: none;">
+                    <li><a href="${pathPrefix}player/player.html#pitcher">투수 (Pitcher)</a></li>
+                    <li><a href="${pathPrefix}player/player.html#catcher">포수 (Catcher)</a></li>
+                    <li><a href="${pathPrefix}player/player.html#infielder">내야수 (Infielder)</a></li>
+                    <li><a href="${pathPrefix}player/player.html#outfielder">외야수 (Outfielder)</a></li>
+                </ul>
+            </li>
+
+            <li class="sidebar-category">
+                <div class="sidebar-category-level1" onclick="toggle_category(this)">
+                    <span class="sidebar-label">경기 기록</span>
+                    <button class="toggle-btn">▼</button>
+                </div>
+                <ul class="sidebar-category-level2" style="display: none;">
+                    <li>
+                        <div class="sidebar-category-level2-group" onclick="toggle_category(this)">
+                            <span class="sidebar-sub-label">제59회 대통령기 전국대학야구 대회</span>
+                            <button class="toggle-btn">▼</button>
+                        </div>
+                        <ul class="sidebar-category-level3" style="display: none;">
+                            <li><a href="${pathPrefix}match/match.html#250808">08.08 vs 경남대</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="sidebar-category">
+                <a href="${pathPrefix}schedule/schedule.html" class="sidebar-category-level1">
+                    <span class="sidebar-label">경기 일정</span>
+                </a>
+            </li>
+
+            <li class="sidebar-category">
+                <div class="sidebar-category-level1" onclick="toggle_category(this)">
+                    <span class="sidebar-label">경기 외</span>
+                    <button class="toggle-btn">▼</button>
+                </div>
+                <ul class="sidebar-category-level2" style="display: none;">
+                     ${sidebarEventHtml} </ul>
+            </li>
+        </ul>
     </div>
     `;
 
-    // 2. HTML을 먼저 그립니다! (사용자는 메뉴를 바로 볼 수 있음)
+    // 4. HTML 그리기
     document.body.insertAdjacentHTML('afterbegin', menu_tree_html);
     attachSidebarEvents();
 
-    // 3. 화면을 그린 '후'에 데이터를 가져옵니다.
-    fillEventMenu(pathPrefix, "2026", "event-list-2026");
+    // 5. [자동 채우기] 설정된 년도들을 반복하면서 데이터 채워넣기
+    targetYears.forEach(year => {
+        fillEventMenu(pathPrefix, year, `top-event-${year}`);       // Top Menu
+        fillEventMenu(pathPrefix, year, `sidebar-event-${year}`);   // Sidebar
+    });
 }
 
 async function draw_footer() {
