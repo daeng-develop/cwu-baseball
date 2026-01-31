@@ -1,73 +1,99 @@
-// event.js
+/* event.js */
 
-// 1. 데이터 베이스 (해시태그를 키값으로 사용)
-// 나중에 이 부분만 수정하면 내용이 바뀝니다.
-const eventData = {
-    '260102': {
-        title: '01.02 기장 동계훈련',
-        date: '2026. 01. 02 (금)',
-        place: '기장 현대차 드림볼파크',
-        // 테스트용 랜덤 이미지들 (높이가 제각각이어야 Masonry 효과가 잘 보임)
-        images: [
-            'https://picsum.photos/400/300',
-            'https://picsum.photos/400/500',
-            'https://picsum.photos/400/400',
-            'https://picsum.photos/400/600',
-            'https://picsum.photos/400/350',
-            'https://picsum.photos/400/450',
-            'https://picsum.photos/400/300'
-        ]
-    },
-    // 다른 날짜 예시
-    '260505': {
-        title: '05.05 어린이날 행사',
-        date: '2026. 05. 05 (화)',
-        place: '홍성군청',
-        images: [] 
-    }
-};
+// 1. Firebase 설정 가져오기
+import { db } from "../firebase.js";
 
-// 2. 렌더링 함수
-function renderEventDetail() {
-    // URL에서 해시태그 가져오기 (# 제거)
-    const hash = window.location.hash.substring(1); // 예: "260102"
+document.addEventListener('DOMContentLoaded', () => {
+    loadEventDetail();
+    
+    // 해시태그가 바뀌면(뒤로가기 등) 다시 로드
+    window.addEventListener('hashchange', loadEventDetail);
+});
 
-    // DOM 요소 가져오기
+async function loadEventDetail() {
+    // 1. URL에서 문서 ID(해시태그) 가져오기
+    const docId = window.location.hash.substring(1); // 예: "260102"
+
+    // DOM 요소
     const titleEl = document.getElementById('event-title');
     const metaEl = document.getElementById('event-meta');
     const galleryEl = document.getElementById('photo-gallery');
 
-    // 데이터가 존재하는지 확인
-    if (eventData[hash]) {
-        const data = eventData[hash];
+    // 2. [UX 개선] 로딩 중 표시 (데이터 가져오는 동안 보여줄 화면)
+    titleEl.textContent = ""; 
+    metaEl.textContent = "데이터를 불러오는 중입니다...";
+    galleryEl.innerHTML = '<div class="loader">잠시만 기다려주세요...</div>'; // CSS로 꾸미면 더 좋음
 
-        // 텍스트 정보 넣기
-        titleEl.textContent = data.title;
+    if (!docId) {
+        titleEl.textContent = "잘못된 접근입니다.";
+        metaEl.textContent = "이벤트 ID가 없습니다.";
+        galleryEl.innerHTML = "";
+        return;
+    }
+
+    try {
+        // 3. Firestore에서 데이터 가져오기
+        const doc = await db.collection("event").doc(docId).get();
+
+        if (!doc.exists) {
+            titleEl.textContent = "삭제되었거나 존재하지 않는 행사입니다.";
+            metaEl.textContent = "";
+            galleryEl.innerHTML = "";
+            return;
+        }
+
+        const data = doc.data();
+
+        // 4. 데이터 바인딩 (화면에 표시)
         
-        // 요청하신 포맷: 날짜 | 장소 | 해시태그
-        metaEl.textContent = `${data.date} | ${data.place} | #${hash}`;
+        // 4-1. 제목
+        titleEl.textContent = data.title;
 
-        // 이미지 생성 및 넣기
-        let imagesHtml = '';
-        data.images.forEach(imgUrl => {
-            imagesHtml += `
-                <div class="photo-item">
-                    <img src="${imgUrl}" alt="현장 사진">
-                </div>
-            `;
-        });
-        galleryEl.innerHTML = imagesHtml;
+        // 4-2. 날짜 및 장소 포맷팅
+        // data.date (예: "2026-01-31") -> "2026년 01월 31일 토요일"
+        const formattedDate = getFormattedDate(data.date);
+        
+        // 요청하신 포맷: 날짜 | 장소 (해시태그 제거됨)
+        metaEl.textContent = `${formattedDate} | ${data.location}`;
 
-    } else {
-        // 데이터가 없을 때 표시
-        titleEl.textContent = "일정을 찾을 수 없습니다.";
-        metaEl.textContent = `요청하신 코드: #${hash}`;
-        galleryEl.innerHTML = '';
+        // 4-3. 사진 갤러리 생성 (배열: data.photo)
+        // [성능 개선] 이미지가 없으면 메시지 표시
+        if (!data.photo || data.photo.length === 0) {
+            galleryEl.innerHTML = '<p class="no-photo">등록된 사진이 없습니다.</p>';
+        } else {
+            let imagesHtml = '';
+            data.photo.forEach(imgUrl => {
+                // [성능 개선] loading="lazy" 추가 -> 스크롤 할 때 로딩하여 초기 속도 향상
+                imagesHtml += `
+                    <div class="photo-item">
+                        <img src="${imgUrl}" alt="현장 사진" loading="lazy">
+                    </div>
+                `;
+            });
+            galleryEl.innerHTML = imagesHtml;
+        }
+
+    } catch (error) {
+        console.error("행사 상세 로딩 실패:", error);
+        titleEl.textContent = "오류가 발생했습니다.";
+        metaEl.textContent = "관리자에게 문의해주세요.";
+        galleryEl.innerHTML = "";
     }
 }
 
-// 3. 페이지 로드 시 실행
-document.addEventListener('DOMContentLoaded', renderEventDetail);
+// [헬퍼 함수] 날짜 문자열을 "YYYY년 MM월 DD일 O요일" 로 변환
+function getFormattedDate(dateString) {
+    if (!dateString) return "";
 
-// (선택) 해시태그가 바뀌었을 때도 다시 렌더링 (뒤로가기 등 대응)
-window.addEventListener('hashchange', renderEventDetail);
+    // 브라우저마다 날짜 파싱 이슈가 있을 수 있어 안전하게 분리
+    const [year, month, day] = dateString.split('-');
+    
+    // Date 객체 생성 (월은 0부터 시작하므로 -1)
+    const date = new Date(year, month - 1, day);
+    
+    // 요일 배열
+    const days = ['일', '월', '화', '수', '목', '금', '토'];
+    const dayName = days[date.getDay()];
+
+    return `${year}년 ${month}월 ${day}일 ${dayName}요일`;
+}

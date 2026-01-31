@@ -41,15 +41,23 @@
 
 /* 개별 사진 아이템 */
 .photo-item {
-    /* 사진이 열 중간에서 잘리지 않게 방지 (필수) */
+    /* [수정] 정렬 문제 해결을 위한 핵심 코드 3줄 추가 */
+    display: inline-block; /* 1. 박스를 글자처럼 취급 */
+    width: 100%;           /* 2. 가로 폭을 꽉 채움 */
+    vertical-align: top;   /* 3. 무조건 위쪽 라인에 맞춤 */
+
+    /* 기존 속성 유지 */
     break-inside: avoid; 
     margin-bottom: 15px; 
     
     /* 사진 감싸는 박스 스타일 */
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    background-color: #fff;
+    
+    /* 기존에 배경색/높이 강제 설정했던 것은 삭제하거나 덮어씌움 */
+    background-color: transparent !important; /* 배경 투명하게 */
+    box-shadow: none !important;
+    min-height: auto !important;
 }
 
 .photo-item img {
@@ -62,6 +70,16 @@
 /* 마우스 올리면 살짝 확대 효과 */
 .photo-item img:hover {
     transform: scale(1.03);
+}
+
+.loader, .no-photo {
+    width: 100%;
+    text-align: center;
+    padding: 50px 0;
+    color: #666;
+    font-size: 1.1rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
 }
 
 /* --- 모바일 반응형 --- */
