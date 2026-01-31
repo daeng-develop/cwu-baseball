@@ -12,6 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // (참고) 경기 일정 등록 버튼 이벤트도 필요하다면 여기서 연결
     // const matchRegisterBtn = ...
+
+    // 페이지 열리면 행사 목록 바로 불러오기
+    loadEventList();
 });
 
 // ==========================================
@@ -112,3 +115,80 @@ async function register_event() {
         }
     }
 }
+
+// ==========================================
+// 2. [신규] 행사 목록 불러오기 함수
+// ==========================================
+async function loadEventList() {
+    const tableBody = document.getElementById('event-table-body');
+    if (!tableBody) return; // 테이블이 없으면 중단 (경기 일정 탭 등)
+
+    tableBody.innerHTML = `<tr><td colspan="4" style="padding:20px;">로딩 중...</td></tr>`;
+
+    try {
+        // 날짜 기준 내림차순 정렬 (최신 행사가 위로)
+        const snapshot = await db.collection("event").orderBy("date", "desc").get();
+
+        if (snapshot.empty) {
+            tableBody.innerHTML = `<tr><td colspan="4" style="padding:20px;">등록된 행사가 없습니다.</td></tr>`;
+            return;
+        }
+
+        let html = "";
+        let count = 1; // 순서 번호 (1부터 시작)
+
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const id = doc.id; // 문서 ID (예: 260131)
+
+            html += `
+                <tr>
+                    <td>${count}</td>
+                    <td>${data.date}</td>
+                    <td class="text-left">${data.title}</td>
+                    <td>
+                        <button class="btn-list edit" onclick="alert('수정 기능 준비중')">수정</button>
+                        <button class="btn-list delete" onclick="deleteEvent('${id}', '${data.title}')">삭제</button>
+                    </td>
+                </tr>
+            `;
+            count++; // 번호 증가
+        });
+
+        tableBody.innerHTML = html;
+
+    } catch (error) {
+        console.error("목록 불러오기 실패:", error);
+        tableBody.innerHTML = `<tr><td colspan="4" style="color:red;">데이터 로딩 실패</td></tr>`;
+    }
+}
+
+// ==========================================
+// 3. [신규] 행사 삭제 함수 (전역 등록)
+// ==========================================
+window.deleteEvent = async function(docId, title) {
+    if (!confirm(`'${title}' 행사를 정말 삭제하시겠습니까?\n포함된 사진들도 모두 삭제됩니다.`)) {
+        return;
+    }
+
+    try {
+        // 1. 스토리지 폴더 내 사진들 모두 삭제
+        // (폴더 자체 삭제 기능이 없어서 파일 목록을 가져와서 하나씩 지워야 함)
+        const folderRef = storage.ref(`event/${docId}`);
+        const listResult = await folderRef.listAll();
+        
+        const deletePromises = listResult.items.map(itemRef => itemRef.delete());
+        await Promise.all(deletePromises);
+        console.log("관련 사진 삭제 완료");
+
+        // 2. DB 문서 삭제
+        await db.collection("event").doc(docId).delete();
+
+        alert("삭제되었습니다.");
+        loadEventList(); // 목록 새로고침
+
+    } catch (error) {
+        console.error("삭제 실패:", error);
+        alert("삭제 중 오류가 발생했습니다: " + error.message);
+    }
+};
