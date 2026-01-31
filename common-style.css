@@ -404,6 +404,37 @@ a.sidebar-category-level1 {
     background-color: rgba(255, 255, 255, 0.05);
 }
 
+/**************** 사이드바 Level 3 디자인 (경기 외 - 세부항목) ****************/
+
+/* 1. 리스트 컨테이너 설정 */
+.sidebar-category-level3 {
+    list-style: none; /* ⭐ 핵심: 점(Bullet) 제거 */
+    padding: 0;
+    margin: 0;
+    /* Level 2(#00152e)보다 아주 살짝 더 어두운 배경으로 깊이감 표현 */
+    background-color: #000b18; 
+}
+
+/* 2. 내부 링크 스타일 */
+.sidebar-category-level3 li a {
+    display: block;
+    /* Level 2(45px)보다 더 깊게 들여쓰기 (65px) */
+    padding: 12px 25px 12px 65px; 
+    
+    color: #a0a0a0; /* 더 연한 회색 */
+    text-decoration: none; /* 밑줄 제거 */
+    font-size: 0.85rem; /* 글자 크기 살짝 작게 */
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent; /* 호버 효과를 위한 투명 테두리 */
+}
+
+/* 3. 마우스 올렸을 때 효과 */
+.sidebar-category-level3 li a:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-left: 4px solid #4895ef; /* 파란색 포인트 바 */
+}
+
 /* Level 2 내부 텍스트 */
 .sidebar-sub-label {
     font-size: 0.95rem;
