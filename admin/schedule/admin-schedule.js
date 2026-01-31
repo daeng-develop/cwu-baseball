@@ -145,7 +145,7 @@ async function loadEventList() {
                 <tr>
                     <td>${count}</td>
                     <td>${data.date}</td>
-                    <td class="text-left">${data.title}</td>
+                    <td>${data.title}</td>
                     <td>
                         <button class="btn-list edit" onclick="alert('수정 기능 준비중')">수정</button>
                         <button class="btn-list delete" onclick="deleteEvent('${id}', '${data.title}')">삭제</button>
