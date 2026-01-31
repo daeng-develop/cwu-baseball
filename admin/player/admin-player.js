@@ -237,10 +237,10 @@ async function deletePlayer(number,name, positionCode) {
         // --- [2] 데이터베이스 문서 삭제 ---
         // 경로: player -> 2026 -> pitcher -> 10
         await db.collection("player").doc(currentYear)
-                .collection(getPositionKorea(positionCode)).doc(number.toString()) // 문자열로 변환 안전장치
+                .collection(getPositionEn(positionCode)).doc(number.toString()) // 문자열로 변환 안전장치
                 .delete();
         
-        alert(`삭제 완료: ${number}.${name} 포지션 : ${getPositionEn(positionCode)}`);
+        alert(`삭제 완료: ${number}.${name} 포지션 : ${getPositionKorea(positionCode)}`);
         
         // 목록 새로고침 (삭제된 것 반영)
         loadPlayerList(currentYear);
