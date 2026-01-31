@@ -145,35 +145,6 @@ body {
     line-height: 1.4;
 }
 
-/* 등록 버튼 공통 */
-.submit-btn {
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: white;
-    cursor: pointer;
-    background-color: #0056b3; /* 경기 일정 버튼 색상 */
-    transition: 0.2s;
-    margin-top: 10px;
-}
-
-.submit-btn:hover {
-    background-color: #003366;
-    transform: translateY(-2px);
-}
-
-/* 행사 등록 버튼 색상 (다르게 포인트) */
-.event-btn-color {
-    background-color: #2a9d8f; /* 청록색 계열 */
-}
-
-.event-btn-color:hover {
-    background-color: #21867a;
-}
-
 /* --- [추가] Select Box 커스텀 디자인 --- */
 
 select.input-field {
@@ -328,4 +299,54 @@ select.input-field:focus {
 .btn-list.delete:hover {
     background-color: #ffd0d0;
     color: #a92255;
+}
+
+/* ===========================
+   [추가] 하단 버튼 그룹 (admin-player 스타일 통일)
+=========================== */
+
+.action-buttons {
+    display: flex;
+    gap: 10px;       /* 버튼 사이 간격 */
+    margin-top: 25px;
+}
+
+/* 모든 버튼 공통 스타일 */
+.btn {
+    flex: 1;         /* 너비를 1:1:1로 똑같이 배분 */
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: white;    /* 글씨색 흰색 */
+}
+
+/* 1. 등록 버튼 (메인 - 네이비) */
+.btn-register {
+    background-color: #001d3d;
+}
+.btn-register:hover {
+    background-color: #003366;
+    transform: translateY(-2px);
+}
+
+/* 2. 수정 버튼 (포인트 - 파란색) */
+.btn-edit {
+    background-color: #0056b3;
+}
+.btn-edit:hover {
+    background-color: #004494;
+    transform: translateY(-2px);
+}
+
+/* 3. 취소 버튼 (서브 - 회색) */
+.btn-cancel {
+    background-color: #6c757d;
+}
+.btn-cancel:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
 }

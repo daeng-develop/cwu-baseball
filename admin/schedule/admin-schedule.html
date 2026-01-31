@@ -63,7 +63,13 @@
                     </select>
                 </div>
 
-                <button class="submit-btn">경기 일정 등록하기</button>
+                <div class="action-buttons">
+                    <button class="btn btn-register btn-register-match">일정 등록</button>
+
+                    <button class="btn btn-edit" onclick="alert('목록에서 수정할 경기를 먼저 선택해주세요.')">수정</button>
+
+                    <button class="btn btn-cancel" onclick="location.reload()">취소</button>
+                </div>
             </div>
         </div>
 
@@ -96,7 +102,13 @@
                     </p>
                 </div>
 
-                <button class="submit-btn event-btn-color btn-register-event">행사 일정 등록하기</button>
+                <div class="action-buttons">
+                    <button class="btn btn-register btn-register-event">일정 등록</button>
+
+                    <button class="btn btn-edit" onclick="alert('목록에서 수정할 행사를 먼저 선택해주세요.')">수정</button>
+
+                    <button class="btn btn-cancel" onclick="location.reload()">취소</button>
+                </div>
             </div>
 
             <hr class="divider">
