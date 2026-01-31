@@ -85,9 +85,7 @@ async function register_member() {
         const currentYear = new Date().getFullYear().toString(); 
 
         // 포지션 매핑
-        const positionMap = ["pitcher", "catcher", "infielder", "outfielder"];
-        const positionIndex = Number(position);
-        const position_doc = positionMap[positionIndex];
+        const position_doc = getPositionEn(Number(position));
 
         if (!position_doc) throw new Error("포지션 선택 오류");
 
@@ -135,9 +133,14 @@ async function register_member() {
     }
 }
 
-// 포지션 숫자(0~3)를 한글로 바꾸는 헬퍼 함수
-function getPositionName(index) {
+// 포지션 숫자(0~3)를 글자로 변경해주는 함수
+function getPositionKorea(index) {
     const names = ["투수", "포수", "내야수", "외야수"];
+    return names[Number(index)] || "미지정";
+}
+
+function getPositionEn(index) {
+    const names = ["pitcher", "catcher", "infielder", "outfielder"];
     return names[Number(index)] || "미지정";
 }
 
@@ -196,7 +199,7 @@ function renderTable(players) {
             <td>${player.name}</td>
             <td>No. ${player.number}</td>
             <td>${player.grade}학년</td>
-            <td>${getPositionName(player.position)}</td>
+            <td>${getPositionKorea(player.position)}</td>
             <td>${player.height}cm / ${player.weight}kg</td>
             <td>
                 <button class="btn-list edit" onclick="alert('수정 기능 준비중: ${player.name}')">수정</button>
@@ -234,10 +237,10 @@ async function deletePlayer(number,name, positionCode) {
         // --- [2] 데이터베이스 문서 삭제 ---
         // 경로: player -> 2026 -> pitcher -> 10
         await db.collection("player").doc(currentYear)
-                .collection(getPositionName(positionCode)).doc(number.toString()) // 문자열로 변환 안전장치
+                .collection(getPositionKorea(positionCode)).doc(number.toString()) // 문자열로 변환 안전장치
                 .delete();
         
-        alert(`삭제 완료: ${number}.${name} 포지션 : ${getPositionName(positionCode)}`);
+        alert(`삭제 완료: ${number}.${name} 포지션 : ${getPositionEn(positionCode)}`);
         
         // 목록 새로고침 (삭제된 것 반영)
         loadPlayerList(currentYear);
