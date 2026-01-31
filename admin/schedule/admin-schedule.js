@@ -3,27 +3,39 @@
 // 1. 설정 파일에서 db와 storage 가져오기
 import { db, storage } from "../../firebase.js";
 
+// [이벤트용 변수]
 let isEditMode = false;
 let currentEditId = null;
-let currentKeptPhotos = [];   // 현재 화면에 남겨둔(유지할) 사진 URL들
-let photosPendingDelete = []; // 삭제하려고 X표 누른 사진 URL들
+let currentKeptPhotos = [];
+let photosPendingDelete = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. 등록 버튼 (기존)
+    // ---------------------------------------------
+    // 1. 경기 일정 (Match) 이벤트 리스너
+    // ---------------------------------------------
+    const matchRegisterBtn = document.querySelector('.btn-register-match');
+    if (matchRegisterBtn) {
+        matchRegisterBtn.addEventListener('click', register_match);
+    }
+    
+    // 페이지 로드 시 경기 목록 불러오기
+    loadMatchList();
+
+
+    // ---------------------------------------------
+    // 2. 행사 일정 (Event) 이벤트 리스너
+    // ---------------------------------------------
     const eventRegisterBtn = document.querySelector('.btn-register-event');
     if (eventRegisterBtn) {
         eventRegisterBtn.addEventListener('click', register_event);
     }
 
-    // 2. [신규] 수정(저장) 버튼 이벤트 연결
-    // HTML에 있는 <button class="btn btn-edit">를 찾아서 연결
     const eventUpdateBtn = document.querySelector('#event-tab .btn-edit');
     if (eventUpdateBtn) {
         eventUpdateBtn.addEventListener('click', update_event);
-        eventUpdateBtn.style.display = 'none'; // 처음엔 숨김
+        eventUpdateBtn.style.display = 'none';
     }
 
-    // 3. [신규] 취소 버튼 이벤트 (새로고침 대신 폼 초기화)
     const eventCancelBtn = document.querySelector('#event-tab .btn-cancel');
     if (eventCancelBtn) {
         eventCancelBtn.addEventListener('click', () => {
@@ -35,13 +47,138 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 페이지 열리면 행사 목록 바로 불러오기
+    // 행사 목록도 불러오기
     loadEventList();
 });
 
-// ==========================================
-// 행사(Event) 등록 함수
-// ==========================================
+
+// =========================================================
+// [PART 1] 경기 일정 (Match) 관련 함수
+// =========================================================
+
+// 1. 경기 일정 등록 함수
+async function register_match() {
+    console.log("경기 등록 시작...");
+
+    const dateVal = document.getElementById('match-date').value;
+    const title = document.getElementById('match-title').value.trim();
+    const opponent = document.getElementById('match-opponent').value.trim();
+    const location = document.getElementById('match-location').value.trim();
+    const homeAway = document.getElementById('match-home-away').value;
+    const status = document.getElementById('match-status').value;
+
+    if (!dateVal || !title || !opponent || !location) {
+        alert("모든 필수 정보를 입력해주세요.");
+        return;
+    }
+
+    try {
+        const btn = document.querySelector('.btn-register-match');
+        btn.disabled = true;
+        btn.innerText = "저장 중...";
+
+        // 문서 ID 생성: YYYYMMDD (예: 20260101)
+        const docId = dateVal.replaceAll('-', '');
+
+        const matchData = {
+            date: dateVal,
+            title: title,
+            opponent: opponent,
+            location: location,
+            homeAway: homeAway,
+            status: status,
+            createdAt: new Date()
+        };
+
+        // DB 저장 (match 컬렉션)
+        await db.collection("match").doc(docId).set(matchData);
+
+        alert(`[${dateVal}] ${title} vs ${opponent} 경기 일정이 등록되었습니다.`);
+        window.location.reload();
+
+    } catch (error) {
+        console.error("경기 등록 에러:", error);
+        alert("등록 중 오류가 발생했습니다: " + error.message);
+        const btn = document.querySelector('.btn-register-match');
+        btn.disabled = false;
+        btn.innerText = "일정 등록";
+    }
+}
+
+// 2. 경기 목록 불러오기 함수
+async function loadMatchList() {
+    const tableBody = document.getElementById('match-table-body');
+    if (!tableBody) return;
+
+    tableBody.innerHTML = `<tr><td colspan="4" style="padding:20px;">로딩 중...</td></tr>`;
+
+    try {
+        const snapshot = await db.collection("match").orderBy("date", "desc").get();
+
+        if (snapshot.empty) {
+            tableBody.innerHTML = `<tr><td colspan="4" style="padding:20px;">등록된 경기가 없습니다.</td></tr>`;
+            return;
+        }
+
+        let html = "";
+        let count = 1;
+
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const id = doc.id;
+            
+            // 상태 텍스트 변환 (영어 -> 한글)
+            let statusText = "";
+            switch(data.status) {
+                case "before": statusText = "경기전"; break;
+                case "end": statusText = "종료"; break;
+                case "rain_cancel": statusText = "우천취소"; break;
+                default: statusText = data.status;
+            }
+
+            html += `
+                <tr>
+                    <td>${count}</td>
+                    <td>${data.date}</td>
+                    <td>
+                        <span style="font-weight:bold;">${data.title}</span> 
+                        <span style="color:#666; font-size:0.9em;">(vs ${data.opponent})</span>
+                    </td>
+                    <td>
+                        <button class="btn-list delete" onclick="deleteMatch('${id}', '${data.title}')">삭제</button>
+                    </td>
+                </tr>
+            `;
+            count++;
+        });
+
+        tableBody.innerHTML = html;
+
+    } catch (error) {
+        console.error("경기 목록 로딩 실패:", error);
+        tableBody.innerHTML = `<tr><td colspan="4" style="color:red;">데이터 로딩 실패</td></tr>`;
+    }
+}
+
+// 3. 경기 삭제 함수 (전역)
+window.deleteMatch = async function(docId, title) {
+    if (!confirm(`'${title}' 경기를 삭제하시겠습니까?`)) return;
+
+    try {
+        await db.collection("match").doc(docId).delete();
+        alert("삭제되었습니다.");
+        loadMatchList(); // 목록 새로고침
+    } catch (error) {
+        console.error("삭제 실패:", error);
+        alert("오류: " + error.message);
+    }
+};
+
+
+// =========================================================
+// [PART 2] 행사 일정 (Event) 관련 함수 (기존 유지)
+// =========================================================
+
 async function register_event() {
     console.log("행사 등록 시작...");
 
@@ -51,10 +188,10 @@ async function register_event() {
     const locationInput = document.getElementById('event-location');
     const fileInput = document.getElementById('event-photos');
 
-    const dateVal = dateInput.value; // "2026-01-31"
+    const dateVal = dateInput.value; 
     const title = titleInput.value.trim();
     const location = locationInput.value.trim();
-    const files = fileInput.files; // 파일 배열 (여러 장)
+    const files = fileInput.files; 
 
     // 2. 텍스트 유효성 검사
     if (!dateVal || !title || !location) {
@@ -62,13 +199,12 @@ async function register_event() {
         return;
     }
 
-    // 3. 파일 유효성 검사 (여러 장을 반복문으로 확인)
+    // 3. 파일 유효성 검사
     if (files.length === 0) {
         alert("최소 1장 이상의 사진을 등록해주세요.");
         return;
     }
 
-    // 모든 파일이 조건을 만족하는지 미리 검사
     for (const file of files) {
         const fileName = file.name.toLowerCase();
         if (!fileName.endsWith('.jpg') && !fileName.endsWith('.jpeg')) {
@@ -83,53 +219,38 @@ async function register_event() {
     }
 
     try {
-        // 버튼 비활성화 (중복 클릭 방지)
         const registerBtn = document.querySelector('.btn-register-event');
         registerBtn.disabled = true;
         registerBtn.innerText = "등록 중...";
 
-        // 4. 문서 ID 생성 (YYMMDD 형식)
-        // 예: "2026-01-31" -> "260131"
+        // 문서 ID 생성: YYMMDD 형식 (행사 쪽은 기존 로직 유지)
         const yymmdd = dateVal.replaceAll('-', '').substring(2);
 
-        console.log(`문서 ID 생성: ${yymmdd}`);
-
-        // --- [1] 스토리지에 사진들 업로드 ---
-        // 여러 장을 동시에 업로드하기 위해 Promise.all 사용
+        // 스토리지 업로드
         const uploadPromises = Array.from(files).map(async (file) => {
-            // 경로: event/260131/파일명.jpg
             const storagePath = `event/${yymmdd}/${file.name}`;
-
-            // 업로드 (admin-player.js 스타일)
             const snapshot = await storage.ref(storagePath).put(file);
-            // 다운로드 URL 가져오기
             return await snapshot.ref.getDownloadURL();
         });
 
-        // 모든 업로드가 끝날 때까지 기다림
         const photoUrls = await Promise.all(uploadPromises);
-        console.log("사진 업로드 완료:", photoUrls);
 
-
-        // --- [2] 데이터베이스 저장 ---
         const eventData = {
-            date: dateVal,       // "2026-01-31"
-            title: title,        // "동계 훈련"
-            location: location,  // "기장"
-            photo: photoUrls,   // ["url1", "url2", ...]
+            date: dateVal,
+            title: title,
+            location: location,
+            photo: photoUrls,
         };
 
-        // 컬렉션: event, 문서ID: yymmdd
         await db.collection("event").doc(yymmdd).set(eventData);
 
         alert(`[${dateVal}] ${title} 행사가 등록되었습니다!`);
-        window.location.reload(); // 새로고침
+        window.location.reload(); 
 
     } catch (error) {
         console.error("에러 발생:", error);
         alert("등록 중 오류가 발생했습니다: " + error.message);
 
-        // 버튼 원상복구
         const registerBtn = document.querySelector('.btn-register-event');
         if (registerBtn) {
             registerBtn.disabled = false;
@@ -138,17 +259,13 @@ async function register_event() {
     }
 }
 
-// ==========================================
-// 2. 행사 목록 불러오기 함수
-// ==========================================
 async function loadEventList() {
     const tableBody = document.getElementById('event-table-body');
-    if (!tableBody) return; // 테이블이 없으면 중단 (경기 일정 탭 등)
+    if (!tableBody) return; 
 
     tableBody.innerHTML = `<tr><td colspan="4" style="padding:20px;">로딩 중...</td></tr>`;
 
     try {
-        // 날짜 기준 내림차순 정렬 (최신 행사가 위로)
         const snapshot = await db.collection("event").orderBy("date", "desc").get();
 
         if (snapshot.empty) {
@@ -157,11 +274,11 @@ async function loadEventList() {
         }
 
         let html = "";
-        let count = 1; // 순서 번호 (1부터 시작)
+        let count = 1; 
 
         snapshot.forEach(doc => {
             const data = doc.data();
-            const id = doc.id; // 문서 ID (예: 260131)
+            const id = doc.id; 
             html += `
                 <tr>
                     <td>${count}</td>
@@ -173,8 +290,7 @@ async function loadEventList() {
                     </td>
                 </tr>
             `;
-
-            count++; // 번호 증가
+            count++; 
         });
 
         tableBody.innerHTML = html;
@@ -185,29 +301,21 @@ async function loadEventList() {
     }
 }
 
-// ==========================================
-// 3. 행사 삭제 함수 (전역 등록)
-// ==========================================
 window.deleteEvent = async function (docId, title) {
     if (!confirm(`'${title}' 행사를 정말 삭제하시겠습니까?\n포함된 사진들도 모두 삭제됩니다.`)) {
         return;
     }
 
     try {
-        // 1. 스토리지 폴더 내 사진들 모두 삭제
-        // (폴더 자체 삭제 기능이 없어서 파일 목록을 가져와서 하나씩 지워야 함)
         const folderRef = storage.ref(`event/${docId}`);
         const listResult = await folderRef.listAll();
-
         const deletePromises = listResult.items.map(itemRef => itemRef.delete());
         await Promise.all(deletePromises);
-        console.log("관련 사진 삭제 완료");
-
-        // 2. DB 문서 삭제
+        
         await db.collection("event").doc(docId).delete();
 
         alert("삭제되었습니다.");
-        loadEventList(); // 목록 새로고침
+        loadEventList(); 
 
     } catch (error) {
         console.error("삭제 실패:", error);
@@ -215,9 +323,6 @@ window.deleteEvent = async function (docId, title) {
     }
 };
 
-// ==========================================
-// 4. 행사 수정 함수 (전역 등록)
-// ==========================================
 window.prepareEditEvent = async function(docId) {
     try {
         const doc = await db.collection("event").doc(docId).get();
@@ -227,23 +332,17 @@ window.prepareEditEvent = async function(docId) {
         }
         const data = doc.data();
 
-        // 입력창 채우기
         document.getElementById('event-date').value = data.date;
         document.getElementById('event-title').value = data.title;
         document.getElementById('event-location').value = data.location;
         
-        // --- [사진 처리 로직] ---
         isEditMode = true;
         currentEditId = docId;
-        
-        // 1. 초기화: 유지할 사진은 DB값 그대로, 삭제할 사진은 없음
         currentKeptPhotos = data.photo || []; 
         photosPendingDelete = [];
         
-        // 2. 미리보기 영역 그리기
         renderPhotoPreviews();
 
-        // 3. UI 변경 (등록버튼 숨김, 수정버튼 보임)
         document.querySelector('.btn-register-event').style.display = 'none';
         
         const updateBtn = document.querySelector('#event-tab .btn-edit');
@@ -262,7 +361,6 @@ window.prepareEditEvent = async function(docId) {
 async function update_event() {
     if (!isEditMode || !currentEditId) return;
 
-    // 입력값 확인
     const newDate = document.getElementById('event-date').value;
     const newTitle = document.getElementById('event-title').value.trim();
     const newLocation = document.getElementById('event-location').value.trim();
@@ -281,35 +379,23 @@ async function update_event() {
     updateBtn.innerText = "저장 중... (삭제 및 이동 처리 중)";
 
     try {
-        // ---------------------------------------------------
-        // 1. 삭제 대기중인 사진들 -> 진짜 스토리지 삭제
-        // ---------------------------------------------------
         if (photosPendingDelete.length > 0) {
-            console.log("사진 삭제 시작:", photosPendingDelete.length + "장");
             const deletePromises = photosPendingDelete.map(url => {
                 try {
                     return storage.refFromURL(url).delete();
                 } catch(e) {
-                    console.warn("이미 삭제되었거나 없는 파일:", e);
-                    return Promise.resolve(); // 에러 나도 무시하고 진행
+                    return Promise.resolve(); 
                 }
             });
             await Promise.all(deletePromises);
         }
 
-        // ---------------------------------------------------
-        // 2. 남은 사진들(currentKeptPhotos) 처리
-        //    (날짜가 바뀌었으면 이사 가야 함)
-        // ---------------------------------------------------
-        let finalPhotoUrls = [...currentKeptPhotos]; // 일단 남은 것들로 시작
+        let finalPhotoUrls = [...currentKeptPhotos]; 
 
         if (isDateChanged && currentKeptPhotos.length > 0) {
-            console.log("날짜 변경! 사진 이사 시작...");
             const movedUrls = [];
-            
             for (const url of currentKeptPhotos) {
                 try {
-                    // 다운로드 -> 새 위치 업로드 -> 기존 삭제
                     const oldRef = storage.refFromURL(url);
                     const fileName = oldRef.name;
                     const newPath = `event/${newDocId}/${fileName}`;
@@ -321,22 +407,16 @@ async function update_event() {
                     const newUrl = await snapshot.ref.getDownloadURL();
                     movedUrls.push(newUrl);
                     
-                    await oldRef.delete(); // 구버전 삭제
+                    await oldRef.delete(); 
                 } catch (err) {
                     console.error("사진 이동 실패 (일부 누락 가능):", err);
                 }
             }
-            finalPhotoUrls = movedUrls; // 이사 완료된 URL들로 교체
+            finalPhotoUrls = movedUrls; 
         }
 
-        // ---------------------------------------------------
-        // 3. 새로 추가된 파일들 업로드
-        // ---------------------------------------------------
         if (newFiles.length > 0) {
-            console.log("새 사진 업로드 중...");
-            // 날짜가 바뀌었으면 새 폴더(newDocId)로, 아니면 기존(currentEditId)로
             const targetId = isDateChanged ? newDocId : currentEditId;
-            
             const uploadPromises = Array.from(newFiles).map(async (file) => {
                 const storagePath = `event/${targetId}/${file.name}`;
                 const snapshot = await storage.ref(storagePath).put(file);
@@ -344,12 +424,9 @@ async function update_event() {
             });
             
             const newUploadedUrls = await Promise.all(uploadPromises);
-            finalPhotoUrls = [...finalPhotoUrls, ...newUploadedUrls]; // 뒤에 붙이기
+            finalPhotoUrls = [...finalPhotoUrls, ...newUploadedUrls]; 
         }
 
-        // ---------------------------------------------------
-        // 4. DB 저장
-        // ---------------------------------------------------
         const eventData = {
             date: newDate,
             title: newTitle,
@@ -358,12 +435,10 @@ async function update_event() {
         };
 
         if (isDateChanged) {
-            // 문서 ID 변경: 새 문서 생성 -> 기존 삭제
             await db.collection("event").doc(newDocId).set(eventData);
             await db.collection("event").doc(currentEditId).delete();
             alert("날짜 변경 및 사진 정리가 완료되었습니다.");
         } else {
-            // 단순 업데이트
             await db.collection("event").doc(currentEditId).update(eventData);
             alert("수정되었습니다.");
         }
@@ -378,13 +453,12 @@ async function update_event() {
     }
 }
 
-// 사진 미리보기 그리기
 function renderPhotoPreviews() {
     const previewBox = document.getElementById('photo-preview-box');
-    previewBox.innerHTML = ""; // 초기화
+    previewBox.innerHTML = ""; 
 
     if (currentKeptPhotos.length > 0) {
-        previewBox.style.display = 'flex'; // 사진이 있으면 보이기
+        previewBox.style.display = 'flex'; 
         
         currentKeptPhotos.forEach((url, index) => {
             const div = document.createElement('div');
@@ -396,19 +470,14 @@ function renderPhotoPreviews() {
             previewBox.appendChild(div);
         });
     } else {
-        previewBox.style.display = 'none'; // 사진 없으면 숨기기
+        previewBox.style.display = 'none'; 
     }
 }
 
-// 사진 X 버튼 누르면 호출됨 (전역 등록)
 window.removePhotoFromArray = function(index) {
-    // 1. 삭제 대기 목록에 추가
     const removedUrl = currentKeptPhotos[index];
     photosPendingDelete.push(removedUrl);
     
-    // 2. 유지 목록에서 제거
     currentKeptPhotos.splice(index, 1);
-    
-    // 3. 화면 다시 그리기
     renderPhotoPreviews();
 };
