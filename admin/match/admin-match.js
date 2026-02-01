@@ -2,46 +2,49 @@
 import { db, storage } from "../../firebase.js";
 
 // 상태 변수
-let selectedMatchId = null; // 현재 선택된 경기 ID (YYYYMMDD)
-let currentKeptPhotos = []; // 유지할 사진 URL 목록
-let photosPendingDelete = []; // 삭제할 사진 URL 목록
+let selectedMatchId = null; 
+let currentKeptPhotos = [];
+let photosPendingDelete = [];
+
+// 선수 목록 캐싱
+let cachedPlayerOptions = '<option value="">선수 선택</option>';
 
 document.addEventListener("DOMContentLoaded", () => {
+    loadAllPlayers();
     loadPastMatches();
 
-    // 경기 선택 시 이벤트
-    document.getElementById('match-select').addEventListener('change', (e) => {
-        const docId = e.target.value;
-        if (docId) {
-            loadMatchRecord(docId);
-        } else {
-            document.getElementById('record-form').style.display = 'none';
-        }
-    });
-
-    // 승패 선택 시 '승리 투수' 입력창 토글
-    document.getElementById('match-result-status').addEventListener('change', (e) => {
-        const winBox = document.getElementById('win-stats-box');
-        if (e.target.value === 'win') {
-            winBox.style.display = 'grid';
-        } else {
-            winBox.style.display = 'none';
-        }
-    });
-
-    // 저장 버튼
+    document.getElementById('match-select').addEventListener('change', handleMatchSelect);
+    document.getElementById('match-result-status').addEventListener('change', toggleWinStats);
     document.getElementById('btn-save-record').addEventListener('click', saveMatchRecord);
 });
 
-// 1. 지난 경기 목록 불러오기 (Dropdown)
+// ==========================================
+// 1. 초기 데이터 로딩
+// ==========================================
+
+async function loadAllPlayers() {
+    try {
+        const snapshot = await db.collection("player").orderBy("backNumber", "asc").get();
+        let optionsHtml = '<option value="">선수 선택</option>';
+        snapshot.forEach(doc => {
+            const p = doc.data();
+            const displayName = `${p.name} (${p.backNumber})`;
+            optionsHtml += `<option value="${displayName}">${displayName} - ${p.position}</option>`;
+        });
+        cachedPlayerOptions = optionsHtml;
+        document.getElementById('win-pitcher').innerHTML = cachedPlayerOptions;
+    } catch (error) {
+        console.error("선수 목록 로딩 실패:", error);
+    }
+}
+
 async function loadPastMatches() {
     const selectEl = document.getElementById('match-select');
-    // 오늘 날짜 구하기 (YYYY-MM-DD)
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split('T')[0]; 
 
     try {
         const snapshot = await db.collection("match")
-            .where("date", "<=", today) // 오늘 포함 과거 경기만
+            .where("date", "<=", today)
             .orderBy("date", "desc")
             .get();
 
@@ -55,40 +58,53 @@ async function loadPastMatches() {
         snapshot.forEach(doc => {
             const data = doc.data();
             const option = document.createElement('option');
-            option.value = doc.id; // YYYYMMDD
+            option.value = doc.id; 
+            // Select Box는 전체 이름 유지 (원하신다면 여기도 축약 가능)
             option.text = `[${data.date}] vs ${data.opponent} (${data.title})`;
             selectEl.add(option);
         });
 
     } catch (error) {
         console.error("경기 목록 로딩 실패:", error);
-        alert("경기 목록을 불러오지 못했습니다.");
     }
 }
 
-// 2. 선택한 경기 데이터 불러오기 & 폼 채우기
-async function loadMatchRecord(docId) {
+// ==========================================
+// 2. 경기 데이터 불러오기 (⭐ 여기가 핵심 수정 부분)
+// ==========================================
+async function handleMatchSelect(e) {
+    const docId = e.target.value;
+    if (!docId) {
+        document.getElementById('record-form').style.display = 'none';
+        return;
+    }
+
     selectedMatchId = docId;
-    
+
     try {
         const doc = await db.collection("match").doc(docId).get();
         if (!doc.exists) return;
         const data = doc.data();
 
-        // (1) 기본 정보 표시
+        // 기본 정보
         document.getElementById('info-title').textContent = data.title;
-        document.getElementById('info-meta').textContent = `${data.date} | ${data.location} | ${data.homeAway === 'home' ? 'HOME(후공)' : 'AWAY(선공)'}`;
+        document.getElementById('info-meta').textContent = `${data.date} | ${data.location} | ${data.homeAway === 'home' ? 'HOME' : 'AWAY'}`;
         
-        // (2) 팀 이름 설정 (스코어보드)
-        document.getElementById('name-home').textContent = "청운대"; // 우리 학교 고정
-        document.getElementById('name-away').textContent = data.opponent;
+        // ⭐ [수정] 스코어보드 팀 이름 축약 로직 적용
+        let shortOpponent = data.opponent;
+        if (shortOpponent) {
+            shortOpponent = shortOpponent
+                .replace('고등학교', '고')
+                .replace('대학교', '대')
+                .replace('학교', ''); // 중학교 -> 중 등 나머지 케이스
+        }
 
-        // (3) 기존 기록이 있으면 채워넣기
-        
-        // 상태 & 승리 기록
+        document.getElementById('name-home').textContent = "청운대";
+        document.getElementById('name-away').textContent = shortOpponent; // 축약된 이름 적용
+
+        // 상태 및 승리 기록
         document.getElementById('match-result-status').value = data.status || 'before';
-        if (data.status === 'win') document.getElementById('win-stats-box').style.display = 'grid';
-        else document.getElementById('win-stats-box').style.display = 'none';
+        toggleWinStats();
 
         if (data.keyStats) {
             document.getElementById('win-pitcher').value = data.keyStats.winPitcher || '';
@@ -100,11 +116,10 @@ async function loadMatchRecord(docId) {
             fillScoreboardRow('away', data.scoreboard.away);
             fillScoreboardRow('home', data.scoreboard.home);
         } else {
-            // 없으면 초기화
             clearScoreboard();
         }
 
-        // 라인업 테이블 초기화 및 채우기
+        // 라인업
         renderLineupTable('table-starting', data.lineups ? data.lineups.starting : []);
         renderLineupTable('table-pitcher', data.lineups ? data.lineups.pitcher : []);
         renderLineupTable('table-bench', data.lineups ? data.lineups.bench : []);
@@ -114,33 +129,31 @@ async function loadMatchRecord(docId) {
         photosPendingDelete = [];
         renderPhotoPreviews();
 
-        // 폼 보여주기
         document.getElementById('record-form').style.display = 'block';
 
     } catch (error) {
-        console.error("경기 상세 로딩 실패:", error);
-        alert("데이터 로딩 중 오류가 발생했습니다.");
+        console.error("상세 데이터 로딩 실패:", error);
+        alert("데이터를 불러오는 중 오류가 발생했습니다.");
     }
 }
 
-// ------------------------------------------
-// [Helper] 스코어보드 관련
-// ------------------------------------------
+function toggleWinStats() {
+    const status = document.getElementById('match-result-status').value;
+    const winBox = document.getElementById('win-stats-box');
+    winBox.style.display = (status === 'win') ? 'grid' : 'none';
+}
+
+// ==========================================
+// 3. 스코어보드 Helper
+// ==========================================
 function fillScoreboardRow(team, scoreData) {
-    // scoreData: { innings: [1,0,0...], r: 1, h: 5, e: 0 }
     if (!scoreData) return;
-    
     const row = document.getElementById(`row-${team}`);
     const inputs = row.querySelectorAll('.score-in');
     
-    // 이닝 점수
     if (scoreData.innings) {
-        scoreData.innings.forEach((score, idx) => {
-            if (inputs[idx]) inputs[idx].value = score;
-        });
+        scoreData.innings.forEach((sc, i) => { if(inputs[i]) inputs[i].value = sc; });
     }
-
-    // R, H, E
     row.querySelector('.r-val').value = scoreData.r || 0;
     document.getElementById(`h-${team}`).value = scoreData.h || 0;
     document.getElementById(`e-${team}`).value = scoreData.e || 0;
@@ -150,103 +163,86 @@ function clearScoreboard() {
     document.querySelectorAll('.score-in, .stat-in').forEach(el => el.value = '');
 }
 
-// R(득점) 자동 계산 (입력할 때마다)
+// R(득점) 자동 계산
 document.querySelectorAll('.score-in').forEach(input => {
-    input.addEventListener('change', calculateRuns);
+    input.addEventListener('change', () => {
+        ['home', 'away'].forEach(team => {
+            let total = 0;
+            document.getElementById(`row-${team}`).querySelectorAll('.score-in').forEach(inp => {
+                total += Number(inp.value) || 0;
+            });
+            document.getElementById(`row-${team}`).querySelector('.r-val').value = total;
+        });
+    });
 });
 
-function calculateRuns() {
-    ['home', 'away'].forEach(team => {
-        let total = 0;
-        const row = document.getElementById(`row-${team}`);
-        row.querySelectorAll('.score-in').forEach(input => {
-            total += Number(input.value) || 0;
-        });
-        row.querySelector('.r-val').value = total;
-    });
-}
-
-// ------------------------------------------
-// [Helper] 라인업 테이블 동적 생성
-// ------------------------------------------
-
-// 1. 스타팅 라인업 행 추가
+// ==========================================
+// 4. 라인업 동적 테이블 Helper
+// ==========================================
 window.addStartingRow = (data = {}) => {
     const tbody = document.querySelector('#table-starting tbody');
     const tr = document.createElement('tr');
     tr.innerHTML = `
-        <td><input type="number" value="${data.order || ''}" placeholder="타순"></td>
-        <td><input type="text" value="${data.name || ''}" placeholder="이름(배번)"></td>
-        <td><input type="text" value="${data.pos || ''}" placeholder="POS"></td>
-        <td><input type="text" value="${data.type || ''}" placeholder="우투우타"></td>
+        <td><input type="number" class="input-field" value="${data.order || ''}" placeholder="타순"></td>
+        <td><select class="input-field player-select">${cachedPlayerOptions}</select></td>
+        <td><input type="text" class="input-field" value="${data.pos || ''}" placeholder="POS"></td>
+        <td><input type="text" class="input-field" value="${data.type || ''}" placeholder="우투우타"></td>
         <td><button class="btn-mini del" onclick="this.closest('tr').remove()">삭제</button></td>
     `;
     tbody.appendChild(tr);
+    if (data.name) tr.querySelector('.player-select').value = data.name;
 };
 
-// 2. 투수 라인업 행 추가
 window.addPitcherRow = (data = {}) => {
     const tbody = document.querySelector('#table-pitcher tbody');
     const tr = document.createElement('tr');
     tr.innerHTML = `
-        <td><input type="number" value="${data.order || ''}" placeholder="순서"></td>
-        <td><input type="text" value="${data.name || ''}" placeholder="이름(배번)"></td>
-        <td><input type="text" value="${data.inn || ''}" placeholder="5.0"></td>
+        <td><input type="number" class="input-field" value="${data.order || ''}" placeholder="순서"></td>
+        <td><select class="input-field player-select">${cachedPlayerOptions}</select></td>
+        <td><input type="text" class="input-field" value="${data.inn || ''}" placeholder="이닝"></td>
         <td><button class="btn-mini del" onclick="this.closest('tr').remove()">삭제</button></td>
     `;
     tbody.appendChild(tr);
+    if (data.name) tr.querySelector('.player-select').value = data.name;
 };
 
-// 3. 벤치/교체 행 추가
 window.addBenchRow = (data = {}) => {
     const tbody = document.querySelector('#table-bench tbody');
     const tr = document.createElement('tr');
     tr.innerHTML = `
-        <td><input type="text" value="${data.inn || ''}" placeholder="7회"></td>
-        <td><input type="text" value="${data.inName || ''}" placeholder="IN 선수"></td>
-        <td><input type="text" value="${data.reason || ''}" placeholder="대타/대주자"></td>
-        <td><input type="text" value="${data.outName || ''}" placeholder="OUT 선수"></td>
+        <td><input type="text" class="input-field" value="${data.inn || ''}" placeholder="7회"></td>
+        <td><select class="input-field in-player">${cachedPlayerOptions}</select></td>
+        <td><input type="text" class="input-field" value="${data.reason || ''}" placeholder="대타/대주자"></td>
+        <td><select class="input-field out-player">${cachedPlayerOptions}</select></td>
         <td><button class="btn-mini del" onclick="this.closest('tr').remove()">삭제</button></td>
     `;
     tbody.appendChild(tr);
+    if (data.inName) tr.querySelector('.in-player').value = data.inName;
+    if (data.outName) tr.querySelector('.out-player').value = data.outName;
 };
 
-// 초기 데이터로 테이블 그리기
-function renderLineupTable(tableId, dataList) {
-    const tbody = document.querySelector(`#${tableId} tbody`);
-    tbody.innerHTML = ''; // 초기화
-    
-    // 데이터가 없으면 기본 행 1개 추가 (편의성)
-    if (!dataList || dataList.length === 0) {
-        if (tableId === 'table-starting') for(let i=0; i<9; i++) window.addStartingRow({order: i+1});
-        else if (tableId === 'table-pitcher') window.addPitcherRow({order: 1});
-        // bench는 비워둠
-        return;
-    }
-
-    dataList.forEach(item => {
+function renderLineupTable(tableId, list) {
+    document.querySelector(`#${tableId} tbody`).innerHTML = '';
+    if (!list || list.length === 0) return;
+    list.forEach(item => {
         if (tableId === 'table-starting') window.addStartingRow(item);
         else if (tableId === 'table-pitcher') window.addPitcherRow(item);
         else window.addBenchRow(item);
     });
 }
 
-// ------------------------------------------
-// [Helper] 사진 관리 (admin-schedule.js 로직 재사용)
-// ------------------------------------------
+// ==========================================
+// 5. 사진 & 저장
+// ==========================================
 function renderPhotoPreviews() {
     const box = document.getElementById('photo-preview-box');
     box.innerHTML = '';
-    
     if (currentKeptPhotos.length > 0) {
         box.style.display = 'flex';
         currentKeptPhotos.forEach((url, idx) => {
             const div = document.createElement('div');
             div.className = 'photo-item';
-            div.innerHTML = `
-                <img src="${url}">
-                <button type="button" class="btn-remove-photo" onclick="removePhoto(${idx})">✕</button>
-            `;
+            div.innerHTML = `<img src="${url}"><button type="button" class="btn-remove-photo" onclick="removePhoto(${idx})">✕</button>`;
             box.appendChild(div);
         });
     } else {
@@ -260,144 +256,98 @@ window.removePhoto = (index) => {
     renderPhotoPreviews();
 };
 
-
-// ==========================================
-// 3. 최종 저장 함수
-// ==========================================
 async function saveMatchRecord() {
     if (!selectedMatchId) return;
-
     const btn = document.getElementById('btn-save-record');
     btn.disabled = true;
     btn.innerText = "저장 중...";
 
     try {
-        // (1) 스코어보드 데이터 수집
-        const getScoreData = (team) => {
-            const row = document.getElementById(`row-${team}`);
-            const inputs = row.querySelectorAll('.score-in');
+        const getScore = (team) => {
+            const inputs = document.getElementById(`row-${team}`).querySelectorAll('.score-in');
             const innings = [];
-            inputs.forEach(inp => {
-                if(inp.value !== '') innings.push(Number(inp.value));
-            });
-            
+            inputs.forEach(inp => { if(inp.value !== '') innings.push(Number(inp.value)); });
             return {
-                innings: innings,
-                r: Number(row.querySelector('.r-val').value) || 0,
+                innings,
+                r: Number(document.getElementById(`row-${team}`).querySelector('.r-val').value) || 0,
                 h: Number(document.getElementById(`h-${team}`).value) || 0,
                 e: Number(document.getElementById(`e-${team}`).value) || 0
             };
         };
 
-        const scoreboard = {
-            home: getScoreData('home'),
-            away: getScoreData('away')
-        };
-
-        // (2) 주요 기록 수집
-        const status = document.getElementById('match-result-status').value;
-        const keyStats = {
-            winPitcher: document.getElementById('win-pitcher').value.trim(),
-            mvp: document.getElementById('mvp-player').value.trim()
-        };
-
-        // (3) 라인업 데이터 수집
-        const lineups = {
-            starting: [],
-            pitcher: [],
-            bench: []
-        };
-
-        // Starting
-        document.querySelectorAll('#table-starting tbody tr').forEach(tr => {
-            const inputs = tr.querySelectorAll('input');
-            if (inputs[1].value) { // 이름이 있어야 저장
-                lineups.starting.push({
-                    order: inputs[0].value,
-                    name: inputs[1].value,
-                    pos: inputs[2].value,
-                    type: inputs[3].value
-                });
-            }
-        });
-
-        // Pitcher
-        document.querySelectorAll('#table-pitcher tbody tr').forEach(tr => {
-            const inputs = tr.querySelectorAll('input');
-            if (inputs[1].value) {
-                lineups.pitcher.push({
-                    order: inputs[0].value,
-                    name: inputs[1].value,
-                    inn: inputs[2].value
-                });
-            }
-        });
-
-        // Bench
-        document.querySelectorAll('#table-bench tbody tr').forEach(tr => {
-            const inputs = tr.querySelectorAll('input');
-            if (inputs[1].value) {
-                lineups.bench.push({
-                    inn: inputs[0].value,
-                    inName: inputs[1].value,
-                    reason: inputs[2].value,
-                    outName: inputs[3].value
-                });
-            }
-        });
-
-        // (4) 사진 처리 (삭제 -> 업로드)
+        const lineups = { starting: [], pitcher: [], bench: [] };
         
-        // 4-1. 삭제 대기 파일 삭제
+        document.querySelectorAll('#table-starting tbody tr').forEach(tr => {
+            const sel = tr.querySelector('select');
+            if (sel.value) {
+                const inputs = tr.querySelectorAll('input');
+                lineups.starting.push({
+                    order: inputs[0].value, name: sel.value, pos: inputs[1].value, type: inputs[2].value
+                });
+            }
+        });
+        document.querySelectorAll('#table-pitcher tbody tr').forEach(tr => {
+            const sel = tr.querySelector('select');
+            if (sel.value) {
+                lineups.pitcher.push({
+                    order: tr.querySelector('input').value, name: sel.value, inn: tr.querySelectorAll('input')[1].value
+                });
+            }
+        });
+        document.querySelectorAll('#table-bench tbody tr').forEach(tr => {
+            const inSel = tr.querySelector('.in-player');
+            const outSel = tr.querySelector('.out-player');
+            if (inSel.value) {
+                const inputs = tr.querySelectorAll('input');
+                lineups.bench.push({
+                    inn: inputs[0].value, inName: inSel.value, reason: inputs[1].value, outName: outSel.value
+                });
+            }
+        });
+
         if (photosPendingDelete.length > 0) {
             await Promise.all(photosPendingDelete.map(url => {
-                try { return storage.refFromURL(url).delete(); } 
-                catch(e) { return Promise.resolve(); }
+                try { return storage.refFromURL(url).delete(); } catch(e) { return Promise.resolve(); }
             }));
         }
 
-        // 4-2. 새 파일 업로드
         const fileInput = document.getElementById('match-photos');
         let finalPhotos = [...currentKeptPhotos];
 
         if (fileInput.files.length > 0) {
-            // 유효성 검사
             for(const file of fileInput.files) {
-                if(file.size > 200 * 1024) throw new Error(`${file.name} 용량이 200KB를 초과합니다.`);
-                if(!file.name.toLowerCase().match(/\.(jpg|jpeg)$/)) throw new Error("JPG 파일만 가능합니다.");
+                if(file.size > 200 * 1024) throw new Error(`${file.name} 200KB 초과`);
+                if(!file.name.match(/\.(jpg|jpeg)$/i)) throw new Error("JPG만 가능");
             }
-
-            const uploadPromises = Array.from(fileInput.files).map(async (file) => {
-                const path = `match/${selectedMatchId}/${file.name}`;
-                const snap = await storage.ref(path).put(file);
+            const uploads = Array.from(fileInput.files).map(async f => {
+                const snap = await storage.ref(`match/${selectedMatchId}/${f.name}`).put(f);
                 return await snap.ref.getDownloadURL();
             });
-            const newUrls = await Promise.all(uploadPromises);
+            const newUrls = await Promise.all(uploads);
             finalPhotos = [...finalPhotos, ...newUrls];
         }
 
-        // (5) DB 업데이트
-        // match 컬렉션 업데이트
-        await db.collection("match").doc(selectedMatchId).update({
+        const status = document.getElementById('match-result-status').value;
+        const updateData = {
             status: status,
-            scoreboard: scoreboard,
-            keyStats: keyStats,
+            scoreboard: { home: getScore('home'), away: getScore('away') },
+            keyStats: {
+                winPitcher: document.getElementById('win-pitcher').value,
+                mvp: document.getElementById('mvp-player').value
+            },
             lineups: lineups,
-            photo: finalPhotos,
-            updatedAt: new Date()
-        });
+            photo: finalPhotos
+        };
 
-        // schedule 컬렉션도 status 업데이트 (경기 결과 반영)
-        await db.collection("schedule").doc(selectedMatchId).update({
-            status: status
-        });
+        await db.collection("match").doc(selectedMatchId).update(updateData);
+        await db.collection("schedule").doc(selectedMatchId).update({ status: status });
 
-        alert("경기 기록이 저장되었습니다.");
+        alert("저장 완료!");
         location.reload();
 
     } catch (error) {
         console.error("저장 실패:", error);
-        alert("저장 중 오류 발생: " + error.message);
+        alert("오류: " + error.message);
         btn.disabled = false;
         btn.innerText = "경기 기록 저장";
     }

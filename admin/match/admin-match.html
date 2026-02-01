@@ -19,7 +19,7 @@
 
         <section class="selection-section">
             <label for="match-select">기록할 경기 선택 (지난 경기만 표시)</label>
-            <select id="match-select" class="match-select">
+            <select id="match-select" class="input-field match-select">
                 <option value="">경기를 선택해주세요</option>
             </select>
         </section>
@@ -27,8 +27,8 @@
         <div id="record-form" class="form-container" style="display: none;">
             
             <div class="info-card">
-                <h3 id="info-title">제59회 대통령기 전국대학야구 대회</h3>
-                <p id="info-meta">2026-08-08 | 보은 스포츠파크</p>
+                <h3 id="info-title">대회 이름 로딩중...</h3>
+                <p id="info-meta">날짜 | 장소</p>
             </div>
 
             <hr class="divider">
@@ -51,10 +51,12 @@
             <div id="win-stats-box" class="form-grid" style="display: none;">
                 <div class="form-group">
                     <label>승리 투수</label>
-                    <input type="text" id="win-pitcher" class="input-field" placeholder="예: 김기민">
+                    <select id="win-pitcher" class="input-field">
+                        <option value="">선수 선택</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label>결승타 / 수훈선수</label>
+                    <label>결승타 / 수훈선수 (MVP)</label>
                     <input type="text" id="mvp-player" class="input-field" placeholder="예: 나예준 (3회 1사 2루 좌전 안타)">
                 </div>
             </div>
@@ -125,14 +127,13 @@
                         <thead>
                             <tr>
                                 <th width="15%">타순</th>
-                                <th>이름 (배번)</th>
+                                <th>선수 선택</th>
                                 <th width="20%">포지션</th>
                                 <th width="20%">투타</th>
                                 <th width="10%">삭제</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
 
@@ -145,7 +146,7 @@
                         <thead>
                             <tr>
                                 <th width="15%">순서</th>
-                                <th>이름 (배번)</th>
+                                <th>선수 선택</th>
                                 <th width="25%">이닝</th>
                                 <th width="10%">삭제</th>
                             </tr>
@@ -156,7 +157,7 @@
 
                 <div class="lineup-box">
                     <div class="lineup-header">
-                        <h4>교체 명단 (Bench / Change)</h4>
+                        <h4>교체 명단 (Bench)</h4>
                         <button class="btn-mini add" onclick="addBenchRow()">+ 행 추가</button>
                     </div>
                     <table class="lineup-input-table" id="table-bench">
@@ -187,7 +188,7 @@
                 <div id="photo-preview-box" class="photo-preview-container" style="display:none;"></div>
 
                 <p class="warning-text">
-                    ⚠️ 주의: 사진을 삭제하거나 추가한 뒤 <strong>[저장]</strong> 버튼을 눌러야 반영됩니다.
+                    ⚠️ 사진 수정 후 반드시 <strong>[저장]</strong> 버튼을 눌러야 반영됩니다.
                 </p>
             </div>
 
