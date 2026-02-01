@@ -8,6 +8,9 @@ let currentDate = new Date();
 let currentYear = currentDate.getFullYear();
 let currentMonth = currentDate.getMonth(); // 0: 1월 ~ 11: 12월
 
+// ⭐ [핵심 추가] 비동기 충돌 방지용 번호표
+let currentRenderId = 0;
+
 // DOM 요소
 const yearMonthEl = document.getElementById('current-date');
 const calendarGridEl = document.getElementById('calendar-grid');
@@ -16,11 +19,14 @@ const nextBtn = document.getElementById('btn-next');
 
 // 3. 달력 렌더링 함수
 async function renderCalendar() {
+    // 1. 요청 번호표 발급 (버튼 누를 때마다 숫자가 올라감)
+    const myRenderId = ++currentRenderId;
+
     // (1) 헤더 텍스트 업데이트
     const monthString = String(currentMonth + 1).padStart(2, '0');
     yearMonthEl.textContent = `${currentYear}. ${monthString}`;
 
-    // (2) 그리드 초기화
+    // (2) 그리드 초기화 (기존 내용 싹 지우기)
     calendarGridEl.innerHTML = '';
 
     // (3) 요일 헤더
@@ -50,8 +56,7 @@ async function renderCalendar() {
         const cellDiv = document.createElement('div');
         cellDiv.classList.add('calendar-cell');
         
-        // ⭐ 중요: 나중에 데이터를 넣기 위해 날짜 정보를 태그에 심어둠
-        // 예: data-date="2026-01-05"
+        // 날짜 데이터 속성 심기 (2026-01-05)
         const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
         cellDiv.dataset.date = dateStr;
 
@@ -77,63 +82,68 @@ async function renderCalendar() {
         calendarGridEl.appendChild(emptyDiv);
     }
 
-    // ⭐ (8) 일정 데이터 불러오기 (비동기)
-    await loadMonthlySchedules(currentYear, currentMonth);
+    // ⭐ (8) 일정 데이터 불러오기 (번호표를 함께 넘김)
+    await loadMonthlySchedules(currentYear, currentMonth, myRenderId);
 }
 
 // 4. 일정 데이터 로드 및 표시 함수
-async function loadMonthlySchedules(year, month) {
+async function loadMonthlySchedules(year, month, reqId) {
     const strMonth = String(month + 1).padStart(2, '0');
     
-    // 쿼리 범위: 해당 월 1일 ~ 31일
+    // 쿼리 범위
     const start = `${year}-${strMonth}-01`;
     const end = `${year}-${strMonth}-31`;
 
     try {
+        // DB 요청
         const snapshot = await db.collection("schedule")
             .where("date", ">=", start)
             .where("date", "<=", end)
             .orderBy("date", "asc")
             .get();
 
+        // ⭐ [핵심 방어 코드]
+        // DB에서 데이터가 도착했을 때, 현재 화면 번호표(currentRenderId)와
+        // 내가 요청했던 번호표(reqId)가 다르면? -> 이미 사용자가 다른 달로 이동한 것!
+        // 그러니까 아무것도 하지 말고 함수 종료.
+        if (reqId !== currentRenderId) {
+            // console.log("이전 달력 요청이 취소되었습니다.");
+            return;
+        }
+
         snapshot.forEach(doc => {
             const data = doc.data();
-            const docId = doc.id; // 예: 20260101
+            const docId = doc.id; 
 
             // 1. 해당 날짜 칸 찾기
             const targetCell = document.querySelector(`.calendar-cell[data-date="${data.date}"]`);
             
+            // 만약 셀을 찾았는데 이미 똑같은 내용이 있으면 추가하지 않음 (이중 방지)
             if (targetCell) {
-                // 2. 배경색 변경 (일정이 있는 날 표시)
+                // 중복 방지: 같은 ID의 링크가 이미 있는지 확인
+                if (targetCell.querySelector(`a[href*="${docId}"]`)) return;
+
                 targetCell.classList.add('has-match');
 
-                // 3. 링크 생성
                 const linkEl = document.createElement('a');
-                linkEl.className = 'match-info'; // CSS 스타일 적용
+                linkEl.className = 'match-info';
                 
-                // 클릭 시 이동 경로 설정
+                // 클릭 시 이동 경로
                 if (data.status === 'event') {
-                    // 행사 -> event.html
                     linkEl.href = `../event/event.html#${docId}`;
                 } else {
-                    // 경기 -> match.html
                     linkEl.href = `../match/match.html#${docId}`;
                 }
 
-                // 4. 내용 표시
-                // 행사일 때: opponent 필드에 'Title'이 들어있음 -> (Title, Location)
-                // 경기일 때: opponent 필드에 '상대팀'이 들어있음 -> (Opponent, Location)
-                // 결론: 둘 다 opponent와 location을 보여주면 됨
-                
                 // (1) 제목/상대팀
                 const titleSpan = document.createElement('span');
-                titleSpan.className = 'match-result'; // 굵은 글씨 스타일 재사용
-                // 행사면 검정색, 경기면 기본색
+                titleSpan.className = 'match-result';
+                
                 if (data.status === 'event') {
                     titleSpan.style.color = '#333'; 
-                    titleSpan.textContent = data.opponent; // 행사 제목
+                    titleSpan.textContent = data.opponent; 
                 } else {
-                    titleSpan.style.color = '#1565c0'; // 경기 상대팀(파란색 계열)
+                    titleSpan.style.color = '#1565c0'; 
                     titleSpan.textContent = `vs ${data.opponent}`;
                 }
 
@@ -142,7 +152,6 @@ async function loadMonthlySchedules(year, month) {
                 placeSpan.className = 'match-place';
                 placeSpan.textContent = data.location;
 
-                // 추가
                 linkEl.appendChild(titleSpan);
                 linkEl.appendChild(placeSpan);
                 targetCell.appendChild(linkEl);
