@@ -362,3 +362,27 @@ select.input-field {
     border-color: #eee !important;
     box-shadow: none !important;
 }
+
+/* 벤치: 이닝 입력칸 래퍼 (Select + Label) */
+.inning-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+/* 이닝 Select Box */
+.inning-select {
+    width: 70px !important;
+    min-width: 60px;
+    padding: 6px !important;
+    text-align: center;
+    background-position: right 8px center !important; /* 화살표 위치 조정 */
+}
+
+/* "회" 라벨 */
+.inning-label {
+    font-weight: bold;
+    color: #444;
+    font-size: 0.95rem;
+}
