@@ -213,6 +213,18 @@ thead .e-col {
     background-color: #ffced1 !important; 
 }
 
+
+.b-col, .b-cell {
+    background-color: #e8f5e9 !important; /* 연한 초록 */
+    color: #2e7d32 !important; /* 진한 초록 */
+    width: 50px;
+    font-weight: bold;
+}
+
+thead .b-col {
+    background-color: #c8e6c9 !important; /* 헤더는 조금 더 진한 연두색 */
+}
+
 /* --- 4. 주요 경기 기록 (승리투수, 결승타) --- */
 .match-key-stats {
     display: flex;
