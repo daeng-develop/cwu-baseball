@@ -73,7 +73,7 @@ async function draw_menu_tree() {
                             <button class="toggle-btn">▼</button>
                         </div>
                         <ul class="top-menu-category-level3" style="display: none;">
-                            <li><a href="${pathPrefix}match/match.html#250808">08.08 vs 경남대</a></li>
+                            <li><a href="${pathPrefix}match/match.html#20260201">08.08 vs 경남대</a></li>
                         </ul>
                     </li>
                 </ul>
