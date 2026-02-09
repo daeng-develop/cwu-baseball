@@ -1,13 +1,13 @@
+/* common.js */
+
 /** * top menu와 side bar 기본 작성 */
 async function draw_menu_tree() {
 
-    /* common.js */
     const pageName = window.location.pathname.split("/").pop();
     const isRoot = pageName === "" || pageName === "index.html";
     const pathPrefix = isRoot ? "./" : "../"; 
 
-    // ✅ [설정] 여기에 년도만 추가하면 자동으로 메뉴가 생깁니다!
-    // 예시: const targetYears = ["2027", "2026", "2025"];
+    // [설정] 경기 외 년도별 메뉴
     const targetYears = ["2026"]; 
 
 
@@ -66,16 +66,8 @@ async function draw_menu_tree() {
                     <span class="top-menu-category-lv1-label">경기 기록</span>
                     <button class="toggle-btn">▼</button>
                 </div>
-                <ul class="top-menu-category-level2" style="display: none;">
-                    <li>
-                        <div class="top-menu-category-level2-label" onclick="toggle_category(this)">
-                            <span>제59회 대통령기 전국대학야구 대회</span>
-                            <button class="toggle-btn">▼</button>
-                        </div>
-                        <ul class="top-menu-category-level3" style="display: none;">
-                            <li><a href="${pathPrefix}match/match.html#20260201">08.08 vs 경남대</a></li>
-                        </ul>
-                    </li>
+                <ul class="top-menu-category-level2" id="top-match-menu" style="display: none;">
+                    <li><span style="padding:10px; color:#999;">로딩 중...</span></li>
                 </ul>
             </li>
 
@@ -90,9 +82,9 @@ async function draw_menu_tree() {
                     <span class="top-menu-category-lv1-label">경기 외</span>
                     <button class="toggle-btn">▼</button>
                 </div>
-            
                 <ul class="top-menu-category-level2" style="display: none;">
-                    ${topMenuEventHtml} </ul>
+                    ${topMenuEventHtml} 
+                </ul>
             </li>
         </ul>
     </header>
@@ -128,16 +120,8 @@ async function draw_menu_tree() {
                     <span class="sidebar-label">경기 기록</span>
                     <button class="toggle-btn">▼</button>
                 </div>
-                <ul class="sidebar-category-level2" style="display: none;">
-                    <li>
-                        <div class="sidebar-category-level2-group" onclick="toggle_category(this)">
-                            <span class="sidebar-sub-label">제59회 대통령기 전국대학야구 대회</span>
-                            <button class="toggle-btn">▼</button>
-                        </div>
-                        <ul class="sidebar-category-level3" style="display: none;">
-                            <li><a href="${pathPrefix}match/match.html#250808">08.08 vs 경남대</a></li>
-                        </ul>
-                    </li>
+                <ul class="sidebar-category-level2" id="sidebar-match-menu" style="display: none;">
+                    <li><span style="padding:10px; color:#999;">로딩 중...</span></li>
                 </ul>
             </li>
 
@@ -153,7 +137,8 @@ async function draw_menu_tree() {
                     <button class="toggle-btn">▼</button>
                 </div>
                 <ul class="sidebar-category-level2" style="display: none;">
-                     ${sidebarEventHtml} </ul>
+                     ${sidebarEventHtml} 
+                </ul>
             </li>
         </ul>
     </div>
@@ -163,15 +148,19 @@ async function draw_menu_tree() {
     document.body.insertAdjacentHTML('afterbegin', menu_tree_html);
     attachSidebarEvents();
 
-    // 5. [자동 채우기] 설정된 년도들을 반복하면서 데이터 채워넣기
+    // 5. [데이터 채우기 실행]
+    // (A) 경기 외 (이벤트)
     targetYears.forEach(year => {
-        fillEventMenu(pathPrefix, year, `top-event-${year}`);       // Top Menu
-        fillEventMenu(pathPrefix, year, `sidebar-event-${year}`);   // Sidebar
+        fillEventMenu(pathPrefix, year, `top-event-${year}`);
+        fillEventMenu(pathPrefix, year, `sidebar-event-${year}`);
     });
+
+    // (B) ⭐ 경기 기록 (Match List)
+    fillMatchMenu(pathPrefix, "top-match-menu", false);      // Top Menu용
+    fillMatchMenu(pathPrefix, "sidebar-match-menu", true);   // Sidebar용
 }
 
 async function draw_footer() {
-    // [경로 계산 로직 추가]
     const pageName = window.location.pathname.split("/").pop();
     const isRoot = pageName === "" || pageName === "index.html";
     const pathPrefix = isRoot ? "./" : "../";
@@ -188,46 +177,31 @@ async function draw_footer() {
     document.body.insertAdjacentHTML('beforeend', footer_html);
 }
 
-// 사이드바 이벤트 연결 함수 (draw_menu_tree 안에서 호출됨)
 function attachSidebarEvents() {
     const openBtn = document.getElementById('sidebar-open');
     const closeBtn = document.getElementById('sidebar-close');
     const sidebar = document.getElementById('sidebar');
 
     if (openBtn && sidebar) {
-        openBtn.addEventListener('click', () => {
-            sidebar.classList.add('active');
-        });
+        openBtn.addEventListener('click', () => sidebar.classList.add('active'));
     }
-
     if (closeBtn && sidebar) {
-        closeBtn.addEventListener('click', () => {
-            sidebar.classList.remove('active');
-        });
+        closeBtn.addEventListener('click', () => sidebar.classList.remove('active'));
     }
-
     if (sidebar) {
-        // .sidebar-links 안에 있는 모든 a 태그(링크)를 찾음
         const links = sidebar.querySelectorAll('.sidebar-links a');
-
         links.forEach(link => {
-            link.addEventListener('click', () => {
-                sidebar.classList.remove('active');
-            });
+            link.addEventListener('click', () => sidebar.classList.remove('active'));
         });
     }
 }
 
-/** 카테고리 클릭시 UI 동적 구성 */
-/* 통합된 메뉴 토글 함수 */
 function toggle_category(element) {
     const btn = element.querySelector('.toggle-btn');
     const submenu = element.nextElementSibling;
-
     if (!submenu) return;
 
     const isClosed = submenu.style.display === "none" || submenu.style.display === "";
-
     if (isClosed) {
         submenu.style.display = "block";
         if (btn) btn.innerText = "▲";
@@ -238,17 +212,15 @@ function toggle_category(element) {
 }
 
 // ===============================================
-// 특정 연도의 이벤트를 가져와서 UL 채우기
+// [이벤트] 특정 연도의 행사 불러오기
 // ===============================================
 async function fillEventMenu(pathPrefix, year, elementId) {
     const listElement = document.getElementById(elementId);
     if (!listElement) return;
 
-    // 1. Firebase 로드
     let db;
     try {
         const module = await import(`${pathPrefix}firebase.js`);
-        console.log("현재 firebase.js path :",module)
         db = module.db;
     } catch (error) {
         console.error("Firebase 로드 실패:", error);
@@ -256,7 +228,6 @@ async function fillEventMenu(pathPrefix, year, elementId) {
         return;
     }
 
-    // 2. 데이터 조회
     try {
         const snapshot = await db.collection("event")
             .where("date", ">=", `${year}-01-01`)
@@ -264,7 +235,6 @@ async function fillEventMenu(pathPrefix, year, elementId) {
             .orderBy("date", "asc")
             .get();
 
-        // 3. HTML 업데이트
         if (snapshot.empty) {
             listElement.innerHTML = `<li><span style="padding: 10px 15px; color: #999; font-size: 0.9em;">일정 없음</span></li>`;
             return;
@@ -273,20 +243,118 @@ async function fillEventMenu(pathPrefix, year, elementId) {
         let html = "";
         snapshot.forEach(doc => {
             const data = doc.data();
-            const dateStr = data.date.slice(5).replace('-', '월 ') + '일'; // mm월 dd일
+            const dateStr = data.date.slice(5).replace('-', '월 ') + '일'; 
             html += `<li><a href="${pathPrefix}event/event.html#${doc.id}">${dateStr} ${data.title}</a></li>`;
         });
-
         listElement.innerHTML = html;
 
     } catch (error) {
         console.error("행사 목록 로딩 에러:", error);
-        // 에러가 나면 조용히 실패하거나, 기존 '로딩 중'을 '에러'로 바꿈
-        //listElement.innerHTML = `<li><a href="#">불러오기 오류 발생</a></li>`;
     }
 }
 
-// 페이지 로드 시 실행
+// ===============================================
+// ⭐ [경기 기록] 대회명(Level 2) -> 경기 목록(Level 3) 동적 생성
+// ===============================================
+async function fillMatchMenu(pathPrefix, elementId, isSidebar) {
+    const container = document.getElementById(elementId);
+    if (!container) return;
+
+    let db;
+    try {
+        const module = await import(`${pathPrefix}firebase.js`);
+        db = module.db;
+    } catch (error) {
+        container.innerHTML = `<li><span style="padding:10px;">연결 실패</span></li>`;
+        return;
+    }
+
+    try {
+        // 1. 대회 목록 가져오기
+        const listDoc = await db.collection("match").doc("match-list").get();
+        
+        if (!listDoc.exists) {
+            container.innerHTML = `<li><span style="padding:10px; color:#999;">대회 정보 없음</span></li>`;
+            return;
+        }
+
+        const data = listDoc.data();
+        const tournamentNames = data['match-name']; 
+
+        if (!tournamentNames || tournamentNames.length === 0) {
+            container.innerHTML = `<li><span style="padding:10px; color:#999;">등록된 대회가 없습니다.</span></li>`;
+            return;
+        }
+
+        // 2. 각 대회별로 경기 목록 쿼리
+        const htmlPromises = tournamentNames.map(async (tournament) => {
+            
+            // ⭐ [수정] orderBy 제거 (색인 에러 방지)
+            const matchSnap = await db.collection("match")
+                .where("title", "==", tournament)
+                .get();
+
+            // 메모리에서 데이터 배열로 변환 및 정렬
+            let matches = [];
+            matchSnap.forEach(doc => {
+                matches.push({ id: doc.id, ...doc.data() });
+            });
+
+            // ⭐ [추가] 자바스크립트에서 날짜 내림차순 정렬
+            matches.sort((a, b) => {
+                if (a.date < b.date) return 1;
+                if (a.date > b.date) return -1;
+                return 0;
+            });
+
+            // Level 3 HTML 생성
+            let subItemsHtml = "";
+            if (matches.length === 0) {
+                subItemsHtml = `<li><span style="padding:10px; color:#999;">기록 없음</span></li>`;
+            } else {
+                matches.forEach(m => {
+                    const dateShort = m.date ? m.date.slice(5).replace('-', '.') : '00.00'; 
+                    subItemsHtml += `<li><a href="${pathPrefix}match/match.html#${m.id}">${dateShort} vs ${m.opponent}</a></li>`;
+                });
+            }
+
+            // HTML 조립
+            if (isSidebar) {
+                return `
+                    <li>
+                        <div class="sidebar-category-level2-group" onclick="toggle_category(this)">
+                            <span class="sidebar-sub-label">${tournament}</span>
+                            <button class="toggle-btn">▼</button>
+                        </div>
+                        <ul class="sidebar-category-level3" style="display: none;">
+                            ${subItemsHtml}
+                        </ul>
+                    </li>
+                `;
+            } else {
+                return `
+                    <li>
+                        <div class="top-menu-category-level2-label" onclick="toggle_category(this)">
+                            <span>${tournament}</span>
+                            <button class="toggle-btn">▼</button>
+                        </div>
+                        <ul class="top-menu-category-level3" style="display: none;">
+                            ${subItemsHtml}
+                        </ul>
+                    </li>
+                `;
+            }
+        });
+
+        const htmlArray = await Promise.all(htmlPromises);
+        container.innerHTML = htmlArray.join('');
+
+    } catch (error) {
+        console.error("경기 메뉴 로딩 에러:", error);
+        container.innerHTML = `<li><span style="padding:10px;">불러오기 오류</span></li>`;
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     draw_menu_tree();
     draw_footer();
