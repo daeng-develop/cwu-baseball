@@ -33,7 +33,7 @@ function renderMatchUI(data) {
     
     document.querySelector('.match-status').textContent = statusMap[data.status] || data.status;
     document.querySelector('.tournament-title').textContent = data.title;
-    
+
    // ⭐ [수정] 날짜 포맷 변경 (yyyy-mm-dd -> yyyy년 mm월 dd일)
     const [year, month, day] = data.date.split('-'); 
     const formattedDate = `${year}년 ${month}월 ${day}일`;
@@ -227,20 +227,11 @@ function renderTable(selector, dataArr, type) {
                 <td>${parts[3]}</td>
             `;
         } else if (type === 'bench') {
-            // ⭐ [수정] OUT 선수 표시 로직 (배번이 있는지 확인)
-            let outPlayerDisplay = parts[4];
-            
-            // 만약 OUT 선수가 "17.나예준" 처럼 저장되어 있다면 -> "나예준 (17)"로 변환
-            if (outPlayerDisplay && outPlayerDisplay.includes('.')) {
-                const [num, name] = outPlayerDisplay.split('.');
-                outPlayerDisplay = `${name} (${num})`;
-            }
-
             tr.innerHTML = `
                 <td class="inn-col">${parts[0]}회</td>
                 <td class="name-col">${parts[1]} (${parts[2]})</td>
                 <td class="change-type-col">${parts[3]}</td>
-                <td class="change-out-col">${outPlayerDisplay}</td>
+                <td class="change-out-col">${parts[5]} (${parts[4]})</td>
             `;
         }
         tbody.appendChild(tr);

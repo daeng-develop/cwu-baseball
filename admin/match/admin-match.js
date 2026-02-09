@@ -587,7 +587,7 @@ async function saveMatchRecord() {
             if (rawInName) {
                 const inP = parseNameNum(rawInName);
                 const outP = parseNameNum(rawOutName); 
-                benchLineupArr.push(`${inn},${inP.name},${inP.number},${reason},${outP.name}`);
+                benchLineupArr.push(`${inn},${inP.name},${inP.number},${reason},${outP.number},${outP.name}`);
             }
         });
         updateData['bench-line-up'] = benchLineupArr;
