@@ -18,14 +18,14 @@
         </header>
 
         <section class="selection-section">
-            <label for="match-select">기록할 경기 선택 (지난 경기만 표시)</label>
+            <label for="match-select">기록할 경기 선택</label>
             <select id="match-select" class="input-field match-select">
                 <option value="">경기를 선택해주세요</option>
             </select>
         </section>
 
         <div id="record-form" class="form-container" style="display: none;">
-            
+
             <div class="info-card">
                 <h3 id="info-title">대회 이름 로딩중...</h3>
                 <p id="info-meta">날짜 | 장소</p>
@@ -34,7 +34,7 @@
             <hr class="divider">
 
             <h3 class="section-title">스코어보드 & 상태</h3>
-            
+
             <div class="form-group">
                 <label>경기 결과</label>
                 <select id="match-result-status" class="input-field">
@@ -51,9 +51,9 @@
             <div id="win-stats-box" class="form-grid" style="display: none;">
                 <div class="form-group">
                     <label>승리 투수</label>
-                    <select id="win-pitcher" class="input-field">
-                        <option value="">선수 선택</option>
-                    </select>
+                    <div class="autocomplete-wrapper">
+                        <input type="text" id="win-pitcher" class="input-field" placeholder="선수 검색 또는 입력">
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>결승타 / 수훈선수 (MVP)</label>
@@ -66,16 +66,30 @@
                     <thead>
                         <tr>
                             <th>TEAM</th>
-                            <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th>
-                            <th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th>
+                            <th>1</th>
+                            <th>2</th>
+                            <th>3</th>
+                            <th>4</th>
+                            <th>5</th>
+                            <th>6</th>
+                            <th>7</th>
+                            <th>8</th>
+                            <th>9</th>
+                            <th>10</th>
+                            <th>11</th>
+                            <th>12</th>
                             <th class="stat-head">R</th>
                             <th class="stat-head">H</th>
                             <th class="stat-head">E</th>
                         </tr>
                     </thead>
                     <tbody>
+                    <tbody>
+                    <tbody>
                         <tr id="row-away">
-                            <td class="team-name" id="name-away">AWAY</td>
+                            <td class="team-name-cell">
+                                <span id="name-away" class="team-name-label">AWAY</span>
+                            </td>
                             <td><input type="number" class="score-in" data-idx="1"></td>
                             <td><input type="number" class="score-in" data-idx="2"></td>
                             <td><input type="number" class="score-in" data-idx="3"></td>
@@ -93,7 +107,9 @@
                             <td><input type="number" id="e-away" class="stat-in" placeholder="0"></td>
                         </tr>
                         <tr id="row-home">
-                            <td class="team-name" id="name-home">HOME</td>
+                            <td class="team-name-cell">
+                                <span id="name-home" class="team-name-label">청운대</span>
+                            </td>
                             <td><input type="number" class="score-in" data-idx="1"></td>
                             <td><input type="number" class="score-in" data-idx="2"></td>
                             <td><input type="number" class="score-in" data-idx="3"></td>
@@ -111,13 +127,15 @@
                             <td><input type="number" id="e-home" class="stat-in" placeholder="0"></td>
                         </tr>
                     </tbody>
+                    </tbody>
+                    </tbody>
                 </table>
             </div>
 
             <hr class="divider">
 
             <div class="lineup-section-wrapper">
-                
+
                 <div class="lineup-box">
                     <div class="lineup-header">
                         <h4>스타팅 라인업 (Starting)</h4>
@@ -127,7 +145,7 @@
                         <thead>
                             <tr>
                                 <th width="15%">타순</th>
-                                <th>선수 선택</th>
+                                <th>선수 이름 (검색/입력)</th>
                                 <th width="20%">포지션</th>
                                 <th width="20%">투타</th>
                                 <th width="10%">삭제</th>
@@ -146,7 +164,7 @@
                         <thead>
                             <tr>
                                 <th width="15%">순서</th>
-                                <th>선수 선택</th>
+                                <th>선수 이름 (검색/입력)</th>
                                 <th width="25%">이닝</th>
                                 <th width="10%">삭제</th>
                             </tr>
@@ -176,6 +194,9 @@
 
             </div>
 
+            <datalist id="player-list">
+            </datalist>
+
             <hr class="divider">
 
             <h3 class="section-title">경기 사진 업로드</h3>
@@ -184,12 +205,8 @@
                     <input type="file" id="match-photos" multiple accept=".jpg, .jpeg">
                     <p class="file-help">여러 장 선택 가능 (200KB 이하, JPG)</p>
                 </div>
-                
                 <div id="photo-preview-box" class="photo-preview-container" style="display:none;"></div>
-
-                <p class="warning-text">
-                    ⚠️ 사진 수정 후 반드시 <strong>[저장]</strong> 버튼을 눌러야 반영됩니다.
-                </p>
+                <p class="warning-text">⚠️ 사진 수정 후 반드시 <strong>[저장]</strong> 버튼을 눌러야 반영됩니다.</p>
             </div>
 
             <div class="action-buttons">
@@ -197,7 +214,8 @@
                 <button class="btn btn-cancel" onclick="location.reload()">취소</button>
             </div>
 
-        </div> </div>
+        </div>
+    </div>
 
     <script type="module" src="admin-match.js"></script>
 </body>

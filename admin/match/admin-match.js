@@ -1,4 +1,4 @@
-/* admin/admin-match.js */
+/* admin/admin-match.js (전체 코드 갱신) */
 import { db, storage } from "../../firebase.js";
 
 // 상태 변수
@@ -6,33 +6,58 @@ let selectedMatchId = null;
 let currentKeptPhotos = [];
 let photosPendingDelete = [];
 
-// 선수 목록 캐싱
-let cachedPlayerOptions = '<option value="">선수 선택</option>';
+// 선수 데이터를 담을 배열
+let globalPlayersData = []; 
 
 document.addEventListener("DOMContentLoaded", () => {
-    loadAllPlayers();
+    const currentYear = new Date().getFullYear().toString();
+    loadAllPlayers(currentYear);
     loadPastMatches();
 
     document.getElementById('match-select').addEventListener('change', handleMatchSelect);
     document.getElementById('match-result-status').addEventListener('change', toggleWinStats);
     document.getElementById('btn-save-record').addEventListener('click', saveMatchRecord);
+
+    // 승리 투수 입력창 자동완성 적용
+    setupAutocomplete(document.getElementById('win-pitcher'));
 });
 
 // ==========================================
 // 1. 초기 데이터 로딩
 // ==========================================
 
-async function loadAllPlayers() {
+async function loadAllPlayers(year) {
+    console.log(`[${year}년] 선수 명단 로딩...`);
+    const positions = ['pitcher', 'catcher', 'infielder', 'outfielder'];
+    const pos_name = ["투수", "포수", "내야수", "외야수"];
+    let allPlayers = [];
+
     try {
-        const snapshot = await db.collection("player").orderBy("backNumber", "asc").get();
-        let optionsHtml = '<option value="">선수 선택</option>';
-        snapshot.forEach(doc => {
-            const p = doc.data();
-            const displayName = `${p.name} (${p.backNumber})`;
-            optionsHtml += `<option value="${displayName}">${displayName} - ${p.position}</option>`;
+        const promises = positions.map(pos => 
+            db.collection("player").doc(year).collection(pos).get()
+        );
+        
+        const snapshots = await Promise.all(promises);
+
+        snapshots.forEach(snapshot => {
+            snapshot.forEach(doc => {
+                const p = doc.data();
+                if (p.name) allPlayers.push(p);
+            });
         });
-        cachedPlayerOptions = optionsHtml;
-        document.getElementById('win-pitcher').innerHTML = cachedPlayerOptions;
+
+        // 배번 순 정렬
+        allPlayers.sort((a, b) => Number(a.backNumber || a.number || 999) - Number(b.backNumber || b.number || 999));
+
+        globalPlayersData = allPlayers.map(p => ({
+            name: p.name,
+            number: p.backNumber || p.number || '?',
+            position: pos_name[p.position] || 'Unknown',
+            displayName: `${p.number || '?'}.${p.name}`
+        }));
+
+        console.log(`총 ${globalPlayersData.length}명 데이터 캐싱 완료`);
+
     } catch (error) {
         console.error("선수 목록 로딩 실패:", error);
     }
@@ -59,7 +84,6 @@ async function loadPastMatches() {
             const data = doc.data();
             const option = document.createElement('option');
             option.value = doc.id; 
-            // Select Box는 전체 이름 유지 (원하신다면 여기도 축약 가능)
             option.text = `[${data.date}] vs ${data.opponent} (${data.title})`;
             selectEl.add(option);
         });
@@ -70,7 +94,7 @@ async function loadPastMatches() {
 }
 
 // ==========================================
-// 2. 경기 데이터 불러오기 (⭐ 여기가 핵심 수정 부분)
+// 2. 경기 데이터 불러오기 (수정됨)
 // ==========================================
 async function handleMatchSelect(e) {
     const docId = e.target.value;
@@ -80,29 +104,33 @@ async function handleMatchSelect(e) {
     }
 
     selectedMatchId = docId;
+    
+    // 연도 추출 및 선수 명단 로드
+    const matchYear = docId.substring(0, 4);
+    await loadAllPlayers(matchYear); 
 
     try {
         const doc = await db.collection("match").doc(docId).get();
         if (!doc.exists) return;
         const data = doc.data();
 
-        // 기본 정보
         document.getElementById('info-title').textContent = data.title;
         document.getElementById('info-meta').textContent = `${data.date} | ${data.location} | ${data.homeAway === 'home' ? 'HOME' : 'AWAY'}`;
         
-        // ⭐ [수정] 스코어보드 팀 이름 축약 로직 적용
+        // 팀 이름 축약 로직
         let shortOpponent = data.opponent;
         if (shortOpponent) {
             shortOpponent = shortOpponent
                 .replace('고등학교', '고')
                 .replace('대학교', '대')
-                .replace('학교', ''); // 중학교 -> 중 등 나머지 케이스
+                .replace('학교', ''); 
         }
 
+        // ⭐ [수정] span 태그이므로 .value 대신 .textContent 사용
         document.getElementById('name-home').textContent = "청운대";
-        document.getElementById('name-away').textContent = shortOpponent; // 축약된 이름 적용
+        document.getElementById('name-away').textContent = shortOpponent; 
 
-        // 상태 및 승리 기록
+        // (이하 나머지 코드는 기존과 동일)
         document.getElementById('match-result-status').value = data.status || 'before';
         toggleWinStats();
 
@@ -111,7 +139,6 @@ async function handleMatchSelect(e) {
             document.getElementById('mvp-player').value = data.keyStats.mvp || '';
         }
 
-        // 스코어보드
         if (data.scoreboard) {
             fillScoreboardRow('away', data.scoreboard.away);
             fillScoreboardRow('home', data.scoreboard.home);
@@ -119,12 +146,10 @@ async function handleMatchSelect(e) {
             clearScoreboard();
         }
 
-        // 라인업
         renderLineupTable('table-starting', data.lineups ? data.lineups.starting : []);
         renderLineupTable('table-pitcher', data.lineups ? data.lineups.pitcher : []);
         renderLineupTable('table-bench', data.lineups ? data.lineups.bench : []);
 
-        // 사진
         currentKeptPhotos = data.photo || [];
         photosPendingDelete = [];
         renderPhotoPreviews();
@@ -133,7 +158,70 @@ async function handleMatchSelect(e) {
 
     } catch (error) {
         console.error("상세 데이터 로딩 실패:", error);
-        alert("데이터를 불러오는 중 오류가 발생했습니다.");
+    }
+}
+
+// ==========================================
+// [기타 함수들] 자동완성, 스코어보드, 저장 등 (기존 유지)
+// ==========================================
+
+function setupAutocomplete(input) {
+    if (!input) return;
+    if (input.dataset.autocomplete === "active") return;
+    input.dataset.autocomplete = "active";
+
+    input.addEventListener("input", function(e) {
+        const val = this.value;
+        closeAllLists();
+        if (!val) return false;
+
+        const listDiv = document.createElement("DIV");
+        listDiv.setAttribute("class", "autocomplete-items");
+        this.parentNode.appendChild(listDiv);
+
+        let matchCount = 0;
+        for (let i = 0; i < globalPlayersData.length; i++) {
+            const player = globalPlayersData[i];
+            if (player.displayName.toUpperCase().includes(val.toUpperCase()) || 
+                player.number.toString().includes(val)) {
+                
+                const itemDiv = document.createElement("DIV");
+                itemDiv.className = "autocomplete-item";
+                itemDiv.innerHTML = `
+                    <span>${player.displayName}</span>
+                    <span class="item-pos">${player.position}</span>
+                `;
+                itemDiv.addEventListener("click", function(e) {
+                    input.value = player.displayName; 
+                    
+                    const tr = input.closest('tr');
+                    if(tr) {
+                        const posInput = tr.querySelector('input[placeholder="POS"]');
+                        if(posInput) posInput.value = player.position;
+                    }
+                    closeAllLists();
+                });
+                listDiv.appendChild(itemDiv);
+                matchCount++;
+            }
+        }
+        if(matchCount === 0) {
+            const noItem = document.createElement("DIV");
+            noItem.className = "autocomplete-item";
+            noItem.innerHTML = "<span style='color:#ccc'>검색 결과 없음</span>";
+            listDiv.appendChild(noItem);
+        }
+    });
+
+    document.addEventListener("click", function (e) {
+        if (e.target !== input) closeAllLists(e.target);
+    });
+}
+
+function closeAllLists(elmnt) {
+    const items = document.getElementsByClassName("autocomplete-items");
+    for (let i = 0; i < items.length; i++) {
+        if (elmnt != items[i]) items[i].parentNode.removeChild(items[i]);
     }
 }
 
@@ -143,9 +231,6 @@ function toggleWinStats() {
     winBox.style.display = (status === 'win') ? 'grid' : 'none';
 }
 
-// ==========================================
-// 3. 스코어보드 Helper
-// ==========================================
 function fillScoreboardRow(team, scoreData) {
     if (!scoreData) return;
     const row = document.getElementById(`row-${team}`);
@@ -163,7 +248,6 @@ function clearScoreboard() {
     document.querySelectorAll('.score-in, .stat-in').forEach(el => el.value = '');
 }
 
-// R(득점) 자동 계산
 document.querySelectorAll('.score-in').forEach(input => {
     input.addEventListener('change', () => {
         ['home', 'away'].forEach(team => {
@@ -176,21 +260,18 @@ document.querySelectorAll('.score-in').forEach(input => {
     });
 });
 
-// ==========================================
-// 4. 라인업 동적 테이블 Helper
-// ==========================================
 window.addStartingRow = (data = {}) => {
     const tbody = document.querySelector('#table-starting tbody');
     const tr = document.createElement('tr');
     tr.innerHTML = `
         <td><input type="number" class="input-field" value="${data.order || ''}" placeholder="타순"></td>
-        <td><select class="input-field player-select">${cachedPlayerOptions}</select></td>
+        <td><div class="autocomplete-wrapper"><input type="text" class="input-field player-input" value="${data.name || ''}" placeholder="선수 검색"></div></td>
         <td><input type="text" class="input-field" value="${data.pos || ''}" placeholder="POS"></td>
         <td><input type="text" class="input-field" value="${data.type || ''}" placeholder="우투우타"></td>
         <td><button class="btn-mini del" onclick="this.closest('tr').remove()">삭제</button></td>
     `;
     tbody.appendChild(tr);
-    if (data.name) tr.querySelector('.player-select').value = data.name;
+    setupAutocomplete(tr.querySelector('.player-input'));
 };
 
 window.addPitcherRow = (data = {}) => {
@@ -198,12 +279,12 @@ window.addPitcherRow = (data = {}) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
         <td><input type="number" class="input-field" value="${data.order || ''}" placeholder="순서"></td>
-        <td><select class="input-field player-select">${cachedPlayerOptions}</select></td>
+        <td><div class="autocomplete-wrapper"><input type="text" class="input-field player-input" value="${data.name || ''}" placeholder="선수 검색"></div></td>
         <td><input type="text" class="input-field" value="${data.inn || ''}" placeholder="이닝"></td>
         <td><button class="btn-mini del" onclick="this.closest('tr').remove()">삭제</button></td>
     `;
     tbody.appendChild(tr);
-    if (data.name) tr.querySelector('.player-select').value = data.name;
+    setupAutocomplete(tr.querySelector('.player-input'));
 };
 
 window.addBenchRow = (data = {}) => {
@@ -211,14 +292,14 @@ window.addBenchRow = (data = {}) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
         <td><input type="text" class="input-field" value="${data.inn || ''}" placeholder="7회"></td>
-        <td><select class="input-field in-player">${cachedPlayerOptions}</select></td>
-        <td><input type="text" class="input-field" value="${data.reason || ''}" placeholder="대타/대주자"></td>
-        <td><select class="input-field out-player">${cachedPlayerOptions}</select></td>
+        <td><div class="autocomplete-wrapper"><input type="text" class="input-field in-player" value="${data.inName || ''}" placeholder="IN 선수"></div></td>
+        <td><input type="text" class="input-field" value="${data.reason || ''}" placeholder="사유"></td>
+        <td><div class="autocomplete-wrapper"><input type="text" class="input-field out-player" value="${data.outName || ''}" placeholder="OUT 선수"></div></td>
         <td><button class="btn-mini del" onclick="this.closest('tr').remove()">삭제</button></td>
     `;
     tbody.appendChild(tr);
-    if (data.inName) tr.querySelector('.in-player').value = data.inName;
-    if (data.outName) tr.querySelector('.out-player').value = data.outName;
+    setupAutocomplete(tr.querySelector('.in-player'));
+    setupAutocomplete(tr.querySelector('.out-player'));
 };
 
 function renderLineupTable(tableId, list) {
@@ -231,9 +312,6 @@ function renderLineupTable(tableId, list) {
     });
 }
 
-// ==========================================
-// 5. 사진 & 저장
-// ==========================================
 function renderPhotoPreviews() {
     const box = document.getElementById('photo-preview-box');
     box.innerHTML = '';
@@ -278,30 +356,27 @@ async function saveMatchRecord() {
         const lineups = { starting: [], pitcher: [], bench: [] };
         
         document.querySelectorAll('#table-starting tbody tr').forEach(tr => {
-            const sel = tr.querySelector('select');
-            if (sel.value) {
-                const inputs = tr.querySelectorAll('input');
+            const inputs = tr.querySelectorAll('input');
+            const nameVal = tr.querySelector('.player-input').value;
+            if (nameVal) {
                 lineups.starting.push({
-                    order: inputs[0].value, name: sel.value, pos: inputs[1].value, type: inputs[2].value
+                    order: inputs[0].value, name: nameVal, pos: inputs[2].value, type: inputs[3].value
                 });
             }
         });
         document.querySelectorAll('#table-pitcher tbody tr').forEach(tr => {
-            const sel = tr.querySelector('select');
-            if (sel.value) {
-                lineups.pitcher.push({
-                    order: tr.querySelector('input').value, name: sel.value, inn: tr.querySelectorAll('input')[1].value
-                });
+            const nameVal = tr.querySelector('.player-input').value;
+            if (nameVal) {
+                const inputs = tr.querySelectorAll('input');
+                lineups.pitcher.push({ order: inputs[0].value, name: nameVal, inn: inputs[2].value });
             }
         });
         document.querySelectorAll('#table-bench tbody tr').forEach(tr => {
-            const inSel = tr.querySelector('.in-player');
-            const outSel = tr.querySelector('.out-player');
-            if (inSel.value) {
+            const inName = tr.querySelector('.in-player').value;
+            const outName = tr.querySelector('.out-player').value;
+            if (inName) {
                 const inputs = tr.querySelectorAll('input');
-                lineups.bench.push({
-                    inn: inputs[0].value, inName: inSel.value, reason: inputs[1].value, outName: outSel.value
-                });
+                lineups.bench.push({ inn: inputs[0].value, inName: inName, reason: inputs[2].value, outName: outName });
             }
         });
 
