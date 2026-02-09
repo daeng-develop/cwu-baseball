@@ -1,0 +1,505 @@
+/**************** 기본적인 폰트 및 배경 설정 ****************/
+body {
+    margin: 0;/* 화면에 꽉 차게 (하얀 테두리 삭제) */
+    display: flex;/* 정렬 상자로 변신 */
+    flex-direction: column;/* 위에서 아래로 차례대로 배치 */
+    font-family: "Noto Sans KR", sans-serif;/*폰트 적용*/
+    background-color: #f8f9fa;/*화면 배경 색 설정*/
+    overflow-x: hidden;/*가로 스크롤바가 생기지 않도록 강제로 숨기기*/
+
+    overflow-y: scroll;
+}
+
+/**************** 홈버튼 ****************/
+.home-btn {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0056b3;
+    white-space: nowrap;/* 로고가 줄바꿈되지 않도록 고정 */
+
+    height: 40px;/* ⭐ 추가된 코드: 메뉴 1단계 높이(40px)와 맞춤 */
+    display: flex;
+    align-items: center;
+    margin-right: 30px;/* 메뉴와의 간격 */
+    margin-top: 0;/* 위로 올라가 있다면 마진 제거 */
+}
+
+/* 홈 버튼 링크 스타일 초기화 */
+.home-btn-link {
+    text-decoration: none; /* 밑줄 제거 */
+    color: inherit;       /* 부모 색상 상속 */
+    display: flex;
+    align-items: center;
+}
+
+.home-btn-link:hover {
+    opacity: 0.8; /* 살짝 흐려지는 피드백 효과 (선택) */
+}
+
+/**************** 토글 버튼 ****************/
+/* [공통] 화살표 버튼 기본 스타일 */
+.toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0 5px;
+}
+
+/* 2. [상단 메뉴] 전용 스타일 */
+.top-menu .toggle-btn {
+    font-size: 0.7rem;
+    color: inherit;     /* 부모 글자색 따라감 */
+    margin-left: 8px;   /* ⭐ 글자와 버튼 사이 간격 (상단 메뉴용) */
+}
+
+/* [사이드바 전용] 스타일 (흰색, 작게) */
+.sidebar .toggle-btn {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+}
+
+/* [사이드바 호버 시] 밝게 */
+.sidebar-category-level1:hover .toggle-btn,
+.sidebar-category-level2-group:hover .toggle-btn {
+    color: #ffffff;
+}
+
+
+/**************** 상단바 ****************/
+.top-menu {
+    display: flex;
+    justify-content: flex-start;/* 모든 요소를 왼쪽(시작점)으로 정렬 */
+    align-items: flex-start;/* ⭐ center에서 flex-start로 변경 */
+    padding: 10px 30px; /* 좌우 간격을 조금 줄여서 공간 확보 */
+    background-color: rgb(255, 255, 255);
+    position: sticky;/* 스크롤을 내려도 상단에 고정 */
+    top: 0;/* 여백없이 상단에 딱 붙어서 전시 될 수 있도록 구현 */
+    z-index: 1000;/* 다른 요소보다 위에 보이게 */
+}
+
+/* 카테고리 정렬 스타일 */
+.top-menu-tree {
+    display: flex;
+    flex: 1;
+    justify-content: flex-start;
+    gap: 10px;/* 메뉴 간격을 조금 줄여서 한 줄에 담기게 유도 */
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    flex-wrap: nowrap;/* ⭐ 메뉴가 절대 두 줄이 되지 않도록 설정 */
+}
+
+.top-menu-category
+
+/*카테고리 메뉴를 묶기 위한 class*/
+    {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;/* ⭐ 하위 메뉴가 배치될 기준점이 됩니다. */
+}
+
+/* --- 카테고리 공통 레이블 스타일 (디자인만!) --- */
+.top-menu [class*="-label"], 
+.top-menu-category-level1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #333;
+}
+
+/* 1. 하위 메뉴들(Label)은 마우스 올리면 배경색 생김 */
+.top-menu [class*="-label"]:hover {
+    background-color: #f0f4f8;
+    color: #0056b3;
+}
+
+/* 2. [수정] 상단 대분류(Level 1)는 배경 없이 글자색만 변경 */
+.top-menu-category-level1:hover {
+    background-color: transparent; /* ⭐ 배경 투명하게 (네모 박스 제거) */
+    color: #0056b3;                /* 글자색만 파랗게 변경 */
+}
+/* --- 레벨별 특화 스타일 --- */
+/* --- Level 1: 대분류 (상단 고정 및 스타일) --- */
+.top-menu-category-level1 {
+    /* [1] 요청하신 디자인 적용 */
+    height: 40px;         /* 기존 50px에서 40px로 축소 */
+    display: flex;
+    align-items: center;
+    padding: 0 10px;      /* 상하 패딩 삭제, 좌우만 유지 */
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #222;
+    cursor: pointer;
+    white-space: nowrap;
+
+    /* [2] 상단 고정 기능 (Level 1에만 적용!) */
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
+    z-index: 10;
+    
+    /* [3] 배경색 필수 (글자 겹침 방지) */
+    background-color: #fff; 
+    
+    /* [4] 구분선 제거 (요청사항) */
+    border-bottom: none; 
+}
+
+/* 링크 태그 기본 스타일 제거 (밑줄 없애기, 색상 상속) */
+a.top-menu-category-level1 {
+    text-decoration: none; /* 밑줄 제거 */
+    color: inherit;        /* 부모 색상 따라가기 (검정/흰색 등) */
+    display: flex;         /* 기존 레이아웃 유지 */
+    align-items: center;   /* 세로 중앙 정렬 유지 */
+    width: 100%;           /* 클릭 영역 꽉 채우기 */
+    
+    /* ⭐ [수정] 기존 100%를 지우고 40px로 고정하세요 */
+    /* height: 100%;  <-- 이게 문제였습니다 */
+    height: 40px;
+}
+
+/* --- Level 2: 중분류 (대회명이 길면 줄바꿈)--- */
+.top-menu-category-level2-label {
+    padding-left: 20px; 
+    font-weight: 600;
+    font-size: 0.95rem; /* 글자 크기도 살짝 줄이면 좁은 폭에 더 잘 어울립니다 */
+    
+    /* ⭐ [핵심 수정] 줄바꿈 & 너비 축소 */
+    white-space: normal !important;
+    
+    /* 1. 너비 제한을 더 좁게 설정 (기존 220px -> 160px) */
+    max-width: 160px; 
+    
+    /* 2. 글자 길이에 딱 맞게 박스 크기 조절 (여백 제거) */
+    width: fit-content; 
+    
+    height: auto !important;
+    line-height: 1.3; /* 줄간격도 살짝 좁힘 */
+    padding-top: 8px;
+    padding-bottom: 8px;
+    
+    /* 화살표와 정렬 */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* 글자 부분 스타일 */
+.top-menu-category-level2-label span {
+    flex: 1;
+    margin-right: 8px; /* 간격 살짝 줄임 */
+    text-align: left;
+    word-break: keep-all; /* 단어 단위로 깔끔하게 끊기 */
+}
+
+/* Level 2, 3 리스트 공통 */
+.top-menu-category-level2,
+.top-menu-category-level3
+{
+    list-style: none;
+    display: none;
+    flex-direction: column;
+    padding: 0 0 0 30px; /* 위-오른쪽-아래는 0, 왼쪽만 20px */
+    margin-top: -2px;/* ⭐ 음수 마진을 주어 Level 1에 더 밀착시킴 */
+    margin-bottom: 5px;/* 다음 카테고리와의 간격만 유지 */
+    width: 100%;
+
+    /* (참고) box-sizing이 없으면 padding 때문에 너비가 100%를 넘을 수 있음 */
+    box-sizing: border-box;
+}
+
+/* --- Level 3: 소분류 (최종 링크 아이템)--- */
+.top-menu-category-level3 li {
+    margin: 2px 0;
+}
+.top-menu-category-level3 a,
+.top-menu-category-level3 span {
+    display: block;/* 기본적으로 한 줄을 차지하지만 */
+    width: fit-content;/* ⭐ 배경색이 글자 길이에 딱 맞게 조절 */
+    text-decoration: none;
+    color: #555;
+    font-size: 0.9rem;/* 글씨 크기 유지 */
+
+    padding: 4px 8px;/* ⭐ 패딩을 상하 4px, 좌우 8px로 대폭 축소 */
+    margin: 1px 0;/* 항목 간의 세로 간격도 살짝 조절 */
+
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    background-color: transparent;
+}
+
+.top-menu-category-level3 a:hover,
+.top-menu-category-level3 li span:hover {
+    background-color: #0056b3;
+    color: #ffffff !important;/* 호버 시 글자색 반전으로 세련미 추가 */
+    font-weight: 500;
+    transform: translateX(2px);/* 오른쪽으로 살짝 미는 애니메이션 */
+}
+
+/**************** 사이드바 ****************/
+.sidebar-btn {
+    position: absolute;/* 절대적인 위치로 고정 */
+    left: 20px;/* 버튼을 왼쪽 구석에 고정 */
+    background: none;
+    border: none;
+    color: #0056b3;
+    font-size: 2rem;
+    cursor: pointer;
+
+    display: none; /* PC에서는 사이드바 버튼을 숨김 */
+}
+
+
+/**************** 사이드바 UI 디자인 ****************/
+
+/* 사이드바 배경 및 기본 설정 */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -300px;         /* 평소에는 숨김 */
+    height: 100%;
+    z-index: 2000;
+    transition: left 0.3s ease;
+
+    background-color: #001d3d; 
+    width: 280px;              
+    box-shadow: 4px 0 15px rgba(0,0,0,0.3); 
+    display: flex;
+    flex-direction: column;
+    padding-top: 0;            
+}
+
+/* 활성화 시 등장 */
+.sidebar.active {
+    left: 0; 
+}
+
+/* 1. 사이드바 헤더 */
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 10px;
+}
+
+.sidebar-title {
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+.sidebar-close-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px;
+}
+
+/* 2. 리스트 컨테이너 */
+.sidebar-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-category {
+    width: 100%;
+    margin-bottom: 0; /* 간격 제거 */
+}
+
+/* ⭐ 3. Level 1 메뉴 아이템 (수정됨) */
+.sidebar-category-level1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    
+   
+    color: #ffffff;  /* [수정] 기본 글씨색을 완전 흰색으로 변경하여 잘 보이게 함 */        
+    
+    text-decoration: none;
+    font-size: 1.05rem;
+    font-weight: 500;
+    cursor: pointer;
+    
+    /* [수정] 호버 애니메이션(이동) 제거를 위해 트랜지션 삭제 */
+    /* transition: all 0.2s ease;  <-- 삭제 */
+    border-left: 4px solid transparent; 
+}
+
+/* 4. [사이드바] 호버 효과 */
+/* 마우스를 올렸을 때 화살표가 하얗게 변하고 살짝 커짐 */
+.sidebar-category-level1:hover .toggle-btn,
+.sidebar-category-level2-group:hover .toggle-btn {
+    color: #ffffff;
+    transform: scale(1.1); /* 살짝 커지는 효과 */
+}
+
+/* 단일 링크 스타일 보정 */
+a.sidebar-category-level1 {
+    display: block;
+    width: auto;
+}
+
+/**************** 사이드바 Level 2 디자인 ****************/
+
+/* Level 2 컨테이너 (배경색을 더 어둡게 하여 안쪽으로 들어간 느낌) */
+.sidebar-category-level2 {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background-color: #00152e; /* Level 1(#001d3d)보다 더 어두운 색 */
+    box-shadow: inset 0 3px 5px rgba(0,0,0,0.2); /* 안쪽 그림자 효과 */
+}
+
+/* --- Case A: Level 2가 링크일 때 (선수 정보) --- */
+.sidebar-category-level2 a {
+    display: block;
+    padding: 12px 25px 12px 45px; /* 왼쪽 패딩을 45px로 늘려 들여쓰기 */
+    
+    color: #cfcfcf; /* Level 1보다 살짝 어두운 회색 */
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 400;
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+}
+
+/* 호버 효과 */
+.sidebar-category-level2 a:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-left: 4px solid #4cc9f0; /* Level 2는 밝은 하늘색 포인트 */
+}
+
+
+/* --- Case B: Level 2가 하위 그룹일 때 (경기 기록) --- */
+.sidebar-category-level2-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 25px 12px 45px; /* 링크와 동일한 들여쓰기 */
+    
+    color: #cfcfcf;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+}
+
+/* 그룹형 호버 효과 */
+.sidebar-category-level2-group:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/**************** 사이드바 Level 3 디자인 (경기 외 - 세부항목) ****************/
+
+/* 1. 리스트 컨테이너 설정 */
+.sidebar-category-level3 {
+    list-style: none; /* ⭐ 핵심: 점(Bullet) 제거 */
+    padding: 0;
+    margin: 0;
+    /* Level 2(#00152e)보다 아주 살짝 더 어두운 배경으로 깊이감 표현 */
+    background-color: #000b18; 
+}
+
+/* 2. 내부 링크 스타일 */
+.sidebar-category-level3 li a {
+    display: block;
+    /* Level 2(45px)보다 더 깊게 들여쓰기 (65px) */
+    padding: 12px 25px 12px 65px; 
+    
+    color: #a0a0a0; /* 더 연한 회색 */
+    text-decoration: none; /* 밑줄 제거 */
+    font-size: 0.85rem; /* 글자 크기 살짝 작게 */
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent; /* 호버 효과를 위한 투명 테두리 */
+}
+
+/* 3. 마우스 올렸을 때 효과 */
+.sidebar-category-level3 li a:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-left: 4px solid #4895ef; /* 파란색 포인트 바 */
+}
+
+/* Level 2 내부 텍스트 */
+.sidebar-sub-label {
+    font-size: 0.95rem;
+    font-weight: 400;
+}
+
+/* --- 모바일 스타일 (800px 이하) --- */
+@media (max-width: 800px) {
+    .top-menu-tree {
+        display: none;/* 상단 메뉴를 숨김 */
+    }
+
+    .top-menu {
+        display: flex;
+        justify-content: center;/* 로고 중앙 정렬 */
+        position: relative;
+        padding: 15px 20px;
+    }
+
+    .sidebar-btn {
+        display: block;
+        top: 50%;/* 세로 50% 지점으로 이동 */
+        transform: translateY(-50%);/* 버튼 자신의 높이 절반만큼 위로 끌어올려 완벽한 중앙 배치 */
+    }
+
+    .home-btn
+    {
+        margin-right: 0px; /*모바일에서는 중앙정렬해야함*/
+    }
+}
+
+/**************** 푸터 스타일 (Dark Version) ****************/
+.main-footer {
+    width: 100%;
+    background-color: #001d3d; /* ⭐ 아주 어두운 블루 배경 */
+    border-top: 1px solid #00152e;
+    padding: 10px 0;
+    margin-top: auto;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.copyright {
+    margin: 0;
+    font-size: 0.7rem;
+    color: #ffffff; /* ⭐ 글씨색 흰색으로 변경 */
+    font-weight: 300;
+    letter-spacing: 0.5px;
+}
+
+.admin-link-btn {
+    background-color: rgba(255, 255, 255, 0.1); /* 살짝 비치는 흰색 배경 */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff; /* ⭐ 글씨색 흰색 */
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}

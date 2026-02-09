@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>경기 기록 상세</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../common-style.css">
+    <link rel="stylesheet" href="match-style.css">
+</head>
+
+<body>
+    <main class="main-content">
+
+        <div class="match-detail-container">
+
+            <header class="match-header">
+                <span class="match-status">경기 종료</span>
+                <h1 class="tournament-title">제59회 대통령기 전국대학야구 대회</h1>
+                <p class="match-meta">2025년 8월 8일 (금) 14:00 | 횡성야구장</p>
+            </header>
+
+            <section class="scoreboard-main">
+
+                <div class="team-box away">
+                    <span class="team-badge away-badge">AWAY</span>
+                    <h2 class="team-name">경남대</h2>
+                </div>
+
+
+                <div class="score-center">
+                    <div class="score-display">
+                        <span class="score home-score">0</span>
+                        <span class="score-divider">:</span>
+                        <span class="score away-score">0</span>
+                    </div>
+                </div>
+
+                <div class="team-box home">
+                    <span class="team-badge home-badge">HOME</span>
+                    <h2 class="team-name">청운대</h2>
+                </div>
+
+            </section>
+
+            <div class="scoreboard-table-wrapper">
+                <table class="score-table">
+                    <thead>
+                        <tr>
+                            <th class="team-col">TEAM</th>
+                            <th>1</th>
+                            <th>2</th>
+                            <th>3</th>
+                            <th>4</th>
+                            <th>5</th>
+                            <th>6</th>
+                            <th>7</th>
+                            <th>8</th>
+                            <th>9</th>
+                            <th>10</th>
+                            <th>11</th>
+                            <th>12</th>
+
+                            <th class="stat-header r-col">R</th>
+                            <th class="stat-header h-col">H</th>
+                            <th class="stat-header e-col">E</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="team-name-cell">경남대</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+
+                            <td class="stat-cell r-cell">0</td>
+                            <td class="stat-cell h-cell">3</td>
+                            <td class="stat-cell e-cell">1</td>
+                        </tr>
+                        <tr>
+                            <td class="team-name-cell">청운대</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+
+                            <td class="stat-cell r-cell">0</td>
+                            <td class="stat-cell h-cell">5</td>
+                            <td class="stat-cell e-cell">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="match-key-stats">
+
+                <div class="stat-item">
+                    <span class="stat-label">승리투수</span>
+                    <span class="stat-value">김기민</span>
+                </div>
+
+                <div class="stat-divider"></div>
+
+                <div class="stat-item">
+                    <span class="stat-label">홀드 투수</span>
+                    <span class="stat-value">서승우, 김재운</span>
+                </div>
+
+                <div class="stat-divider"></div>
+
+                <div class="stat-item">
+                    <span class="stat-label">결승타</span>
+                    <span class="stat-value">나예준 (3회 1사 2루 좌전 안타)</span>
+                </div>
+
+            </div>
+
+            <section class="lineups-container">
+
+                <div class="lineup-column left-col">
+                    <div id="start-line-up" class="lineup-box">
+                        <h3 class="lineup-title">스타팅 라인업</h3>
+                        <table class="lineup-table">
+                            <thead>
+                                <tr>
+                                    <th class="no-col">No</th>
+                                    <th class="name-col">이름</th>
+                                    <th class="pos-col">포지션</th>
+                                    <th class="type-col">투타</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>나예준(17)</td>
+                                    <td>CF</td>
+                                    <td>우투우타</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>강태호(16)</td>
+                                    <td>SS</td>
+                                    <td>우투좌타</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="lineup-column right-col">
+
+                    <div id="pitcher-line-up" class="lineup-box">
+                        <h3 class="lineup-title">투수 라인업</h3>
+                        <table class="lineup-table">
+                            <thead>
+                                <tr>
+                                    <th class="no-col">순서</th>
+                                    <th class="name-col">이름</th>
+                                    <th class="inn-col">이닝</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>김선발(1)</td>
+                                    <td>5.0</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>이중계(21)</td>
+                                    <td>2.1</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>박마무(99)</td>
+                                    <td>1.2</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="bench-line-up" class="lineup-box">
+                        <h3 class="lineup-title">교체 명단</h3>
+                        <table class="lineup-table">
+                            <thead>
+                                <tr>
+                                    <th class="inn-col">이닝</th>
+                                    <th class="name-col">이름</th>
+                                    <th class="change-type-col">사유</th>
+                                    <th class="change-out-col">OUT</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="inn-col">7회</td>
+                                    <td class="name-col">박대타(99)</td>
+                                    <td class="change-type-col">대타</td>
+                                    <td class="change-out-col">김선발(1)</td>
+                                </tr>
+                                <tr>
+                                    <td class="inn-col">8회</td>
+                                    <td class="name-col">이주자(5)</td>
+                                    <td class="change-type-col">대주자</td>
+                                    <td class="change-out-col">박대타(99)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="match-photos-container">
+                <h3 class="section-title">경기 사진</h3>
+
+                <div class="photo-gallery">
+                    <div class="photo-item">
+                        <img src="https://picsum.photos/400/300" alt="경기 장면 1">
+                    </div>
+                    <div class="photo-item">
+                        <img src="https://picsum.photos/400/500" alt="경기 장면 2">
+                    </div>
+                    <div class="photo-item">
+                        <img src="https://picsum.photos/400/400" alt="경기 장면 3">
+                    </div>
+                    <div class="photo-item">
+                        <img src="https://picsum.photos/400/600" alt="경기 장면 4">
+                    </div>
+                    <div class="photo-item">
+                        <img src="https://picsum.photos/400/350" alt="경기 장면 5">
+                    </div>
+                    <div class="photo-item">
+                        <img src="https://picsum.photos/400/450" alt="경기 장면 6">
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+    </main>
+
+    <script src="../common.js"></script>
+    <script src="macth.js"></script>
+</body>
+
+</html>

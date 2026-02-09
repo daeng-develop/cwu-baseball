@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 - 경기 기록 관리</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin-match-style.css">
+</head>
+
+<body>
+
+    <div class="admin-container">
+        <header class="admin-header">
+            <h2>⚾ 경기 기록 입력</h2>
+            <a href="../menu.html" class="back-link">메뉴로 돌아가기</a>
+        </header>
+
+        <section class="selection-section">
+            <label for="match-select">기록할 경기 선택 (지난 경기만 표시)</label>
+            <select id="match-select" class="input-field match-select">
+                <option value="">경기를 선택해주세요</option>
+            </select>
+        </section>
+
+        <div id="record-form" class="form-container" style="display: none;">
+            
+            <div class="info-card">
+                <h3 id="info-title">대회 이름 로딩중...</h3>
+                <p id="info-meta">날짜 | 장소</p>
+            </div>
+
+            <hr class="divider">
+
+            <h3 class="section-title">스코어보드 & 상태</h3>
+            
+            <div class="form-group">
+                <label>경기 결과</label>
+                <select id="match-result-status" class="input-field">
+                    <option value="before">경기전</option>
+                    <option value="win">승리 (WIN)</option>
+                    <option value="loss">패배 (LOSS)</option>
+                    <option value="draw">무승부 (DRAW)</option>
+                    <option value="rain_cancel">우천 취소</option>
+                    <option value="etc_cancel">기타 취소</option>
+                    <option value="rain_suspend">서스펜디드</option>
+                </select>
+            </div>
+
+            <div id="win-stats-box" class="form-grid" style="display: none;">
+                <div class="form-group">
+                    <label>승리 투수</label>
+                    <select id="win-pitcher" class="input-field">
+                        <option value="">선수 선택</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>결승타 / 수훈선수 (MVP)</label>
+                    <input type="text" id="mvp-player" class="input-field" placeholder="예: 나예준 (3회 1사 2루 좌전 안타)">
+                </div>
+            </div>
+
+            <div class="table-scroll">
+                <table class="scoreboard-input-table">
+                    <thead>
+                        <tr>
+                            <th>TEAM</th>
+                            <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th>
+                            <th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th>
+                            <th class="stat-head">R</th>
+                            <th class="stat-head">H</th>
+                            <th class="stat-head">E</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="row-away">
+                            <td class="team-name" id="name-away">AWAY</td>
+                            <td><input type="number" class="score-in" data-idx="1"></td>
+                            <td><input type="number" class="score-in" data-idx="2"></td>
+                            <td><input type="number" class="score-in" data-idx="3"></td>
+                            <td><input type="number" class="score-in" data-idx="4"></td>
+                            <td><input type="number" class="score-in" data-idx="5"></td>
+                            <td><input type="number" class="score-in" data-idx="6"></td>
+                            <td><input type="number" class="score-in" data-idx="7"></td>
+                            <td><input type="number" class="score-in" data-idx="8"></td>
+                            <td><input type="number" class="score-in" data-idx="9"></td>
+                            <td><input type="number" class="score-in" data-idx="10"></td>
+                            <td><input type="number" class="score-in" data-idx="11"></td>
+                            <td><input type="number" class="score-in" data-idx="12"></td>
+                            <td><input type="number" class="stat-in r-val" placeholder="0"></td>
+                            <td><input type="number" id="h-away" class="stat-in" placeholder="0"></td>
+                            <td><input type="number" id="e-away" class="stat-in" placeholder="0"></td>
+                        </tr>
+                        <tr id="row-home">
+                            <td class="team-name" id="name-home">HOME</td>
+                            <td><input type="number" class="score-in" data-idx="1"></td>
+                            <td><input type="number" class="score-in" data-idx="2"></td>
+                            <td><input type="number" class="score-in" data-idx="3"></td>
+                            <td><input type="number" class="score-in" data-idx="4"></td>
+                            <td><input type="number" class="score-in" data-idx="5"></td>
+                            <td><input type="number" class="score-in" data-idx="6"></td>
+                            <td><input type="number" class="score-in" data-idx="7"></td>
+                            <td><input type="number" class="score-in" data-idx="8"></td>
+                            <td><input type="number" class="score-in" data-idx="9"></td>
+                            <td><input type="number" class="score-in" data-idx="10"></td>
+                            <td><input type="number" class="score-in" data-idx="11"></td>
+                            <td><input type="number" class="score-in" data-idx="12"></td>
+                            <td><input type="number" class="stat-in r-val" placeholder="0"></td>
+                            <td><input type="number" id="h-home" class="stat-in" placeholder="0"></td>
+                            <td><input type="number" id="e-home" class="stat-in" placeholder="0"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <hr class="divider">
+
+            <div class="lineup-section-wrapper">
+                
+                <div class="lineup-box">
+                    <div class="lineup-header">
+                        <h4>스타팅 라인업 (Starting)</h4>
+                        <button class="btn-mini add" onclick="addStartingRow()">+ 행 추가</button>
+                    </div>
+                    <table class="lineup-input-table" id="table-starting">
+                        <thead>
+                            <tr>
+                                <th width="15%">타순</th>
+                                <th>선수 선택</th>
+                                <th width="20%">포지션</th>
+                                <th width="20%">투타</th>
+                                <th width="10%">삭제</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="lineup-box">
+                    <div class="lineup-header">
+                        <h4>투수 라인업 (Pitcher)</h4>
+                        <button class="btn-mini add" onclick="addPitcherRow()">+ 행 추가</button>
+                    </div>
+                    <table class="lineup-input-table" id="table-pitcher">
+                        <thead>
+                            <tr>
+                                <th width="15%">순서</th>
+                                <th>선수 선택</th>
+                                <th width="25%">이닝</th>
+                                <th width="10%">삭제</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="lineup-box">
+                    <div class="lineup-header">
+                        <h4>교체 명단 (Bench)</h4>
+                        <button class="btn-mini add" onclick="addBenchRow()">+ 행 추가</button>
+                    </div>
+                    <table class="lineup-input-table" id="table-bench">
+                        <thead>
+                            <tr>
+                                <th width="15%">이닝</th>
+                                <th>IN 선수</th>
+                                <th width="20%">사유</th>
+                                <th>OUT 선수</th>
+                                <th width="10%">삭제</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <hr class="divider">
+
+            <h3 class="section-title">경기 사진 업로드</h3>
+            <div class="form-group">
+                <div class="file-upload-box">
+                    <input type="file" id="match-photos" multiple accept=".jpg, .jpeg">
+                    <p class="file-help">여러 장 선택 가능 (200KB 이하, JPG)</p>
+                </div>
+                
+                <div id="photo-preview-box" class="photo-preview-container" style="display:none;"></div>
+
+                <p class="warning-text">
+                    ⚠️ 사진 수정 후 반드시 <strong>[저장]</strong> 버튼을 눌러야 반영됩니다.
+                </p>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-register" id="btn-save-record">경기 기록 저장</button>
+                <button class="btn btn-cancel" onclick="location.reload()">취소</button>
+            </div>
+
+        </div> </div>
+
+    <script type="module" src="admin-match.js"></script>
+</body>
+
+</html>

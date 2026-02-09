@@ -1,0 +1,273 @@
+/* admin-match-style.css */
+
+/* --- 공통 레이아웃 --- */
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.admin-container {
+    width: 100%;
+    /* ⭐ 너비를 넓혀서 한 줄 전시 유도 */
+    max-width: 1000px;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.admin-header h2 { margin: 0; color: #333; }
+
+.back-link {
+    text-decoration: none;
+    color: #555;
+    font-weight: bold;
+    padding: 5px 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+/* --- 경기 선택 섹션 --- */
+.selection-section {
+    background: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+}
+
+/* 제목(label)과 박스 사이 간격 추가 */
+.selection-section label {
+    display: block;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #001d3d;
+}
+
+/* --- 폼 컨테이너 --- */
+.form-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- 기본 정보 카드 --- */
+.info-card {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-left: 4px solid #001d3d;
+    border-radius: 4px;
+}
+.info-card h3 { margin: 0 0 5px 0; color: #001d3d; }
+.info-card p { margin: 0; color: #666; font-size: 0.9rem; }
+
+/* --- 공통 입력 필드 (Select Box 디자인 적용) --- */
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 6px; font-weight: 700; color: #444; }
+
+.input-field {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+}
+
+/* Select Box 커스텀 디자인 */
+select.input-field {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+/* --- 스코어보드 입력 테이블 --- */
+.table-scroll {
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+.scoreboard-input-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+    text-align: center;
+}
+
+.scoreboard-input-table th {
+    background: #001d3d;
+    color: white;
+    padding: 8px;
+    font-size: 0.9rem;
+}
+.scoreboard-input-table td {
+    border: 1px solid #eee;
+    padding: 4px;
+}
+.scoreboard-input-table input {
+    width: 40px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+/* ⭐ [수정] 팀 이름 셀 스타일 변경 */
+.team-name {
+    font-weight: bold;
+    background: #f9f9f9;
+    
+    /* 너비 확장 (기존 80px -> 120px 이상) */
+    min-width: 120px;
+    
+    /* 한 줄로 강제 표시 */
+    white-space: nowrap;
+    
+    padding: 4px 8px;
+}
+
+.stat-head { background: #444 !important; }
+.stat-in { background: #f0f0f0; font-weight: bold; }
+
+/* --- 라인업 섹션 --- */
+.lineup-section-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.lineup-box {
+    border: 1px solid #eee;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.lineup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 8px;
+}
+
+.lineup-input-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.lineup-input-table th {
+    background: #f1f3f5;
+    color: #444;
+    padding: 8px;
+    font-size: 0.85rem;
+    text-align: center;
+}
+.lineup-input-table td {
+    padding: 4px;
+    border-bottom: 1px solid #eee;
+}
+
+/* 테이블 안의 Select Box도 스타일 적용 */
+.lineup-input-table select.input-field,
+.lineup-input-table input {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+}
+
+/* 버튼들 */
+.btn-mini {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.btn-mini.add { background: #28a745; color: white; }
+.btn-mini.del { background: #e63946; color: white; width: 100%; }
+
+/* --- 사진 업로드 --- */
+.file-upload-box {
+    border: 2px dashed #ccc;
+    padding: 15px;
+    background: #fafafa;
+    text-align: center;
+    border-radius: 6px;
+}
+.warning-text { color: #e63946; font-size: 0.85rem; margin-top: 5px; }
+
+.photo-preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+.photo-item {
+    position: relative;
+    width: 70px;
+    height: 70px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.photo-item img { width: 100%; height: 100%; object-fit: cover; }
+.btn-remove-photo {
+    position: absolute;
+    top: 0; right: 0;
+    width: 20px; height: 20px;
+    background: rgba(0,0,0,0.6);
+    color: white; border: none; cursor: pointer;
+}
+
+/* --- 하단 버튼 --- */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+}
+.btn {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+}
+.btn-register { background: #001d3d; }
+.btn-cancel { background: #6c757d; }
+.divider { border: 0; height: 1px; background: #ddd; margin: 30px 0; }

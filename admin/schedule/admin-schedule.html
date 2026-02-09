@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 - 일정 관리</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin-schedule-style.css">
+</head>
+
+<body>
+
+    <div class="admin-container">
+        <header class="admin-header">
+            <h2>📅 일정 관리</h2>
+            <a href="../menu.html" class="back-link">메뉴로 돌아가기</a>
+        </header>
+
+        <div class="tab-menu">
+            <button class="tab-btn active" onclick="openTab('match-tab', this)">⚾ 경기 일정 등록</button>
+            <button class="tab-btn" onclick="openTab('event-tab', this)">🎉 행사 일정 등록</button>
+        </div>
+
+        <div id="match-tab" class="tab-content active">
+            <div class="form-container">
+                <div class="form-group">
+                    <label>경기 날짜</label>
+                    <input type="date" id="match-date" class="input-field">
+                </div>
+
+                <div class="form-group">
+                    <label>대회 이름</label>
+
+                    <div class="input-with-select">
+                        <input type="text" id="match-title" class="input-field" placeholder="대회 이름을 입력하세요">
+
+                        <select id="match-title-select" class="input-field select-helper">
+                            <option value="direct">직접 입력</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>상대팀</label>
+                    <input type="text" id="match-opponent" class="input-field" placeholder="예: 경남대학교">
+                </div>
+
+                <div class="form-group">
+                    <label>경기 장소</label>
+                    <input type="text" id="match-location" class="input-field" placeholder="예: 보은 스포츠파크 야구장">
+                </div>
+
+                <div class="form-group">
+                    <label>홈 / 어웨이</label>
+                    <select id="match-home-away" class="input-field">
+                        <option value="home">Home (후공)</option>
+                        <option value="away">Away (선공)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>경기 상태</label>
+                    <select id="match-status" class="input-field">
+                        <option value="before">경기전</option>
+                        <option value="end">경기 종료</option>
+                        <option value="rain_cancel">우천 취소</option>
+                        <option value="etc_cancel">기타 취소</option>
+                        <option value="rain_suspend">우천 중단 (서스펜디드)</option>
+                    </select>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-register btn-register-match">일정 등록</button>
+                    <button class="btn btn-edit" style="display:none;">수정</button>
+                    <button class="btn btn-cancel" onclick="location.reload()">취소</button>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <section class="list-section">
+                <h3 class="section-title">등록된 경기 목록</h3>
+
+                <div class="table-container">
+                    <table class="admin-list-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%;">번호</th>
+                                <th style="width: 20%;">날짜</th>
+                                <th style="width: 50%;">대회 이름 (vs 상대)</th>
+                                <th style="width: 20%;">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="match-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <div id="event-tab" class="tab-content">
+            <div class="form-container">
+                <div class="form-group">
+                    <label>행사 날짜</label>
+                    <input type="date" id="event-date" class="input-field">
+                </div>
+
+                <div class="form-group">
+                    <label>행사 이름 (Title)</label>
+                    <input type="text" id="event-title" class="input-field" placeholder="예: 동계 훈련">
+                </div>
+
+                <div class="form-group">
+                    <label>장소</label>
+                    <input type="text" id="event-location" class="input-field" placeholder="예: 기장 현대차 드림볼파크">
+                </div>
+
+                <div class="form-group">
+                    <label>사진 업로드</label>
+                    <div class="file-upload-box">
+                        <input type="file" id="event-photos" multiple accept=".jpg, .jpeg">
+                        <p class="file-help">여러 장 선택 가능</p>
+                    </div>
+
+                    <div id="photo-preview-box" class="photo-preview-container" style="display:none;">
+                    </div>
+
+                    <p class="warning-text">
+                        ⚠️ 주의: <strong>.jpg / .jpeg</strong> 파일만 가능하며,
+                        장당 <strong>200KB 이하</strong>여야 합니다.
+                    </p>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-register btn-register-event">일정 등록</button>
+                    <button class="btn btn-edit">수정</button>
+                    <button class="btn btn-cancel" onclick="location.reload()">취소</button>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <section class="list-section">
+                <h3 class="section-title">등록된 행사 목록</h3>
+
+                <div class="table-container">
+                    <table class="admin-list-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%;">번호</th>
+                                <th style="width: 20%;">날짜</th>
+                                <th style="width: 50%;">행사 이름</th>
+                                <th style="width: 20%;">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="event-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <script>
+        function openTab(tabId, btnElement) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+    </script>
+    <script type="module" src="admin-schedule.js"></script>
+</body>
+
+</html>

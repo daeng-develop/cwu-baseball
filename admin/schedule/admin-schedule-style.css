@@ -1,0 +1,420 @@
+/* admin/admin-schedule-style.css */
+
+/* 기본 설정 */
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* 전체 컨테이너 */
+.admin-container {
+    width: 100%;
+    max-width: 600px;
+    background-color: transparent;
+}
+
+/* 헤더 영역 */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.admin-header h2 {
+    margin: 0;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.back-link {
+    text-decoration: none;
+    color: #555;
+    font-weight: bold;
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    transition: 0.2s;
+}
+
+.back-link:hover {
+    background-color: #e9ecef;
+}
+
+/* 탭 메뉴 스타일 */
+.tab-menu {
+    display: flex;
+    background-color: #ddd;
+    border-radius: 10px 10px 0 0;
+    overflow: hidden;
+}
+
+.tab-btn {
+    flex: 1; /* 너비를 똑같이 반반 차지 */
+    border: none;
+    padding: 15px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: #e0e0e0;
+    color: #777;
+    transition: 0.3s;
+}
+
+/* 활성화된 탭 스타일 */
+.tab-btn.active {
+    background-color: #fff; /* 활성화되면 흰색 배경 */
+    color: #001d3d; /* 글자색 진하게 */
+    border-top: 3px solid #001d3d; /* 상단 포인트 컬러 */
+}
+
+/* 탭 내용 영역 (기본적으로 숨김) */
+.tab-content {
+    display: none;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* 활성화된 내용만 보이게 */
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 폼 스타일 */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: #444;
+    font-size: 0.95rem;
+}
+
+.input-field {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box; /* 패딩 포함 크기 계산 */
+    font-family: inherit;
+}
+
+.input-field:focus {
+    border-color: #001d3d;
+    outline: none;
+}
+
+/* 파일 업로드 스타일 */
+.file-upload-box {
+    border: 2px dashed #ccc;
+    padding: 15px;
+    border-radius: 6px;
+    background-color: #fafafa;
+}
+
+.file-help {
+    margin: 5px 0 0 0;
+    font-size: 0.8rem;
+    color: #888;
+}
+
+/* 경고 문구 스타일 */
+.warning-text {
+    font-size: 0.85rem;
+    color: #e63946; /* 붉은색 */
+    margin-top: 8px;
+    line-height: 1.4;
+}
+
+/* --- [추가] Select Box 커스텀 디자인 --- */
+
+select.input-field {
+    /* 1. 기본 브라우저 스타일 제거 (가장 중요!) */
+    -webkit-appearance: none;  /* 크롬, 사파리 */
+    -moz-appearance: none;     /* 파이어폭스 */
+    appearance: none;          /* 표준 */
+
+    /* 2. 배경색 및 커스텀 화살표 추가 */
+    background-color: #fff;
+    
+    /* SVG 화살표 아이콘 (회색) */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    
+    background-repeat: no-repeat;
+    background-position: right 12px center; /* 오른쪽에서 12px 떨어진 곳에 중앙 정렬 */
+    background-size: 16px; /* 화살표 크기 */
+
+    /* 3. 텍스트가 화살표와 겹치지 않게 오른쪽 여백 확보 */
+    padding-right: 40px; 
+    
+    cursor: pointer;
+    color: #444;
+    font-weight: 500;
+}
+
+/* 마우스를 올렸을 때 살짝 진해짐 */
+select.input-field:hover {
+    border-color: #888;
+}
+
+/* 클릭했을 때 (포커스) - 테두리 색상 강조 & 화살표 색상 변경(선택사항) */
+select.input-field:focus {
+    border-color: #001d3d;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 29, 61, 0.1); /* 부드러운 파란색 번짐 효과 */
+}
+
+/* ===========================
+   [추가] 구분선 및 목록 스타일
+=========================== */
+
+/* 구분선 */
+.divider {
+    border: 0;
+    height: 1px;
+    background: #e0e0e0;
+    margin: 40px 0; /* 위아래 여백 */
+}
+
+/* 유틸리티: 상단 여백 */
+.margin-top-30 {
+    margin-top: 30px;
+}
+
+/* 유틸리티: 텍스트 왼쪽 정렬 */
+.text-left {
+    text-align: left !important;
+    padding-left: 20px !important; /* 왼쪽 여백 살짝 줌 */
+}
+
+/* ===========================
+   범용 관리자 테이블 디자인
+=========================== */
+
+/* 테이블 컨테이너 (스크롤 대응) */
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* 화면이 작으면 가로 스크롤 생성 */
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* 부드러운 그림자 */
+    border-radius: 8px; /* 둥근 모서리 */
+    margin-top: 15px;
+}
+
+/* 테이블 기본 스타일 */
+.admin-list-table {
+    width: 100%;
+    border-collapse: collapse; /* 테두리 겹침 방지 */
+    font-size: 0.95rem;
+    white-space: nowrap; /* 줄바꿈 방지 */
+}
+
+/* 테이블 헤더 (thead) */
+.admin-list-table thead th {
+    background-color: #f8f9fa; /* 밝은 회색 배경 */
+    color: #495057; /* 진한 회색 글씨 */
+    font-weight: 700;
+    padding: 15px 12px;
+    text-align: center;
+    border-bottom: 2px solid #dee2e6; /* 헤더 아래 진한 줄 */
+}
+
+/* 테이블 본문 행 (tr) */
+.admin-list-table tbody tr {
+    border-bottom: 1px solid #f1f3f5; /* 행 사이 얇은 줄 */
+    transition: background-color 0.2s;
+}
+
+/* 마우스 올렸을 때 효과 (Hover) */
+.admin-list-table tbody tr:hover {
+    background-color: #f1f8ff; /* 아주 연한 파란색 하이라이트 */
+}
+
+/* 테이블 셀 (td) */
+.admin-list-table tbody td {
+    padding: 12px 12px;
+    text-align: center; /* 기본 중앙 정렬 */
+    vertical-align: middle;
+    color: #333;
+}
+
+/* 데이터가 없을 때 메시지 셀 */
+.admin-list-table td[colspan] {
+    padding: 30px;
+    color: #868e96;
+    font-style: italic;
+    text-align: center;
+}
+
+/* ===========================
+   관리 버튼 스타일 (수정/삭제)
+=========================== */
+.btn-list {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin: 0 2px; /* 버튼 사이 간격 */
+    font-weight: 500;
+}
+
+/* 수정 버튼 (파란색 계열) */
+.btn-list.edit {
+    background-color: #e7f1ff;
+    color: #0056b3;
+}
+
+.btn-list.edit:hover {
+    background-color: #d0e4ff;
+    color: #004494;
+}
+
+/* 삭제 버튼 (빨간색 계열) */
+.btn-list.delete {
+    background-color: #ffeaea;
+    color: #d6336c;
+}
+
+.btn-list.delete:hover {
+    background-color: #ffd0d0;
+    color: #a92255;
+}
+
+/* ===========================
+   [추가] 하단 버튼 그룹 (admin-player 스타일 통일)
+=========================== */
+
+.action-buttons {
+    display: flex;
+    gap: 10px;       /* 버튼 사이 간격 */
+    margin-top: 25px;
+}
+
+/* 모든 버튼 공통 스타일 */
+.btn {
+    flex: 1;         /* 너비를 1:1:1로 똑같이 배분 */
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: white;    /* 글씨색 흰색 */
+}
+
+/* 1. 등록 버튼 (메인 - 네이비) */
+.btn-register {
+    background-color: #001d3d;
+}
+.btn-register:hover {
+    background-color: #003366;
+    transform: translateY(-2px);
+}
+
+/* 2. 수정 버튼 (포인트 - 파란색) */
+.btn-edit {
+    background-color: #0056b3;
+}
+.btn-edit:hover {
+    background-color: #004494;
+    transform: translateY(-2px);
+}
+
+/* 3. 취소 버튼 (서브 - 회색) */
+.btn-cancel {
+    background-color: #6c757d;
+}
+.btn-cancel:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+
+/* 기존 사진 미리보기 영역 */
+.photo-preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #eee;
+}
+
+/* 개별 사진 카드 */
+.photo-item {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 정사각형 꽉 채우기 */
+}
+
+/* 삭제(X) 버튼 */
+.btn-remove-photo {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 24px;
+    height: 24px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.btn-remove-photo:hover {
+    background-color: #e63946; /* 빨간색 */
+}
+/* 입력창 + 선택박스 가로 배치 */
+.input-with-select {
+    display: flex;
+    gap: 10px; /* 사이 간격 */
+}
+
+/* 입력창이 남은 공간을 모두 차지 */
+.input-with-select input {
+    flex: 1;
+}
+
+/* 선택 박스는 적당한 너비 고정 (혹은 flex로 비율 조정 가능) */
+.input-with-select select {
+    width: 150px; /* 필요에 따라 조절 */
+    min-width: 100px;
+    background-color: #f8f9fa; /* 살짝 회색빛으로 도우미 느낌 */
+}

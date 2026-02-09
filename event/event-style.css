@@ -1,0 +1,98 @@
+/* event-style.css */
+
+/* 전체 컨테이너 */
+.event-detail-container {
+    max-width: 1000px;
+    margin: 40px auto; /* 상하 여백 넉넉히 */
+    padding: 0 20px;
+    text-align: center;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* --- 헤더 영역 --- */
+.event-header {
+    margin-bottom: 50px;
+    border-bottom: 2px solid #eee; /* 하단 구분선 */
+    padding-bottom: 30px;
+}
+
+.event-title {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #222;
+    margin: 0 0 15px 0;
+    word-break: keep-all;
+}
+
+.event-meta {
+    font-size: 1rem;
+    color: #777;
+    margin: 0;
+    font-weight: 500;
+}
+
+
+/* --- 사진 갤러리 (Pinterest Masonry Style) --- */
+.photo-gallery {
+    /* PC: 가로 3줄 */
+    column-count: 3;
+    column-gap: 15px; 
+}
+
+/* 개별 사진 아이템 */
+.photo-item {
+    /* [수정] 정렬 문제 해결을 위한 핵심 코드 3줄 추가 */
+    display: inline-block; /* 1. 박스를 글자처럼 취급 */
+    width: 100%;           /* 2. 가로 폭을 꽉 채움 */
+    vertical-align: top;   /* 3. 무조건 위쪽 라인에 맞춤 */
+
+    /* 기존 속성 유지 */
+    break-inside: avoid; 
+    margin-bottom: 15px; 
+    
+    /* 사진 감싸는 박스 스타일 */
+    border-radius: 12px;
+    overflow: hidden;
+    
+    /* 기존에 배경색/높이 강제 설정했던 것은 삭제하거나 덮어씌움 */
+    background-color: transparent !important; /* 배경 투명하게 */
+    box-shadow: none !important;
+    min-height: auto !important;
+}
+
+.photo-item img {
+    width: 100%;
+    height: auto; /* 비율 유지 */
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+/* 마우스 올리면 살짝 확대 효과 */
+.photo-item img:hover {
+    transform: scale(1.03);
+}
+
+.loader, .no-photo {
+    width: 100%;
+    text-align: center;
+    padding: 50px 0;
+    color: #666;
+    font-size: 1.1rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+/* --- 모바일 반응형 --- */
+@media (max-width: 768px) {
+    .photo-gallery {
+        column-count: 2; /* 태블릿/모바일은 2줄 */
+    }
+    
+    .event-title {
+        font-size: 1.5rem;
+    }
+    
+    .event-detail-container {
+        margin-top: 20px;
+    }
+}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>선수 페이지 기능 테스트</title>
+    
+    <link rel="stylesheet" href="../common-style.css">
+    <link rel="stylesheet" href="player-style.css">
+</head>
+<body>
+<main class="player-container">
+    <div class="page-header">
+        <h2 class="page-title"><span id="display-year">2026</span>년도 <span id="display-position">선수단</span></h2>
+        
+        <div class="filter-controls">
+            <div class="position-selector">
+                <button class="position-btn" data-position="pitcher">투수</button>
+                <button class="position-btn" data-position="catcher">포수</button>
+                <button class="position-btn" data-position="infielder">내야수</button>
+                <button class="position-btn" data-position="outfielder">외야수</button>
+            </div>
+
+            <select id="year-select" class="year-select">
+                <option value="2025">2025 시즌</option>
+                <option value="2026" selected>2026 시즌</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="player-list-area" class="player-grid"><div class="no-data">데이터를 불러오는 중입니다...</div></div>
+</main>
+    <script src="../common.js"></script>
+    <script type="module" src="player.js"></script>
+</body>
+</html>

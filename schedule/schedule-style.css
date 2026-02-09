@@ -1,0 +1,200 @@
+/* scheduler-style.css */
+
+.schedule-container {
+    max-width: 1200px; 
+    width: 95%; /* 작은 화면에서도 꽉 차게 */
+    margin: 0 auto;
+    padding: 40px 20px; /* 상하 여백도 좀 더 넉넉히 */
+}
+
+/* --- 1. 헤더 (년/월 선택) --- */
+.calendar-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 30px;
+}
+
+.current-date {
+    font-size: 2.2rem; /* 헤더 폰트도 살짝 키움 */
+    font-weight: 800;
+    color: #333;
+    margin: 0;
+}
+
+.nav-btn {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: 0.2s;
+    color: #555;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.nav-btn:hover {
+    background-color: #333;
+    color: white;
+    border-color: #333;
+}
+
+
+/* --- 2. 달력 그리드 --- */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    
+    background-color: #fff;
+    border-top: 2px solid #333; 
+    border-left: 1px solid #eee;
+    
+    /* 그림자 추가로 달력 전체가 떠 보이게 */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05); 
+}
+
+/* 요일 헤더 */
+.weekday {
+    padding: 15px 0; /* 패딩 키움 */
+    text-align: center;
+    font-weight: 700;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    border-right: 1px solid #eee;
+    font-size: 1rem;
+    color: #555;
+}
+
+.sun { color: #e53935 !important; }
+.sat { color: #1565c0 !important; }
+
+/* --- 날짜 셀 (Cell) --- */
+.calendar-cell {
+    min-height: 120px; 
+    
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    border-right: 1px solid #eee;
+    position: relative;
+    box-sizing: border-box;
+    background-color: white; /* 기본 배경: 흰색 */
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    transition: background-color 0.2s;
+}
+
+.calendar-cell:hover {
+    background-color: #fafafa; /* 기본 호버는 아주 살짝만 */
+}
+
+/* 날짜 숫자 */
+.date-num {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.calendar-cell.sun .date-num { color: #e53935; }
+.calendar-cell.sat .date-num { color: #1565c0; }
+
+.calendar-cell.empty {
+    background-color: #fcfcfc;
+}
+
+/* --- ⭐ [핵심 수정] 경기가 있는 날 스타일 --- */
+.calendar-cell.has-match {
+    /* 배경색을 연한 파랑(하늘색)으로 변경하여 흰색과 확실히 구분 */
+    background-color: #eef6fd; 
+}
+
+/* 경기가 있는 날 호버 시 조금 더 진하게 */
+.calendar-cell.has-match:hover {
+    background-color: #e1f0fc;
+}
+
+/* --- 경기 정보 (Cell 내부 링크) --- */
+.match-info {
+    width: 100%;
+    
+    /* 1. 박스 배치 */
+    display: flex;
+    flex-direction: column;
+    gap: 3px; 
+    margin-top: 5px; 
+    
+    /* 2. 링크 스타일 제거 */
+    text-decoration: none; /* 밑줄 제거 */
+    cursor: pointer;
+    
+    /* 3. 살짝 띄워서 클릭 영역 확보 */
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+/* 마우스 올렸을 때 강조 */
+.match-info:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* 텍스트 공통 스타일 */
+.match-time, 
+.match-result, 
+.match-place {
+    font-size: 0.85rem;  
+    font-weight: 400;   
+    line-height: 1.3;   
+    
+    /* 말줄임표 처리 */
+    white-space: nowrap;      
+    overflow: hidden;         
+    text-overflow: ellipsis;  
+    display: block;           
+}
+
+/* 제목/상대팀 (굵게) */
+.match-result {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+/* 장소 (회색) */
+.match-place {
+    color: #888;
+    font-size: 0.8rem;
+}
+/* --- 개별 속성 및 색상 --- */
+
+/* 시간 (기본 회색 유지) */
+.match-time {
+    color: #888; 
+    font-size: 0.85rem; /* 시간만 아주 살짝 작게 해도 좋지만, 원하면 0.9rem로 통일 */
+}
+
+/* 결과 (색상만 다르게, 굵기는 위에서 통일됨) */
+.match-result.win { color: #1565c0; }      /* 승리: 파랑 */
+.match-result.loss { color: #e53935; }     /* 패배: 빨강 */
+.match-result.upcoming { color: #333; }    /* 예정: 진한 검정 */
+
+/* 장소 (기본 회색) */
+.match-place {
+    color: #888;
+}
+
+
+/* --- 모바일 반응형 --- */
+@media (max-width: 768px) {
+    /* 모바일에서도 폰트 크기 통일감 유지 */
+    .match-time, 
+    .match-result, 
+    .match-place {
+        font-size: 0.8rem; /* 모바일은 조금만 작게 */
+    }
+}
