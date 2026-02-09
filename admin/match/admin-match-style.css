@@ -333,3 +333,32 @@ select.input-field {
 .autocomplete-item strong {
     color: #001d3d;
 }
+
+/* 포지션 선택 박스 */
+.pos-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    text-align: center;
+    background-color: #fff;
+}
+
+/* 타순 컬럼 (숫자) */
+#table-starting td:first-child {
+    text-align: center;
+    background-color: #f9f9f9;
+    border-right: 1px solid #eee;
+}
+
+/* Readonly Input (투타) */
+.type-input {
+    border: 1px solid #eee !important;
+    text-align: center;
+    cursor: default;
+}
+.type-input:focus {
+    border-color: #eee !important;
+    box-shadow: none !important;
+}
