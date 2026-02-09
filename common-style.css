@@ -314,6 +314,13 @@ a.top-menu-category-level1 {
     margin: 0;
     display: flex;
     flex-direction: column;
+
+    /* ⭐ [수정] 스크롤 기능 추가 */
+    flex: 1;           /* 헤더를 제외한 남은 공간을 모두 차지함 */
+    overflow-y: auto;  /* 내용이 넘치면 세로 스크롤바 생성 */
+    
+    /* (선택) 스크롤바가 너무 투박하지 않게 여백 조정 */
+    padding-bottom: 20px; 
 }
 
 .sidebar-category {
