@@ -222,7 +222,7 @@ async function fillEventMenu(pathPrefix, year, elementId) {
 
     let db;
     try {
-        const module = await import(`${pathPrefix}firebase/firebase.js`);
+        const module = await import("../firebase/firebase.js");
         db = module.db;
     } catch (error) {
         console.error("Firebase 로드 실패:", error);
@@ -264,7 +264,7 @@ async function fillMatchMenu(pathPrefix, elementId, isSidebar) {
 
     let db;
     try {
-        const module = await import(`${pathPrefix}firebase/firebase.js`);
+        const module = await import("../firebase/firebase.js");
         db = module.db;
     } catch (error) {
         container.innerHTML = `<li><span style="padding:10px;">연결 실패</span></li>`;
