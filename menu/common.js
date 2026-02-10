@@ -1,11 +1,8 @@
 /* common.js */
+const pathPrefix = "../";
 
 /** * top menu와 side bar 기본 작성 */
 async function draw_menu_tree() {
-
-    const pageName = window.location.pathname.split("/").pop();
-    const isRoot = pageName === "" || pageName === "index.html";
-    const pathPrefix = isRoot ? "./" : "../"; 
 
     // [설정] 경기 외 년도별 메뉴
     const targetYears = ["2026"]; 
@@ -161,10 +158,6 @@ async function draw_menu_tree() {
 }
 
 async function draw_footer() {
-    const pageName = window.location.pathname.split("/").pop();
-    const isRoot = pageName === "" || pageName === "index.html";
-    const pathPrefix = isRoot ? "./" : "../";
-
     const footer_html = `
       <footer class="main-footer">
         <div class="footer-content">
