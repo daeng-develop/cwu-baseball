@@ -1,3 +1,6 @@
+/* ⭐ 폰트 불러오기 (HTML link 태그 대신 사용) */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
 /**************** 기본적인 폰트 및 배경 설정 ****************/
 body {
     margin: 0;/* 화면에 꽉 차게 (하얀 테두리 삭제) */
