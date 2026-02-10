@@ -1,7 +1,7 @@
 /* schedule.js */
 
 // 1. Firebase 가져오기
-import { db } from "../firebase.js";
+import { db } from "../firebase/firebase.js";
 
 // 2. 상태 변수
 let currentDate = new Date();

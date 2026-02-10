@@ -1,5 +1,5 @@
 /* index.js */
-import { db, storage } from './firebase.js'; 
+import { db, storage } from './firebase/firebase.js'; 
 
 // 메인 배너 이미지 불러오기 함수
 async function loadMainBanner() {

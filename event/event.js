@@ -1,7 +1,7 @@
 /* event.js */
 
 // 1. Firebase 설정 가져오기
-import { db } from "../firebase.js";
+import { db } from "../firebase/firebase.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     loadEventDetail();

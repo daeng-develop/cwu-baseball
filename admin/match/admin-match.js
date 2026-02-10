@@ -1,5 +1,5 @@
 /* admin/admin-match.js */
-import { db, storage } from "../../firebase.js";
+import { db, storage } from "../../firebase/firebase.js";
 
 // 상태 변수
 let selectedMatchId = null; 

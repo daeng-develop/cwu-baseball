@@ -1,7 +1,7 @@
 /* admin/admin-schedule.js */
 
 // 1. 설정 파일에서 db와 storage 가져오기
-import { db, storage } from "../../firebase.js";
+import { db, storage } from "../../firebase/firebase.js";
 
 // [이벤트(행사)용 변수]
 let isEditMode = false;

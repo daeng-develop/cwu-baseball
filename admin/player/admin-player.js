@@ -1,6 +1,6 @@
 /* admin/admin-player.js */
 // 1. 설정 파일에서 db와 storage 가져오기
-import { db, storage } from "../../firebase.js";
+import { db, storage } from "../../firebase/firebase.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     // 등록 버튼에 클릭 이벤트 연결

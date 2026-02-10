@@ -1,5 +1,5 @@
 // 1. 설정 파일에서 db와 storage 가져오기
-import { db, storage } from "../firebase.js";
+import { db, storage } from "../firebase/firebase.js";
 
 const posNames = { 'pitcher': '투수', 'catcher': '포수', 'infielder': '내야수', 'outfielder': '외야수'};
 const posMap = { 'pitcher': 0, 'catcher': 1, 'infielder': 2, 'outfielder': 3 };

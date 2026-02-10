@@ -1,5 +1,5 @@
 /* match.js */
-import { db } from "../firebase.js"; 
+import { db } from "../firebase/firebase.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const matchId = window.location.hash.substring(1);
