@@ -2,11 +2,30 @@
 // 1. 설정 파일에서 db와 storage 가져오기
 import { db, storage } from "../../firebase/firebase.js";
 
+// 수정 시 기존 정보를 기억할 변수들
+let currentOriginalPhoto = ""; 
+let currentOriginalPosition = ""; // ⭐ [추가] 포지션 변경 감지용
+
 document.addEventListener("DOMContentLoaded", () => {
-    // 등록 버튼에 클릭 이벤트 연결
+    // 1. 등록 버튼 이벤트
     const registerBtn = document.querySelector('.btn-register');
     if (registerBtn) {
-        registerBtn.addEventListener('click',register_member);
+        registerBtn.addEventListener('click', register_member);
+    }
+
+    // ⭐ 2. 수정 버튼 이벤트 (새로 추가)
+    const editBtn = document.querySelector('.btn-edit');
+    if (editBtn) {
+        editBtn.addEventListener('click', update_member);
+        editBtn.style.display = "none"; // 처음에 숨김
+    }
+
+    // ⭐ 3. 취소 버튼 이벤트 (새로 수정)
+    const cancelBtn = document.querySelector('.btn-cancel');
+    if (cancelBtn) {
+        // 새로고침 대신 입력창 초기화 함수 연결
+        cancelBtn.removeAttribute("onclick"); // HTML에 있는거 무시
+        cancelBtn.addEventListener('click', resetFormState); 
     }
 
     // 연도 선택 이벤트 연결
@@ -61,6 +80,13 @@ async function register_member() {
     // 2. 필수 항목 유효성 검사 (이름, 배번, 학년, 포지션)
     if (!name || !number || !grade || !position) {
         alert("필수 항목(이름, 배번, 학년, 포지션)을 모두 입력해주세요.");
+        return;
+    }
+
+    // ⭐ [추가] 생년월일 8자리 검사 (입력값이 있을 때만)
+    if (birth && !/^\d{8}$/.test(birth)) {
+        alert("생년월일은 '20040101' 형식의 8자리 숫자로 입력해주세요.");
+        document.getElementById('birth').focus();
         return;
     }
 
@@ -184,42 +210,53 @@ async function loadPlayerList(year) {
 // 테이블에 그리는 함수
 function renderTable(players) {
     const tableBody = document.getElementById('player-table-body');
-    tableBody.innerHTML = ""; // 기존 내용 초기화
+    tableBody.innerHTML = ""; 
 
     if (players.length === 0) {
-        // 컬럼 개수에 맞춰 colspan을 7로 수정 (사진, 관리 포함)
         tableBody.innerHTML = `<tr><td colspan="7" style="padding:20px; color:#999;">등록된 선수가 없습니다.</td></tr>`;
         return;
     }
 
-    // HTML 생성
     const html = players.map(player => {
+        // 데이터에 따옴표(')가 있으면 에러가 날 수 있으므로 escape 처리하거나
+        // 간단하게 문자열로 변환해서 넘깁니다.
+        // 여기서는 편의상 객체를 통째로 넘기기 위해 JSON 문자열을 활용하지 않고, 
+        // 각 데이터를 인자로 풀어서 넘깁니다. (안전한 방식)
         
-        // ⭐ [추가] 생년월일 포맷팅 (040101 -> 04.01.01)
+        // 생년월일 포맷팅
         let birthDisplay = "-";
-        if (player.birth && player.birth.length === 6) {
-            birthDisplay = `${player.birth.slice(0, 2)}.${player.birth.slice(2, 4)}.${player.birth.slice(4, 6)}`;
+        if (player.birth && player.birth.length === 8) {
+            birthDisplay = `${player.birth.slice(0, 4)}.${player.birth.slice(4, 6)}.${player.birth.slice(6, 8)}`;
         } else if (player.birth) {
-            birthDisplay = player.birth; // 6자리가 아니면 그냥 보여줌
+            birthDisplay = player.birth; // 8자리가 아니면 그냥 표시
         }
+
+        // ⭐ 데이터 안전하게 넘기기 위한 준비
+        const p_name = player.name || "";
+        const p_number = player.number || "";
+        const p_grade = player.grade || "1";
+        const p_pos = player.position || "0";
+        const p_birth = player.birth || "";
+        const p_height = player.height || "";
+        const p_weight = player.weight || "";
+        const p_type = player.type || "미지정";
+        const p_school = player.school || "";
+        const p_photo = player.photo || "";
 
         return `
         <tr>
-            <td>${player.name}</td>
-            <td>No. ${player.number}</td>
-            <td>${player.grade}학년</td>
-            <td>${getPositionKorea(player.position)}</td>
-            
+            <td>${p_name}</td>
+            <td>No. ${p_number}</td>
+            <td>${p_grade}학년</td>
+            <td>${getPositionKorea(p_pos)}</td>
             <td>${birthDisplay}</td>
-            
+            <td>${p_height ? p_height + 'cm' : '-'} / ${p_weight ? p_weight + 'kg' : '-'}</td>
             <td>
-                ${player.height ? player.height + 'cm' : '-'} / 
-                ${player.weight ? player.weight + 'kg' : '-'}
-            </td>
-            
-            <td>
-                <button class="btn-list edit" onclick="alert('수정 기능 준비중: ${player.name}')">수정</button>
-                <button class="btn-list delete" onclick="deletePlayer('${player.number}','${player.name}', '${player.position}')">삭제</button>
+                <button class="btn-list edit" 
+                    onclick="startEditMode('${p_name}', '${p_number}', '${p_grade}', '${p_pos}', '${p_birth}', '${p_height}', '${p_weight}', '${p_type}', '${p_school}', '${p_photo}')">
+                    수정
+                </button>
+                <button class="btn-list delete" onclick="deletePlayer('${p_number}','${p_name}', '${p_pos}')">삭제</button>
             </td>
         </tr>
         `;
@@ -266,4 +303,155 @@ async function deletePlayer(number,name, positionCode) {
         console.error("삭제 중 오류 발생:", error);
         alert("삭제 실패: " + error.message);
     }
+}
+
+// [수정 모드 시작] 목록에서 수정 버튼 클릭 시 실행
+window.startEditMode = function(name, number, grade, position, birth, height, weight, type, school, photoUrl) {
+    // 1. 입력창에 값 채워넣기
+    document.getElementById('name').value = name;
+    document.getElementById('number').value = number;
+    document.getElementById('grade').value = grade;
+    document.getElementById('position').value = position;
+    document.getElementById('birth').value = birth;
+    document.getElementById('height').value = height;
+    document.getElementById('weight').value = weight;
+    document.getElementById('type').value = type;
+    document.getElementById('school').value = school;
+
+    // 2. 사진 URL 저장 (사진을 안 바꾸면 이걸 그대로 씀)
+    currentOriginalPhoto = photoUrl;
+    currentOriginalPosition = position; // ⭐ [핵심] 수정 전 포지션 기억!
+
+    // 3. UI 변경 (등록 버튼 숨김, 수정 버튼 보임)
+    document.querySelector('.btn-register').style.display = "none";
+    document.querySelector('.btn-edit').style.display = "inline-block"; // flex 안깨지게 주의
+    document.querySelector('.section-title').innerText = "선수 정보 수정";
+
+    // 4. 중요: 배번(ID)은 수정 못하게 막기 (DB 키값이므로)
+    const numInput = document.getElementById('number');
+    numInput.readOnly = true;
+    numInput.style.backgroundColor = "#e9ecef"; // 회색 처리
+
+    // 5. 스크롤을 맨 위로 올려서 입력창 보여주기
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// [수정 실행] 실제 DB 업데이트 함수
+async function update_member() {
+    console.log("수정 시작...");
+
+    // 1. 입력값 가져오기
+    const name = document.getElementById('name').value.trim();
+    const number = document.getElementById('number').value.trim();
+    const grade = document.getElementById('grade').value;
+    const position = document.getElementById('position').value;
+    const birth = document.getElementById('birth').value.trim();
+    
+    // 선택 항목
+    const height = document.getElementById('height').value.trim();
+    const weight = document.getElementById('weight').value.trim();
+    const type = document.getElementById('type').value;
+    const school = document.getElementById('school').value.trim();
+    const fileInput = document.getElementById('photo');
+
+    // 2. 필수값 검사
+    if (!name || !number || !grade || !position) {
+        alert("필수 정보를 확인해주세요.");
+        return;
+    }
+
+    // 3. 생년월일 8자리 유효성 검사
+    if (birth && !/^\d{8}$/.test(birth)) {
+        alert("생년월일은 '20040101' 형식의 8자리 숫자로 입력해주세요.");
+        document.getElementById('birth').focus();
+        return;
+    }
+
+    try {
+        const editBtn = document.querySelector('.btn-edit');
+        editBtn.disabled = true;
+        editBtn.innerText = "수정 중...";
+
+        const currentYear = document.getElementById('admin-year-select').value; // 현재 선택된 연도
+        
+        // ⭐ [수정] 변수 정의 부분 (이 부분이 빠져서 에러가 났습니다)
+        const newPositionEn = getPositionEn(position);                // 바꿀 포지션 (영어)
+        const oldPositionEn = getPositionEn(currentOriginalPosition); // 원래 포지션 (영어)
+
+        // --- [1] 사진 처리 로직 ---
+        let finalPhotoUrl = currentOriginalPhoto; // 기본적으로 기존 사진 유지
+
+        // 만약 새 파일을 선택했다면 업로드 진행
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const storagePath = `player/${currentYear}/${number}.jpg`;
+            const snapshot = await storage.ref(storagePath).put(file);
+            finalPhotoUrl = await snapshot.ref.getDownloadURL();
+        }
+
+        // --- [2] DB 업데이트 데이터 준비 ---
+        const player_data = {
+            name: name,
+            number: Number(number),
+            grade: Number(grade),
+            position: Number(position),
+            birth: birth || "",
+            height: height ? Number(height) : "",
+            weight: weight ? Number(weight) : "",
+            type: type || "미지정",
+            school: school || "",
+            photo: finalPhotoUrl, 
+            updatedAt: new Date()
+        };
+
+        // ⭐ 4. [핵심] 포지션 변경 처리 로직
+        // 새 포지션 컬렉션에 데이터 저장 (newPositionEn 사용)
+        await db.collection("player").doc(currentYear)
+                .collection(newPositionEn).doc(number)
+                .set(player_data, { merge: true });
+
+        // 만약 포지션이 바뀌었다면 -> 기존 포지션 컬렉션에서 삭제 (oldPositionEn 사용)
+        if (currentOriginalPosition !== position) {
+            console.log(`포지션 변경 감지: ${oldPositionEn} -> ${newPositionEn}. 기존 데이터 삭제.`);
+            
+            await db.collection("player").doc(currentYear)
+                    .collection(oldPositionEn).doc(number)
+                    .delete();
+        }
+
+        alert("수정 완료되었습니다.");
+        
+        // 3. 뒷정리
+        resetFormState(); // 폼 초기화
+        loadPlayerList(currentYear); // 목록 새로고침
+
+    } catch (error) {
+        console.error("수정 실패:", error);
+        alert("수정 중 오류 발생: " + error.message);
+        document.querySelector('.btn-edit').disabled = false;
+        document.querySelector('.btn-edit').innerText = "수정";
+    }
+}
+// [초기화] 입력창 및 버튼 상태를 '등록 모드'로 리셋
+function resetFormState() {
+    // 1. 입력창 비우기
+    const inputs = document.querySelectorAll('.input-field');
+    inputs.forEach(input => input.value = "");
+    document.getElementById('photo').value = ""; 
+    document.getElementById('type').value = "미지정"; // select 초기화
+
+    // 2. 버튼 상태 복구
+    document.querySelector('.btn-register').style.display = "inline-block";
+    document.querySelector('.btn-edit').style.display = "none";
+    document.querySelector('.btn-edit').disabled = false;
+    document.querySelector('.btn-edit').innerText = "수정";
+    document.querySelector('.section-title').innerText = "선수 등록 및 수정";
+
+    // 3. 배번 입력창 잠금 해제
+    const numInput = document.getElementById('number');
+    numInput.readOnly = false;
+    numInput.style.backgroundColor = "white";
+    
+    // 4. 변수 초기화
+    currentOriginalPhoto = "";
 }
