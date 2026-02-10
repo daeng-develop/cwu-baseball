@@ -48,19 +48,23 @@ async function register_member() {
     const name = document.getElementById('name').value.trim();
     const number = document.getElementById('number').value.trim();
     const grade = document.getElementById('grade').value;
+    const birth = document.getElementById('birth').value.trim(); // ⭐ 추가
     const position = document.getElementById('position').value;
+    
+    // 선택항목: 값이 없으면 빈 문자열("") 또는 0으로 처리
     const height = document.getElementById('height').value.trim();
     const weight = document.getElementById('weight').value.trim();
     const type = document.getElementById('type').value;
     const school = document.getElementById('school').value.trim();
     const fileInput = document.getElementById('photo');
 
-    // 2. 유효성 검사
-    if (!name || !number || !height || !weight || !school) {
-        alert("모든 정보를 입력해주세요.");
+    // 2. 필수 항목 유효성 검사 (이름, 배번, 학년, 포지션)
+    if (!name || !number || !grade || !position) {
+        alert("필수 항목(이름, 배번, 학년, 포지션)을 모두 입력해주세요.");
         return;
     }
 
+    // 사진 파일 확인 (선택사항)
     const file = fileInput.files[0];
     if (file) {
         const fileName = file.name.toLowerCase();
@@ -72,9 +76,6 @@ async function register_member() {
             alert("파일 크기는 200KB 이하여야 합니다.");
             return;
         }
-    } else {
-        alert("프로필 사진을 등록해주세요.");
-        return; 
     }
 
     try {
@@ -85,39 +86,36 @@ async function register_member() {
         const currentYear = new Date().getFullYear().toString(); 
 
         // 포지션 매핑
-        const position_doc = getPositionEn(Number(position));
+        const position_en = ["pitcher", "catcher", "infielder", "outfielder"][Number(position)];
+        if (!position_en) throw new Error("포지션 선택 오류");
 
-        if (!position_doc) throw new Error("포지션 선택 오류");
+        // --- [1] 스토리지 업로드 (파일이 있을 경우만) ---
+        let downloadURL = ""; // 기본값은 빈 문자열 (또는 기본 이미지 URL)
 
-        // --- [1] 스토리지 업로드 (Compat 스타일) ---
-        // storage.ref()를 바로 사용합니다.
-        const storagePath = `player/${currentYear}/${number}.jpg`;
-        
-        // put()을 사용하여 업로드
-        const snapshot = await storage.ref(storagePath).put(file);
-        
-        // getDownloadURL()로 주소 가져오기
-        const downloadURL = await snapshot.ref.getDownloadURL();
+        if (file) {
+            const storagePath = `player/${currentYear}/${number}.jpg`;
+            const snapshot = await storage.ref(storagePath).put(file);
+            downloadURL = await snapshot.ref.getDownloadURL();
+        }
 
-
-        // --- [2] 데이터베이스 저장 (Compat 스타일) ---
+        // --- [2] 데이터베이스 저장 ---
         const player_data = {
             name: name,
             number: Number(number),
             grade: Number(grade),
             position: Number(position),
-            height: Number(height),
-            weight: Number(weight),
-            type: type,
-            school: school,
-            photo: downloadURL,
+            birth: birth || "",       // ⭐ 추가: 없으면 빈 값
+            height: height ? Number(height) : "", // 없으면 빈 값
+            weight: weight ? Number(weight) : "", // 없으면 빈 값
+            type: type || "미지정",
+            school: school || "",     // 없으면 빈 값
+            photo: downloadURL,       // 사진 없으면 ""
             updatedAt: new Date()
         };
 
-        // 경로: collection(player) -> doc(2026) -> collection(pitcher) -> doc(10) -> set(data)
-        // .doc(), .collection()을 체인처럼 연결해서 씁니다.
+        // 경로: player -> 2026 -> pitcher -> 10
         await db.collection("player").doc(currentYear)
-                .collection(position_doc).doc(number)
+                .collection(position_en).doc(number)
                 .set(player_data);
 
         alert(`${grade}학년 ${name} 선수 등록 성공!`);
@@ -189,24 +187,43 @@ function renderTable(players) {
     tableBody.innerHTML = ""; // 기존 내용 초기화
 
     if (players.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="6" style="padding:20px; color:#999;">등록된 선수가 없습니다.</td></tr>`;
+        // 컬럼 개수에 맞춰 colspan을 7로 수정 (사진, 관리 포함)
+        tableBody.innerHTML = `<tr><td colspan="7" style="padding:20px; color:#999;">등록된 선수가 없습니다.</td></tr>`;
         return;
     }
 
     // HTML 생성
-    const html = players.map(player => `
+    const html = players.map(player => {
+        
+        // ⭐ [추가] 생년월일 포맷팅 (040101 -> 04.01.01)
+        let birthDisplay = "-";
+        if (player.birth && player.birth.length === 6) {
+            birthDisplay = `${player.birth.slice(0, 2)}.${player.birth.slice(2, 4)}.${player.birth.slice(4, 6)}`;
+        } else if (player.birth) {
+            birthDisplay = player.birth; // 6자리가 아니면 그냥 보여줌
+        }
+
+        return `
         <tr>
             <td>${player.name}</td>
             <td>No. ${player.number}</td>
             <td>${player.grade}학년</td>
             <td>${getPositionKorea(player.position)}</td>
-            <td>${player.height}cm / ${player.weight}kg</td>
+            
+            <td>${birthDisplay}</td>
+            
+            <td>
+                ${player.height ? player.height + 'cm' : '-'} / 
+                ${player.weight ? player.weight + 'kg' : '-'}
+            </td>
+            
             <td>
                 <button class="btn-list edit" onclick="alert('수정 기능 준비중: ${player.name}')">수정</button>
                 <button class="btn-list delete" onclick="deletePlayer('${player.number}','${player.name}', '${player.position}')">삭제</button>
             </td>
         </tr>
-    `).join('');
+        `;
+    }).join('');
 
     tableBody.innerHTML = html;
 }
