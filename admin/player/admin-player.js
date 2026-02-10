@@ -171,10 +171,15 @@ function getPositionEn(index) {
 // 전체 선수 목록 가져오기 함수
 async function loadPlayerList(year) {
     const tableBody = document.getElementById('player-table-body');
+    const titleElement = document.getElementById('player-list-title'); // ⭐ 제목 요소 가져오기
+
     if (!tableBody) return;
 
     // 로딩 표시
-    tableBody.innerHTML = `<tr><td colspan="6" style="padding:20px;">데이터를 불러오는 중...</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="7" style="padding:20px;">데이터를 불러오는 중...</td></tr>`;
+    
+    // (선택사항) 로딩 중일 때 제목 변경
+    if(titleElement) titleElement.innerText = "등록 선수 목록 (로딩 중...)";
 
     const positions = ["pitcher", "catcher", "infielder", "outfielder"];
     let allPlayers = [];
@@ -182,7 +187,7 @@ async function loadPlayerList(year) {
     try {
         console.log(`${year}년도 데이터 로딩 시작...`);
 
-        // 4개의 컬렉션을 병렬로 동시에 조회 (속도 향상)
+        // 4개의 컬렉션을 병렬로 동시에 조회
         const promises = positions.map(pos => 
             db.collection("player").doc(year).collection(pos).get()
         );
@@ -196,17 +201,24 @@ async function loadPlayerList(year) {
             });
         });
 
-        // 등번호 순으로 정렬 (오름차순 1 -> 99)
+        // 등번호 순으로 정렬
         allPlayers.sort((a, b) => Number(a.number) - Number(b.number));
+
+        // ⭐ [추가] 선수 수 계산하여 제목 업데이트
+        if (titleElement) {
+            titleElement.innerText = `등록 선수 목록 (${allPlayers.length}명)`;
+        }
 
         renderTable(allPlayers);
 
     } catch (error) {
         console.error("데이터 불러오기 실패:", error);
-        tableBody.innerHTML = `<tr><td colspan="6" style="color:red;">데이터 로딩 실패</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="7" style="color:red;">데이터 로딩 실패</td></tr>`;
+        
+        // 에러 시 제목 원상복구 혹은 0명 처리
+        if (titleElement) titleElement.innerText = "등록 선수 목록 (-명)";
     }
 }
-
 // 테이블에 그리는 함수
 function renderTable(players) {
     const tableBody = document.getElementById('player-table-body');
@@ -218,24 +230,26 @@ function renderTable(players) {
     }
 
     const html = players.map(player => {
-        // 데이터에 따옴표(')가 있으면 에러가 날 수 있으므로 escape 처리하거나
-        // 간단하게 문자열로 변환해서 넘깁니다.
-        // 여기서는 편의상 객체를 통째로 넘기기 위해 JSON 문자열을 활용하지 않고, 
-        // 각 데이터를 인자로 풀어서 넘깁니다. (안전한 방식)
-        
         // 생년월일 포맷팅
         let birthDisplay = "-";
         if (player.birth && player.birth.length === 8) {
             birthDisplay = `${player.birth.slice(0, 4)}.${player.birth.slice(4, 6)}.${player.birth.slice(6, 8)}`;
         } else if (player.birth) {
-            birthDisplay = player.birth; // 8자리가 아니면 그냥 표시
+            birthDisplay = player.birth; 
         }
 
-        // ⭐ 데이터 안전하게 넘기기 위한 준비
+        // ⭐ 데이터 안전하게 넘기기 위한 준비 (수정된 부분)
         const p_name = player.name || "";
-        const p_number = player.number || "";
+        
+        // [수정] 0번일 경우에도 숫자가 유지되도록 조건 변경
+        // (기존: player.number || ""  ->  0이면 거짓이 되어 빈값이 들어감)
+        const p_number = (player.number === 0 || player.number) ? player.number : "";
+        
         const p_grade = player.grade || "1";
-        const p_pos = player.position || "0";
+        
+        // [수정] 포지션 0(투수)도 안전하게 처리
+        const p_pos = (player.position === 0 || player.position) ? player.position : "0";
+        
         const p_birth = player.birth || "";
         const p_height = player.height || "";
         const p_weight = player.weight || "";
@@ -264,7 +278,6 @@ function renderTable(players) {
 
     tableBody.innerHTML = html;
 }
-
 // 삭제 기능 함수 틀
 window.deletePlayer = async function(number,name, positionCode) {
     if(confirm(`${number}.${name} 선수를 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.`)) {  
