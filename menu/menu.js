@@ -1,5 +1,14 @@
-/* common.js */
-const pathPrefix = "../";
+/* menu.js */
+
+// 현재 페이지 파일명을 가져옴
+const pageName = window.location.pathname.split("/").pop();
+
+// 메인 페이지(index.html 이거나 빈 값)면 "./", 아니면 "../" 설정
+// 주의: 만약 github repository 이름이 경로에 포함된다면 로직 확인 필요
+const isRoot = pageName === "" || pageName === "index.html";
+const pathPrefix = isRoot ? "./" : "../"; 
+
+console.log("Current Page:", pageName, "Prefix:", pathPrefix); // 디버깅용 로그
 
 /** * top menu와 side bar 기본 작성 */
 async function draw_menu_tree() {
