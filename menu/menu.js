@@ -291,24 +291,24 @@ async function fillMatchMenu(pathPrefix, elementId, isSidebar) {
         // 2. 각 대회별로 경기 목록 쿼리
         const htmlPromises = tournamentNames.map(async (tournament) => {
             
-            // ⭐ [수정] orderBy 제거 (색인 에러 방지)
-            const matchSnap = await db.collection("match")
-                .where("title", "==", tournament)
-                .get();
+            // DB에서 해당 대회(title)의 모든 경기 가져오기
+            const q = db.collection("match").where("title", "==", tournament);
+            const snapshot = await q.get();
 
-            // 메모리에서 데이터 배열로 변환 및 정렬
             let matches = [];
-            matchSnap.forEach(doc => {
-                matches.push({ id: doc.id, ...doc.data() });
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                
+                // ⭐ [수정] status가 'before'(경기전)인 것은 제외하고 담기
+                if (data.status !== 'before') {
+                    matches.push({ id: doc.id, ...data });
+                }
             });
 
-            // ⭐ [추가] 자바스크립트에서 날짜 내림차순 정렬
-            matches.sort((a, b) => {
-                if (a.date < b.date) return 1;
-                if (a.date > b.date) return -1;
-                return 0;
-            });
+            // 날짜 내림차순 정렬 (최신순)
+            matches.sort((a, b) => b.date.localeCompare(a.date));
 
+            
             // Level 3 HTML 생성
             let subItemsHtml = "";
             if (matches.length === 0) {
