@@ -52,7 +52,7 @@ async function loadAllPlayers(year) {
 
         globalPlayersData = allPlayers.map(p => ({
             name: p.name,
-            number: p.number || '?', 
+            number: (p.number === 0 || p.number) ? p.number : '?',
             position: pos_name[p.position] || 'Unknown', 
             type: p.type || '', 
             displayName: `${p.number || '?'}.${p.name}`
@@ -456,13 +456,14 @@ function closeAllLists(elmnt) {
 }
 
 function parseNameNum(value) {
-    if (!value) return { name: "", number: "" };
+   if (!value) return { name: "", number: "" };
     const dotIndex = value.indexOf('.');
     if (dotIndex !== -1) {
         const numStr = value.substring(0, dotIndex).trim();
         const nameStr = value.substring(dotIndex + 1).trim();
         return { number: numStr, name: nameStr };
     }
+    // 점(.)이 없으면 이름만 있는 것으로 간주 -> 번호는 ?
     return { name: value, number: "?" };
 }
 
@@ -576,21 +577,33 @@ async function saveMatchRecord() {
         });
         updateData['pitcher-line-up'] = pitcherLineupArr;
 
-        const benchLineupArr = [];
-        document.querySelectorAll('#table-bench tbody tr').forEach(tr => {
-            const inn = tr.querySelector('.inning-select').value; 
+        let benchLineupArr = []; // const -> let으로 변경 (정렬 위해)
+document.querySelectorAll('#table-bench tbody tr').forEach(tr => {
+            const inn = tr.querySelector('.inning-select').value; // 이닝 (문자열)
             const rawInName = tr.querySelector('.in-player').value; 
             const reason = tr.querySelector('.reason-select').value; 
             const rawOutName = tr.querySelector('.out-player').value; 
             
-            // ⭐ 벤치 명단이 있을 때만 추가
+            // 데이터가 있는 경우만 추가
             if (rawInName) {
-                const inP = parseNameNum(rawInName);
+                // 이름/번호 분리 (parseNameNum 함수 사용한다고 가정)
+                // 만약 parseNameNum이 없다면 아래 로직 추가 필요
+                const inP = parseNameNum(rawInName); 
                 const outP = parseNameNum(rawOutName); 
-                benchLineupArr.push(`${inn},${inP.name},${inP.number},${reason},${outP.number},${outP.name}`);
+                
+                // 객체 형태로 임시 저장 (정렬을 위해)
+                benchLineupArr.push({
+                    inn: Number(inn), // 숫자 변환
+                    str: `${inn},${inP.name},${inP.number},${reason},${outP.name}` // 저장될 문자열 형식
+                });
             }
         });
-        updateData['bench-line-up'] = benchLineupArr;
+
+        // ⭐ [핵심] 이닝(inn) 기준으로 오름차순 정렬 (1회 -> 9회)
+        benchLineupArr.sort((a, b) => a.inn - b.inn);
+
+        // 정렬된 데이터를 다시 문자열 배열로 변환해서 저장
+        updateData['bench-line-up'] = benchLineupArr.map(item => item.str);
 
         // 사진 처리
         if (photosPendingDelete.length > 0) {
