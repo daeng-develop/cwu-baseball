@@ -115,12 +115,9 @@ async function loadMonthlySchedules(year, month, reqId) {
             const data = doc.data();
             const docId = doc.id; 
 
-            // 1. 해당 날짜 칸 찾기
             const targetCell = document.querySelector(`.calendar-cell[data-date="${data.date}"]`);
             
-            // 만약 셀을 찾았는데 이미 똑같은 내용이 있으면 추가하지 않음 (이중 방지)
             if (targetCell) {
-                // 중복 방지: 같은 ID의 링크가 이미 있는지 확인
                 if (targetCell.querySelector(`a[href*="${docId}"]`)) return;
 
                 targetCell.classList.add('has-match');
@@ -128,23 +125,37 @@ async function loadMonthlySchedules(year, month, reqId) {
                 const linkEl = document.createElement('a');
                 linkEl.className = 'match-info';
                 
-                // 클릭 시 이동 경로
+                // 링크 경로 설정
                 if (data.status === 'event') {
                     linkEl.href = `../event/event.html#${docId}`;
                 } else {
                     linkEl.href = `../match/match.html#${docId}`;
                 }
 
-                // (1) 제목/상대팀
+                // (1) 제목/상대팀 처리 (PC vs 모바일 분기)
                 const titleSpan = document.createElement('span');
                 titleSpan.className = 'match-result';
                 
+                // ⭐ [핵심 로직] 학교 이름 줄이기 (고등학교 -> 고, 대학교 -> 대)
+                // 정규식(/.../g)을 사용하여 문자를 치환합니다.
+                let shortName = data.opponent
+                    .replace(/고등학교/g, '고')
+                    .replace(/대학교/g, '대');
+
                 if (data.status === 'event') {
                     titleSpan.style.color = '#333'; 
+                    // 행사는 보통 vs가 없으므로 그대로 출력 (필요시 여기도 shortName 적용 가능)
                     titleSpan.textContent = data.opponent; 
                 } else {
                     titleSpan.style.color = '#1565c0'; 
-                    titleSpan.textContent = `vs ${data.opponent}`;
+                    
+                    // ⭐ [핵심 변경] innerHTML을 사용하여 PC용과 모바일용 태그를 따로 심습니다.
+                    // view-pc: "vs 풀네임" (기존 방식)
+                    // view-mo: "줄임말" (vs 제거, 학교명 축소)
+                    titleSpan.innerHTML = `
+                        <span class="view-pc">vs ${data.opponent}</span>
+                        <span class="view-mo">${shortName}</span>
+                    `;
                 }
 
                 // (2) 장소
