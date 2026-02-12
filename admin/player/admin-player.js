@@ -109,7 +109,7 @@ async function register_member() {
         registerBtn.disabled = true;
         registerBtn.innerText = "저장 중...";
 
-        const currentYear = new Date().getFullYear().toString(); 
+        const currentYear = new Date().getFullYear().toString();
 
         // 포지션 매핑
         const position_en = ["pitcher", "catcher", "infielder", "outfielder"][Number(position)];
