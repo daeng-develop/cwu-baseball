@@ -107,82 +107,85 @@ async function loadRecentActivityPhotos() {
 }
 
 
-// 3. ⭐ [수정] 일정 로드 (오늘 기준 -2일 ~ +2일)
+// 3. ⭐ [수정] 일정 로드 (오늘 기준 이전 일정 2개 ~ 이후 일정 2개)
 async function loadSchedule5Days() {
     const container = document.getElementById('schedule-list');
-    
-    // 날짜 계산 함수
-    const getDateStr = (addDay) => {
-        const d = new Date();
-        d.setDate(d.getDate() + addDay);
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${y}-${m}-${day}`;
-    };
+    if (!container) return;
 
-    // -2일 ~ +2일 날짜 배열 생성
-    const days = [
-        { label: getDateStr(-2).slice(5), date: getDateStr(-2), offset: -2 },
-        { label: "어제", date: getDateStr(-1), offset: -1 },
-        { label: "오늘", date: getDateStr(0), offset: 0, isToday: true },
-        { label: "내일", date: getDateStr(1), offset: 1 },
-        { label: getDateStr(2).slice(5), date: getDateStr(2), offset: 2 }
-    ];
+    // 오늘 날짜 구하기 (YYYY-MM-DD)
+    const todayStr = new Date().toISOString().split('T')[0];
 
     try {
-        // 날짜 범위 쿼리 (단일 필드 쿼리라 색인 오류 안 남)
-        const snapshot = await db.collection("schedule")
-            .where("date", ">=", days[0].date)
-            .where("date", "<=", days[4].date)
+        // 1. 과거 일정 2개 (오늘 미만 날짜 중 최신순 2개)
+        const pastSnapshot = await db.collection("schedule")
+            .where("date", "<", todayStr)
+            .orderBy("date", "desc")
+            .limit(2)
             .get();
 
-        let scheduleMap = {};
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            if (!scheduleMap[data.date]) scheduleMap[data.date] = [];
-            scheduleMap[data.date].push(data);
+        // 2. 오늘 일정
+        const todaySnapshot = await db.collection("schedule")
+            .where("date", "==", todayStr)
+            .get();
+
+        // 3. 미래 일정 2개 (오늘 초과 날짜 중 가까운순 2개)
+        const futureSnapshot = await db.collection("schedule")
+            .where("date", ">", todayStr)
+            .orderBy("date", "asc")
+            .get(); // limit(2)를 바로 쓰면 색인 복합도가 높아질 수 있어 가져온 후 자릅니다.
+
+        let allData = [];
+
+        // 데이터 담기
+        pastSnapshot.forEach(doc => allData.push(doc.data()));
+        // 과거 데이터는 최신순(desc)으로 가져왔으므로 다시 날짜순 정렬을 위해 뒤집기 필요 없음 (나중에 전체 정렬)
+        
+        todaySnapshot.forEach(doc => allData.push(doc.data()));
+        
+        let futureCount = 0;
+        futureSnapshot.forEach(doc => {
+            if (futureCount < 2) {
+                allData.push(doc.data());
+                futureCount++;
+            }
         });
 
-        let html = "";
-        days.forEach(dayInfo => {
-            const events = scheduleMap[dayInfo.date];
-            const hasEvent = events && events.length > 0;
-            const rowClass = dayInfo.isToday ? "sch-row today" : "sch-row";
-            
-            // 날짜 라벨 (오늘/내일/어제 아니면 MM-DD 표시)
-            let dateLabel = dayInfo.label;
-            if(dayInfo.offset === -2 || dayInfo.offset === 2) {
-                dateLabel = dayInfo.date.slice(5).replace('-', '/');
-            }
+        // 4. 수집된 데이터를 날짜순으로 정렬
+        allData.sort((a, b) => a.date.localeCompare(b.date));
 
-            let contentHtml = `<span style="color:#ccc; font-size:0.9em;">일정 없음</span>`;
-            
-            if (hasEvent) {
-                contentHtml = events.map(e => {
-                    const isEvent = (e.status === 'event');
-                    let title = isEvent ? `[행사] ${e.opponent}` : `vs ${e.opponent}`;
-                    let loc = e.location ? `<span class="sch-sub">(${e.location})</span>` : "";
-                    return `<div>${title} ${loc}</div>`;
-                }).join('');
-            }
+        if (allData.length === 0) {
+            container.innerHTML = `<div class="no-data">표시할 일정이 없습니다.</div>`;
+            return;
+        }
 
-            html += `
+        // 5. HTML 생성
+        container.innerHTML = allData.map(e => {
+            const isToday = e.date === todayStr;
+            const rowClass = isToday ? "sch-row today" : "sch-row";
+            
+            // 날짜 표시 포맷 (MM/DD)
+            const dateLabel = e.date.slice(5).replace('-', '/');
+            
+            const isEvent = (e.status === 'event');
+            const title = isEvent ? `[행사] ${e.opponent}` : `vs ${e.opponent}`;
+            const loc = e.location ? `<span class="sch-sub">(${e.location})</span>` : "";
+
+            return `
                 <div class="${rowClass}">
                     <div class="sch-date-box">
                         <span class="sch-label">${dateLabel}</span>
-                        ${dayInfo.isToday ? '<span class="sch-badge">TODAY</span>' : ''}
+                        ${isToday ? '<span class="sch-badge">TODAY</span>' : ''}
                     </div>
-                    <div class="sch-info">${contentHtml}</div>
+                    <div class="sch-info">
+                        <div>${title} ${loc}</div>
+                    </div>
                 </div>
             `;
-        });
-
-        container.innerHTML = html;
+        }).join('');
 
     } catch (error) {
         console.error("일정 로딩 오류:", error);
-        container.innerHTML = `<div class="no-data">일정 로딩 실패</div>`;
+        container.innerHTML = `<div class="no-data">일정을 불러올 수 없습니다.</div>`;
     }
 }
 
