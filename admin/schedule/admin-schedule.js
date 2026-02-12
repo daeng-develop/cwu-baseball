@@ -435,21 +435,21 @@ async function register_event() {
         return;
     }
 
-    if (files.length === 0) {
-        alert("최소 1장 이상의 사진을 등록해주세요.");
-        return;
-    }
+    // [수정] 사진 유무 체크 제거 (files.length === 0 체크 삭제)
 
-    for (const file of files) {
-        const fileName = file.name.toLowerCase();
-        if (!fileName.endsWith('.jpg') && !fileName.endsWith('.jpeg')) {
-            alert(`"${file.name}"은(는) 허용되지 않는 파일입니다.\n.jpg 또는 .jpeg 파일만 가능합니다.`);
-            return;
-        }
-        const maxSize = 200 * 1024; // 200KB
-        if (file.size > maxSize) {
-            alert(`"${file.name}" 파일 크기가 200KB를 초과합니다.`);
-            return;
+    // 파일이 있는 경우에만 유효성 검사 실시
+    if (files.length > 0) {
+        for (const file of files) {
+            const fileName = file.name.toLowerCase();
+            if (!fileName.endsWith('.jpg') && !fileName.endsWith('.jpeg')) {
+                alert(`"${file.name}"은(는) 허용되지 않는 파일입니다.\n.jpg 또는 .jpeg 파일만 가능합니다.`);
+                return;
+            }
+            const maxSize = 200 * 1024; // 200KB
+            if (file.size > maxSize) {
+                alert(`"${file.name}" 파일 크기가 200KB를 초과합니다.`);
+                return;
+            }
         }
     }
 
@@ -458,32 +458,33 @@ async function register_event() {
         registerBtn.disabled = true;
         registerBtn.innerText = "등록 중...";
 
-        // [수정 완료] YYYYMMDD (기존 .substring(2) 제거)
         const docId = dateVal.replaceAll('-', '');
+        let photoUrls = []; // 기본값 빈 배열
 
-        // 스토리지 업로드 (폴더명도 YYYYMMDD로 통일됨)
-        const uploadPromises = Array.from(files).map(async (file) => {
-            const storagePath = `event/${docId}/${file.name}`;
-            const snapshot = await storage.ref(storagePath).put(file);
-            return await snapshot.ref.getDownloadURL();
-        });
-
-        const photoUrls = await Promise.all(uploadPromises);
+        // [수정] 파일이 존재하는 경우에만 스토리지 업로드 실행
+        if (files.length > 0) {
+            const uploadPromises = Array.from(files).map(async (file) => {
+                const storagePath = `event/${docId}/${file.name}`;
+                const snapshot = await storage.ref(storagePath).put(file);
+                return await snapshot.ref.getDownloadURL();
+            });
+            photoUrls = await Promise.all(uploadPromises);
+        }
 
         // (1) Event 데이터
         const eventData = {
             date: dateVal,
             title: title,
             location: location,
-            photo: photoUrls,
+            photo: photoUrls, // 사진이 없으면 [] 가 저장됨
         };
 
         // (2) Schedule 데이터
         const scheduleData = {
             date: dateVal,
             location: location,
-            opponent: title, // 행사 제목
-            status: "event"  // 고정값
+            opponent: title, 
+            status: "event"  
         };
 
         // DB 저장

@@ -43,7 +43,7 @@ function renderMatchUI(data) {
     
     // --- 1. 헤더 정보 ---
     const statusMap = {
-        'before': '경기전', 'win': '경기 종료', 'loss': '경기 종료', 'draw': '경기 종료', 
+        'before': '경기전','end': '경기 종료', 'win': '경기 종료', 'loss': '경기 종료', 'draw': '경기 종료', 
         'rain_cancel': '우천 취소', 'etc_cancel': '기타 취소', 'rain_suspend': '서스펜디드'
     };
     
