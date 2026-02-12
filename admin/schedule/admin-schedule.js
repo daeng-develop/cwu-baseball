@@ -347,6 +347,30 @@ window.deleteMatch = async function(docId, title) {
     if (!confirm(`'${title}' 경기를 삭제하시겠습니까?`)) return;
 
     try {
+            
+        // -----------------------------------------------------------
+        // ⭐ [추가] Storage의 match/{docId} 폴더 내 모든 파일 삭제
+        // -----------------------------------------------------------
+        const folderRef = storage.ref(`match/${docId}`);
+        
+        try {
+            const listResult = await folderRef.listAll(); // 폴더 내 파일 목록 가져오기
+            
+            // 모든 파일 삭제 Promise 생성
+            const deletePromises = listResult.items.map(itemRef => itemRef.delete());
+            
+            // 병렬로 삭제 실행
+            await Promise.all(deletePromises);
+            console.log("관련 사진 파일 삭제 완료");
+            
+        } catch (storageError) {
+            // 사진이 없거나 폴더가 없는 경우 에러가 발생할 수 있으므로
+            // 로그만 찍고 DB 삭제는 계속 진행하도록 함
+            console.warn("스토리지 파일 삭제 중 오류 (또는 파일 없음):", storageError);
+        }
+        // -----------------------------------------------------------
+
+
         await db.collection("match").doc(docId).delete();
         await db.collection("schedule").doc(docId).delete(); 
 
