@@ -44,7 +44,7 @@ function renderMatchUI(data) {
     // --- 1. 헤더 정보 ---
     const statusMap = {
         'before': '경기전','end': '경기 종료', 'win': '경기 종료', 'loss': '경기 종료', 'draw': '경기 종료', 
-        'rain_cancel': '우천 취소', 'etc_cancel': '기타 취소', 'rain_suspend': '서스펜디드'
+        'rain_cancel': '우천 취소', 'etc_cancel': '기타 취소', 'rain_suspend': '서스펜디드', 'no_record': '기록 없음'
     };
     
     document.querySelector('.match-status').textContent = statusMap[data.status] || data.status;

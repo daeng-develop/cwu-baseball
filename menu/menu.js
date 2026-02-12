@@ -305,17 +305,31 @@ async function fillMatchMenu(pathPrefix, elementId, isSidebar) {
             snapshot.forEach(doc => {
                 const data = doc.data();
                 
-                // 1. 경기전(before) 상태 제외
+                // 1. 경기전(before) 상태는 기본적으로 제외
                 if (data.status !== 'before') {
                     
-                    // 2. ⭐ [핵심 추가] 사진이 있거나 스코어 데이터가 존재하는지 확인
-                    const hasPhotos = data.photo && Array.isArray(data.photo) && data.photo.length > 0;
+                    // 2. 데이터 존재 여부 체크
+                    const hasPhotos = data.photo && 
+                          Array.isArray(data.photo) && 
+                          data.photo.length > 0 && 
+                          data.photo[0] !== "" && // 빈 문자열 체크
+                          data.photo[0] !== null;  // null 체크
                     const hasScore = (data['home-score'] && data['home-score'].length > 0) || 
-                                     (data['away-score'] && data['away-score'].length > 0);
+                                    (data['away-score'] && data['away-score'].length > 0);
 
-                    // 사진 혹은 스코어 둘 중 하나라도 있다면 목록에 추가
-                    if (hasPhotos || hasScore) {
-                        matches.push({ id: doc.id, ...data });
+                    // 3. ⭐ [조건 수정] 
+                    // status가 'no_record'인 경우 -> 무조건 사진이 있어야 함
+                    // 그 외(win, loss, draw 등) -> 사진이 있거나 스코어가 있어야 함
+                    if (data.status === 'no_record') {
+
+                        console.log("No Record Match Check:", doc.id, "Has Photos:", hasPhotos);
+                        if (hasPhotos) {
+                            matches.push({ id: doc.id, ...data });
+                        }
+                    } else {
+                        if (hasPhotos || hasScore) {
+                            matches.push({ id: doc.id, ...data });
+                        }
                     }
                 }
             });
