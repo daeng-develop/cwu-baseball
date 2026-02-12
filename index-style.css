@@ -102,3 +102,248 @@
         padding: 25px 25px 15px 25px;
     }
 }
+
+/* =========================================
+   2. 공통 섹션 스타일
+   ========================================= */
+.content-section, .dashboard-section {
+    padding: 40px 20px 0;
+}
+
+.section-header {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--main-blue-dark); /* 변수 사용 */
+    margin-bottom: 20px;
+    padding-left: 12px;
+    border-left: 5px solid var(--main-blue); /* 변수 사용 */
+}
+
+/* =========================================
+   3. 최근 경기 사진 (5장 그리드)
+   ========================================= */
+.photo-grid {
+    display: grid;
+    /* 5개 컬럼 균등 배치 */
+    grid-template-columns: repeat(5, 1fr); 
+    gap: 12px;
+}
+
+/* 모바일 대응: 가로 스크롤 */
+@media (max-width: 768px) {
+    .photo-grid {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 10px;
+        gap: 10px;
+    }
+    .photo-item {
+        min-width: 160px; /* 모바일 최소 너비 */
+    }
+}
+
+.photo-item {
+    width: 100%;
+    aspect-ratio: 1 / 1; /* 정사각형 */
+    object-fit: cover;
+    border-radius: 8px;
+    background-color: var(--brand-gray);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.photo-item:hover {
+    transform: scale(1.03);
+}
+
+/* =========================================
+   4. 하단 대시보드 (일정 / 기록)
+   ========================================= */
+.dashboard-section {
+    display: flex;
+    gap: 24px;
+    margin-top: 10px;
+}
+
+/* 모바일 세로 배치 */
+@media (max-width: 768px) {
+    .dashboard-section {
+        flex-direction: column;
+    }
+    .banner-title { font-size: 2rem; }
+}
+
+.dashboard-card {
+    flex: 1; /* 1:1 분할 */
+    background: var(--bg-white);
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    display: flex;
+    flex-direction: column;
+}
+
+/* 카드 헤더 */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--brand-gray);
+}
+
+.card-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--main-blue);
+}
+
+.more-link {
+    font-size: 0.85rem;
+    color: #888;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.more-link:hover { color: var(--main-blue); }
+
+
+/* [좌측] 일정 리스트 스타일 */
+.schedule-timeline {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+}
+
+.sch-row {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+/* 오늘 날짜 강조 */
+.sch-row.today {
+    background-color: #f0f7ff; /* 연한 블루 배경 */
+    border-left: 4px solid var(--main-blue);
+}
+
+.sch-date-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 60px;
+    margin-right: 15px;
+    color: #666;
+    font-weight: 700;
+}
+
+.sch-label { font-size: 0.8rem; margin-bottom: 2px; }
+.sch-badge {
+    font-size: 0.7rem;
+    background: var(--brand-green); /* 포인트 컬러 */
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.sch-info {
+    font-size: 0.95rem;
+    color: var(--text-dark);
+}
+.sch-sub {
+    font-size: 0.8rem;
+    color: #999;
+    margin-left: 5px;
+}
+
+
+/* [우측] 스코어보드 스타일 */
+.match-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.result-tag {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 15px;
+}
+/* 승패 색상 */
+.tag-win { background-color: var(--main-blue); }
+.tag-loss { background-color: #e63946; } /* 빨강은 별도 지정 */
+.tag-draw { background-color: #6c757d; }
+
+.scoreboard-mini {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.sb-team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 35%;
+}
+
+.sb-logo {
+    width: 50px;
+    height: 50px;
+    background-color: var(--brand-gray);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #999;
+    margin-bottom: 8px;
+    font-size: 0.8rem;
+}
+
+.sb-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-dark);
+}
+
+.sb-score {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--main-blue);
+    letter-spacing: 2px;
+}
+
+.match-meta-info {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #777;
+    background-color: var(--bg-gray);
+    padding: 8px 20px;
+    border-radius: 20px;
+}
+
+/* 로딩/데이터 없음 텍스트 */
+.loading-box, .no-data {
+    width: 100%;
+    text-align: center;
+    color: #aaa;
+    padding: 30px;
+    background: var(--bg-gray);
+    border-radius: 8px;
+}
