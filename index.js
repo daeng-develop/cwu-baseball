@@ -175,7 +175,9 @@ async function loadSchedule5Days() {
             
             const isEvent = (e.status === 'event');
             const title = isEvent ? `[행사] ${e.opponent}` : `vs ${e.opponent}`;
-            const loc = e.location ? `<span class="sch-sub">(${e.location})</span>` : "";
+            
+            // ⭐ [수정] 괄호()를 제거하고 장소 텍스트만 남김
+            const location = e.location ? e.location : "";
 
             return `
                 <div class="${rowClass}">
@@ -183,8 +185,10 @@ async function loadSchedule5Days() {
                         <span class="sch-label">${dateLabel}</span>
                         ${isToday ? '<span class="sch-badge">TODAY</span>' : ''}
                     </div>
+                    
                     <div class="sch-info">
-                        <div>${title} ${loc}</div>
+                        <div class="sch-title">${title}</div>
+                        ${location ? `<div class="sch-location">${location}</div>` : ''}
                     </div>
                 </div>
             `;

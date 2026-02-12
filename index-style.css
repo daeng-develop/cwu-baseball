@@ -420,9 +420,29 @@
     border-radius: 4px;
 }
 
+/* 일정 정보 컨테이너 */
 .sch-info {
+    display: flex;
+    flex-direction: column; /* ⭐ 위아래로 쌓이게 설정 */
+    justify-content: center;
+    align-items: flex-start; /* 왼쪽 정렬 */
     font-size: 0.95rem;
     color: var(--text-dark);
+}
+
+/* ⭐ [추가] 1번째 줄: 상대팀/제목 */
+.sch-title {
+    font-weight: 700;       /* 굵게 */
+    color: #333;
+    margin-bottom: 2px;     /* 장소와의 간격 */
+    line-height: 1.2;
+}
+
+/* ⭐ [추가] 2번째 줄: 장소 */
+.sch-location {
+    font-size: 0.8rem;      /* 제목보다 작게 */
+    color: #888;            /* 회색으로 처리 */
+    font-weight: 400;
 }
 .sch-sub {
     font-size: 0.8rem;
