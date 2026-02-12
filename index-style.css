@@ -686,4 +686,31 @@
     /* (선택) 경기 제목과 상대팀 글씨도 살짝 조절하여 밸런스 맞춤 */
     .m-title { font-size: 0.7rem; margin-bottom: 2px; }
     .m-vs { font-size: 0.85rem; }
+
+    .main-banner {
+        width: calc(100% - 40px); 
+        margin-top: 20px;
+        border-radius: 15px;
+        /* 모바일에서는 비율을 조금 더 가로로 길게 해서 덜 답답하게 (선택사항) */
+        aspect-ratio: 16 / 9; 
+    }
+    
+    .banner-title {
+        font-size: 0.75rem; 
+        line-height: 1.2; /* 줄 간격도 좁혀서 높이 차지 줄임 */
+    }
+
+    .banner-subtitle {
+        font-size: 0.45rem; 
+        margin-top: 4px; /* 제목과의 간격도 줄임 */
+        opacity: 0.9;
+    }
+
+    .banner-overlay {
+        /* ⭐ [수정] 패딩을 줄여서 텍스트가 구석으로 더 붙게 함 */
+        padding: 10px 20px; 
+        
+        /* 그라데이션 높이를 60% -> 50%로 줄여서 사진을 더 많이 보여줌 */
+        height: 50%; 
+    }
 }
