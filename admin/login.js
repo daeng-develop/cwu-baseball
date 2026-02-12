@@ -5,7 +5,7 @@ function checkPassword() {
     const password = pwInput.value;
 
     // 설정할 관리자 비밀번호
-    const ADMIN_PASSWORD = "1234"; 
+    const ADMIN_PASSWORD = "cwu1234"; 
 
     if (password === ADMIN_PASSWORD) {
         // 같은 폴더에 있는 menu.html로 이동
