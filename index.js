@@ -3,12 +3,12 @@ import { db, storage } from './firebase/firebase.js';
 
 document.addEventListener("DOMContentLoaded", () => {
     loadMainBanner();
-    loadRecentPhotos();
-    loadSchedule();
-    loadLatestMatch();
+    loadRecentActivityPhotos();
+    loadSchedule5Days(); // 5일치 일정
+    loadRecentMatchList(); // 최근 경기 리스트
 });
 
-// 1. 메인 배너 이미지 로드 (페이드인 효과 포함)
+// 1. 메인 배너 이미지 로드
 async function loadMainBanner() {
     try {
         const bannerRef = storage.ref().child('index/main-banner.webp');
@@ -26,37 +26,92 @@ async function loadMainBanner() {
     }
 }
 
-// 2. 최근 경기 사진 5개 로드
-async function loadRecentPhotos() {
+// 2. ⭐ [수정됨] 최근 활동(경기 + 행사) 사진 5개 로드
+async function loadRecentActivityPhotos() {
     const container = document.getElementById('recent-photos-grid');
     
     try {
-        // 날짜 내림차순으로 경기 조회, 사진 있는 것만 추림
-        const snapshot = await db.collection("match")
+        // (1) 경기(Match)와 행사(Event)에서 각각 최신 데이터 가져오기
+        // 사진이 없는 일정도 있을 수 있으므로 넉넉히(10개씩) 가져옵니다.
+        const matchPromise = db.collection("match")
             .orderBy("date", "desc")
-            .limit(10) // 넉넉히 가져옴 (어떤 경기는 사진이 없을 수 있으므로)
+            .limit(10)
             .get();
 
-        let photos = [];
-        snapshot.forEach(doc => {
+        const eventPromise = db.collection("event")
+            .orderBy("date", "desc")
+            .limit(10)
+            .get();
+
+        // 두 데이터를 동시에 요청 (병렬 처리)
+        const [matchSnap, eventSnap] = await Promise.all([matchPromise, eventPromise]);
+
+        let allItems = [];
+
+        // (2) 경기 데이터 정리
+        matchSnap.forEach(doc => {
             const data = doc.data();
+            // 사진이 있는 경우만 리스트에 추가
             if (data.photo && Array.isArray(data.photo) && data.photo.length > 0) {
-                // 각 경기의 첫 번째 사진(썸네일)만 가져옴
-                photos.push(data.photo[0]);
+                allItems.push({
+                    type: 'match',           // 타입 구분
+                    id: doc.id,
+                    date: data.date,
+                    title: `vs ${data.opponent}`, // 제목 (툴팁용)
+                    photo: data.photo[0]     // 대표 사진 1장
+                });
             }
         });
 
-        // 5개로 자르기
-        const displayPhotos = photos.slice(0, 5);
+        // (3) 행사 데이터 정리
+        eventSnap.forEach(doc => {
+            const data = doc.data();
+            if (data.photo && Array.isArray(data.photo) && data.photo.length > 0) {
+                allItems.push({
+                    type: 'event',           // 타입 구분
+                    id: doc.id,
+                    date: data.date,
+                    title: data.title,       // 제목
+                    photo: data.photo[0]     // 대표 사진 1장
+                });
+            }
+        });
 
-        if (displayPhotos.length === 0) {
-            container.innerHTML = `<div class="no-data" style="grid-column:1/-1;">등록된 사진이 없습니다.</div>`;
+        // (4) 날짜 내림차순 정렬 (최신순)
+        allItems.sort((a, b) => {
+            if (a.date < b.date) return 1;
+            if (a.date > b.date) return -1;
+            return 0;
+        });
+
+        // (5) 최신 5개만 자르기
+        const displayItems = allItems.slice(0, 5);
+
+        if (displayItems.length === 0) {
+            container.innerHTML = `<div class="no-data" style="grid-column:1/-1;">최근 활동 사진이 없습니다.</div>`;
             return;
         }
 
-        container.innerHTML = displayPhotos.map(url => `
-            <img src="${url}" class="photo-item" alt="경기 사진" loading="lazy" onclick="window.open(this.src)">
-        `).join('');
+        // (6) HTML 생성 (클릭 시 각 상세 페이지로 이동)
+        container.innerHTML = displayItems.map(item => {
+            // 타입에 따라 이동할 링크 결정
+            const linkUrl = (item.type === 'match') 
+                ? `match/match.html#${item.id}` 
+                : `event/event.html#${item.id}`;
+            
+            // 날짜 포맷 (2026-03-01 -> 03.01)
+            const dateShort = item.date.slice(5).replace('-', '.');
+
+            return `
+                <img src="${item.photo}" 
+                     class="photo-item" 
+                     alt="${item.title}" 
+                     title="[${dateShort}] ${item.title}" 
+                     loading="lazy" 
+                     onclick="location.href='${linkUrl}'"
+                     style="cursor: pointer;">
+            `;
+        }).join('');
 
     } catch (error) {
         console.error("사진 로딩 오류:", error);
@@ -64,11 +119,11 @@ async function loadRecentPhotos() {
     }
 }
 
-// 3. 어제/오늘/내일 일정 로드
-async function loadSchedule() {
+// 3. ⭐ [수정] 일정 로드 (오늘 기준 -2일 ~ +2일)
+async function loadSchedule5Days() {
     const container = document.getElementById('schedule-list');
     
-    // 날짜 구하기 함수 (YYYY-MM-DD)
+    // 날짜 계산 함수
     const getDateStr = (addDay) => {
         const d = new Date();
         d.setDate(d.getDate() + addDay);
@@ -78,17 +133,20 @@ async function loadSchedule() {
         return `${y}-${m}-${day}`;
     };
 
+    // -2일 ~ +2일 날짜 배열 생성
     const days = [
-        { label: "어제", date: getDateStr(-1) },
-        { label: "오늘", date: getDateStr(0), isToday: true },
-        { label: "내일", date: getDateStr(1) }
+        { label: getDateStr(-2).slice(5), date: getDateStr(-2), offset: -2 },
+        { label: "어제", date: getDateStr(-1), offset: -1 },
+        { label: "오늘", date: getDateStr(0), offset: 0, isToday: true },
+        { label: "내일", date: getDateStr(1), offset: 1 },
+        { label: getDateStr(2).slice(5), date: getDateStr(2), offset: 2 }
     ];
 
     try {
-        // 3일치 데이터 조회
+        // 날짜 범위 쿼리 (단일 필드 쿼리라 색인 오류 안 남)
         const snapshot = await db.collection("schedule")
             .where("date", ">=", days[0].date)
-            .where("date", "<=", days[2].date)
+            .where("date", "<=", days[4].date)
             .get();
 
         let scheduleMap = {};
@@ -103,12 +161,19 @@ async function loadSchedule() {
             const events = scheduleMap[dayInfo.date];
             const hasEvent = events && events.length > 0;
             const rowClass = dayInfo.isToday ? "sch-row today" : "sch-row";
+            
+            // 날짜 라벨 (오늘/내일/어제 아니면 MM-DD 표시)
+            let dateLabel = dayInfo.label;
+            if(dayInfo.offset === -2 || dayInfo.offset === 2) {
+                dateLabel = dayInfo.date.slice(5).replace('-', '/');
+            }
 
-            let contentHtml = `<span style="color:#ccc;">일정 없음</span>`;
+            let contentHtml = `<span style="color:#ccc; font-size:0.9em;">일정 없음</span>`;
             
             if (hasEvent) {
                 contentHtml = events.map(e => {
-                    let title = (e.status === 'event') ? `[행사] ${e.opponent}` : `vs ${e.opponent}`;
+                    const isEvent = (e.status === 'event');
+                    let title = isEvent ? `[행사] ${e.opponent}` : `vs ${e.opponent}`;
                     let loc = e.location ? `<span class="sch-sub">(${e.location})</span>` : "";
                     return `<div>${title} ${loc}</div>`;
                 }).join('');
@@ -117,9 +182,8 @@ async function loadSchedule() {
             html += `
                 <div class="${rowClass}">
                     <div class="sch-date-box">
-                        <span class="sch-label">${dayInfo.label}</span>
+                        <span class="sch-label">${dateLabel}</span>
                         ${dayInfo.isToday ? '<span class="sch-badge">TODAY</span>' : ''}
-                        ${(!dayInfo.isToday && hasEvent) ? '<span style="font-size:20px; line-height:0.5; color:var(--brand-green);">.</span>' : ''}
                     </div>
                     <div class="sch-info">${contentHtml}</div>
                 </div>
@@ -130,78 +194,75 @@ async function loadSchedule() {
 
     } catch (error) {
         console.error("일정 로딩 오류:", error);
-        container.innerHTML = `<div class="no-data">일정 정보를 불러올 수 없습니다.</div>`;
+        container.innerHTML = `<div class="no-data">일정 로딩 실패</div>`;
     }
 }
 
-// 4. 최근 경기 기록 로드 (종료된 경기 1개)
-async function loadLatestMatch() {
-    const container = document.getElementById('latest-match-card');
+
+// 4. ⭐ [수정] 최근 경기 기록 리스트 (5개) - 색인 오류 방지
+async function loadRecentMatchList() {
+    const container = document.getElementById('recent-match-list');
 
     try {
-        // 종료된 경기(win, loss, draw) 중 최신순
+        // [핵심] where 조건 없이 날짜순으로만 10개 가져옴 (색인 오류 회피)
+        // -> 가져온 다음 JS에서 필요한 만큼 자름
         const snapshot = await db.collection("match")
-            .where("status", "in", ["win", "loss", "draw"])
-            .orderBy("date", "desc")
-            .limit(1)
+            .orderBy("date", "desc") // 최신순 정렬
+            .limit(10) // 넉넉히 가져옴
             .get();
 
         if (snapshot.empty) {
-            container.innerHTML = `<div class="no-data">최근 경기 기록이 없습니다.</div>`;
+            container.innerHTML = `<div class="no-data">경기 기록이 없습니다.</div>`;
             return;
         }
 
-        const doc = snapshot.docs[0];
-        const data = doc.data();
-        
-        // 홈/어웨이 점수 판별
-        let myScore = 0, oppScore = 0;
-        let myTeam = "청운대", oppTeam = data.opponent;
+        let matchList = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            matchList.push({ id: doc.id, ...data });
+        });
 
-        if (data.homeAway === 'home') { // 우리가 홈(말공격)
-            myScore = data['home-run'] || 0;
-            oppScore = data['away-run'] || 0;
-        } else { // 우리가 원정(초공격)
-            myScore = data['away-run'] || 0;
-            oppScore = data['home-run'] || 0;
-        }
+        // 5개만 자르기
+        const displayList = matchList.slice(0, 5);
 
-        // 결과 태그
-        let tagClass = "tag-draw";
-        let tagText = "DRAW";
-        if (data.status === 'win') { tagClass = "tag-win"; tagText = "WIN"; }
-        else if (data.status === 'loss') { tagClass = "tag-loss"; tagText = "LOSE"; }
+        // HTML 생성
+        container.innerHTML = displayList.map(match => {
+            // 상태별 텍스트 및 클래스 결정
+            let statusText = "경기전";
+            let statusClass = "status-before";
 
-        // 날짜 포맷
-        const dateShort = data.date.slice(5).replace('-', '.');
+            switch(match.status) {
+                case 'win': statusText = "승"; statusClass = "status-win"; break;
+                case 'loss': statusText = "패"; statusClass = "status-loss"; break;
+                case 'draw': statusText = "무"; statusClass = "status-draw"; break;
+                case 'rain_cancel': 
+                case 'etc_cancel': statusText = "취소"; statusClass = "status-cancel"; break;
+                case 'before': statusText = "예정"; statusClass = "status-before"; break;
+                default: statusText = match.status;
+            }
 
-        container.innerHTML = `
-            <div class="result-tag ${tagClass}">${tagText}</div>
-            
-            <div class="scoreboard-mini">
-                <div class="sb-team">
-                    <div class="sb-logo">LOGO</div>
-                    <span class="sb-name">${myTeam}</span>
+            // 날짜 포맷 (MM.DD)
+            const dateShort = match.date.slice(5).replace('-', '.');
+
+            return `
+                <div class="match-list-item" onclick="location.href='match/match.html#${match.id}'">
+                    <div class="match-date-loc">
+                        <span class="m-date">${dateShort}</span>
+                        <span class="m-loc">${match.location || '-'}</span>
+                    </div>
+                    <div class="match-info-center">
+                        <span class="m-title">${match.title}</span>
+                        <span class="m-vs">vs ${match.opponent}</span>
+                    </div>
+                    <div class="match-result-badge ${statusClass}">
+                        ${statusText}
+                    </div>
                 </div>
-                <div class="sb-score">${myScore} : ${oppScore}</div>
-                <div class="sb-team">
-                    <div class="sb-logo">VS</div>
-                    <span class="sb-name">${oppTeam}</span>
-                </div>
-            </div>
-
-            <div class="match-meta-info">
-                ${dateShort} | ${data.title}<br>
-                ${data.location}
-            </div>
-        `;
-
-        // 카드 전체 클릭 시 이동 (선택사항)
-        container.onclick = () => location.href = `match/match.html#${doc.id}`;
-        container.style.cursor = "pointer";
+            `;
+        }).join('');
 
     } catch (error) {
-        console.error("경기 기록 로딩 오류:", error);
-        container.innerHTML = `<div class="no-data">데이터 로딩 중 오류가 발생했습니다.<br>(콘솔 확인 필요)</div>`;
+        console.error("경기 리스트 로딩 오류:", error);
+        container.innerHTML = `<div class="no-data">데이터를 불러올 수 없습니다.</div>`;
     }
 }

@@ -347,3 +347,85 @@
     background: var(--bg-gray);
     border-radius: 8px;
 }
+
+/* =========================================
+   [우측] 경기 기록 리스트 스타일 (새로 추가)
+   ========================================= */
+.match-list-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto; /* 내용이 많으면 스크롤 */
+}
+
+.match-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 10px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.match-list-item:last-child {
+    border-bottom: none;
+}
+
+.match-list-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* 1. 날짜 및 장소 */
+.match-date-loc {
+    display: flex;
+    flex-direction: column;
+    width: 80px;
+    font-size: 0.85rem;
+    color: #666;
+    text-align: center;
+}
+.m-date { font-weight: 700; color: #444; margin-bottom: 3px; }
+.m-loc { font-size: 0.75rem; color: #999; }
+
+/* 2. 경기 정보 (대회명 vs 상대팀) */
+.match-info-center {
+    flex: 1;
+    padding: 0 15px;
+    display: flex;
+    flex-direction: column;
+}
+.m-title {
+    font-size: 0.75rem;
+    color: var(--main-blue);
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+.m-vs {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+/* 3. 결과 뱃지 (상태별 색상) */
+.match-result-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: white;
+    min-width: 50px;
+    text-align: center;
+}
+
+/* 상태별 색상 정의 */
+.status-win { background-color: var(--main-blue); }       /* 승리 (파랑) */
+.status-loss { background-color: #d62828; }               /* 패배 (빨강) */
+.status-draw { background-color: #6c757d; }               /* 무승부 (회색) */
+.status-cancel { background-color: #adb5bd; }             /* 취소 (연회색) */
+.status-before {                                          /* 경기전 (테두리만) */
+    background-color: #fff;
+    color: var(--main-blue);
+    border: 1px solid var(--main-blue);
+}

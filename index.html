@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>청운대학교 야구부</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="common-style.css">
     <link rel="stylesheet" href="menu/menu-style.css">
     <link rel="stylesheet" href="index-style.css">
@@ -15,10 +16,10 @@
 <body>
 
     <main class="main-content">
-        
+
         <section class="main-banner-wrapper">
             <section class="main-banner">
-                <img src="" alt="메인 배너" class="banner-img">    
+                <img src="" alt="메인 배너" class="banner-img">
                 <div class="banner-overlay">
                     <h1 class="banner-title">CHUNGWOON<br>BASEBALL TEAM</h1>
                     <p class="banner-subtitle">청운대학교 야구부를 늘 응원해</p>
@@ -27,28 +28,31 @@
         </section>
 
         <section class="content-section">
-            <h2 class="section-header">최근 경기 사진</h2>
+            <h2 class="section-header">최근 일정 사진</h2>
             <div class="photo-grid" id="recent-photos-grid">
                 <div class="loading-box">로딩 중...</div>
             </div>
         </section>
 
         <section class="dashboard-section">
-            
+
             <div class="dashboard-card schedule-box">
                 <div class="card-header">
                     <h3 class="card-title">일정</h3>
+                    <span class="box-subtitle">최근 5일 일정</span>
                     <a href="schedule/schedule.html" class="more-link">+ 더보기</a>
                 </div>
                 <div class="schedule-timeline" id="schedule-list">
-                    </div>
+                </div>
             </div>
 
             <div class="dashboard-card match-box">
                 <div class="card-header">
-                    <h3 class="card-title">최근 경기 기록</h3>
+                    <h3 class="card-title">경기 결과</h3>
+                    <span class="box-subtitle">최근 경기 결과</span>
                 </div>
-                <div class="match-content" id="latest-match-card">
+
+                <div class="match-list-container" id="recent-match-list">
                     <div class="loading-box">경기 기록을 불러오는 중...</div>
                 </div>
             </div>
