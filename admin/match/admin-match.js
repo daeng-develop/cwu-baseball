@@ -50,13 +50,18 @@ async function loadAllPlayers(year) {
 
         allPlayers.sort((a, b) => Number(a.backNumber || a.number || 999) - Number(b.backNumber || b.number || 999));
 
-        globalPlayersData = allPlayers.map(p => ({
-            name: p.name,
-            number: (p.number === 0 || p.number) ? p.number : '?',
-            position: pos_name[p.position] || 'Unknown', 
-            type: p.type || '', 
-            displayName: `${p.number || '?'}.${p.name}`
-        }));
+        globalPlayersData = allPlayers.map(p => {
+            // ⭐ [핵심 수정] 0번일 경우에도 숫자가 유지되도록 조건 변경
+            const pNum = (p.number === 0 || p.number) ? p.number : '?';
+            
+            return {
+                name: p.name,
+                number: pNum, 
+                position: pos_name[p.position] || 'Unknown', 
+                type: p.type || '', 
+                displayName: `${pNum}.${p.name}` // 여기도 0.이름 으로 잘 뜨게 수정
+            };
+        });
 
         console.log(`총 ${globalPlayersData.length}명 데이터 캐싱 완료`);
 
