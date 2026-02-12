@@ -546,23 +546,33 @@
 
 /* 1. 날짜 및 장소 */
 .match-date-loc {
-   display: flex;
+    display: flex;
     flex-direction: column;
-    /* ⭐ 장소 이름을 위해 너비를 기존 80px에서 110px 정도로 확장 */
-    width: 110px; 
+    width: 110px;        /* PC에서는 넉넉하게 */
     font-size: 0.85rem;
     color: #666;
-    text-align: left; /* 왼쪽 정렬이 긴 장소명 보기에 더 편함 */
+    text-align: left;
     padding-left: 5px;
-    flex-shrink: 0; /* 영역이 찌그러지지 않게 고정 */
+    flex-shrink: 0;      /* 영역 고정 */
 }
-.m-date { font-weight: 700; color: #444; margin-bottom: 2px; }
+
+/* 날짜 텍스트 */
+.m-date { 
+    font-weight: 700; 
+    color: #444; 
+    margin-bottom: 2px; 
+}
+
+/* 장소 텍스트 (PC: 한 줄 말줄임) */
 .m-loc { 
     font-size: 0.7rem; 
     color: #999; 
-    white-space: nowrap; 
-    overflow: hidden; 
-    text-overflow: ellipsis; /* 너무 길면 ... 처리 */
+    width: 100%;
+    
+    white-space: nowrap;      /* PC는 한 줄 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
 }
 
 /* 중앙 경기 정보 */
@@ -617,4 +627,43 @@
     padding: 0;              /* 넘침을 유발하는 패딩 제거 */
     background: transparent; /* 배경 투명 (필요시) */
     height: 100%;            /* 높이 100% */
+}
+
+@media (max-width: 768px) {
+    /* 날짜/장소 박스 너비 축소 -> 상대팀 영역 확보 */
+    .match-date-loc {
+        width: 55px;  /* ⭐ 110px -> 72px로 확 줄임 */
+    }
+
+    /* 폰트 사이즈도 살짝 줄여서 좁은 폭에 맞춤 */
+    .m-date {
+        font-size: 0.75rem; 
+    }
+    
+    /* 장소: 좁아진 대신 두 줄 허용 */
+    .m-loc { 
+        font-size: 0.65rem; /* 글씨 작게 */
+        white-space: normal; /* 줄바꿈 허용 */
+        word-break: break-all; /* 단어 끊기 허용 */
+        line-height: 1.2;
+        
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* 두 줄 제한 */
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* ⭐ [추가] 경기 결과 뱃지 축소 */
+    .match-result-badge {
+        padding: 2px 6px;      /* 패딩을 줄여서 박스 크기 축소 */
+        font-size: 0.7rem;     /* 글자 크기 축소 */
+        min-width: 36px;       /* 최소 너비도 50px -> 36px로 축소 */
+        border-radius: 8px;    /* 둥글기 살짝 조정 */
+        margin-left: 5px;      /* 왼쪽 여백 살짝 */
+    }
+
+    /* (선택) 경기 제목과 상대팀 글씨도 살짝 조절하여 밸런스 맞춤 */
+    .m-title { font-size: 0.7rem; margin-bottom: 2px; }
+    .m-vs { font-size: 0.85rem; }
 }
