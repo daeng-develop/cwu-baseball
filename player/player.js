@@ -3,7 +3,8 @@ import { db, storage } from "../firebase/firebase.js";
 
 const posNames = { 'pitcher': '투수', 'catcher': '포수', 'infielder': '내야수', 'outfielder': '외야수'};
 const posMap = { 'pitcher': 0, 'catcher': 1, 'infielder': 2, 'outfielder': 3 };
-const doc_map = { 0: 'pitcher', 1: 'catcher', 2: 'infielder', 3: 'outfielder' };
+
+const DEFAULT_IMG = "https://placehold.co/300x400?text=No+Image";
 
 // 페이지가 열리자마자 실행되는 코드
 document.addEventListener("DOMContentLoaded", () => {
@@ -72,23 +73,33 @@ async function update_page() {
     //등번호 순으로 정렬 (오름차순: 1번 -> 99번)
     players.sort((a, b) => a.number - b.number);
 
+    
     // 3. 화면에 그리기
-    listArea.innerHTML = players.map(player => `
-        <div class="player-card">
-            <div class="player-image-box">
-                <img src="${player.photo || '../images/default-player.png'}" 
-                    alt="${player.name}" 
-                    onerror="this.src='../images/default-player.png'">
+        const listArea = document.getElementById('player-list-area');
+        listArea.innerHTML = players.map(player => {
+            
+            // ⭐ [수정] 이미지가 없으면 플레이스홀더 사용
+            const playerImg = (player.photo && player.photo.trim() !== "") 
+                              ? player.photo 
+                              : DEFAULT_IMG;
+
+            return `
+            <div class="player-card">
+                <div class="player-image-box">
+                    <img src="${playerImg}" 
+                        alt="${player.name}" 
+                        onerror="this.src='${DEFAULT_IMG}'"> 
+                </div>
+                <div class="player-details">
+                    <div class="player-number">No. ${player.number}</div>
+                    <div class="player-name">${player.name}</div>
+                    <div class="player-main-info">${player.type || posNames[currentHash]}</div> <div class="player-grade">${player.height}cm, ${player.weight}kg | ${player.grade}학년</div>
+                    <div class="player-school">${player.school}</div>
+                </div>
             </div>
-            <div class="player-details">
-                <div class="player-number">No. ${player.number}</div>
-                <div class="player-name">${player.name}</div>
-                <div class="player-main-info">${player.type}</div>
-                <div class="player-grade">${player.height}cm, ${player.weight}kg | ${player.grade}학년</div>
-                <div class="player-school">${player.school}</div>
-            </div>
-        </div>
-    `).join('');
+            `;
+        }).join('');
+
     } catch (error) {
         console.error("데이터 불러오기 실패:", error);
         listArea.innerHTML = `<div class="no-data">데이터를 불러오는 중 오류가 발생했습니다.</div>`;
