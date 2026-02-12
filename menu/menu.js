@@ -282,7 +282,6 @@ async function fillMatchMenu(pathPrefix, elementId, isSidebar) {
     }
 
     try {
-        // 1. 대회 목록 가져오기
         const listDoc = await db.collection("match").doc("match-list").get();
         
         if (!listDoc.exists) {
@@ -298,10 +297,7 @@ async function fillMatchMenu(pathPrefix, elementId, isSidebar) {
             return;
         }
 
-        // 2. 각 대회별로 경기 목록 쿼리
         const htmlPromises = tournamentNames.map(async (tournament) => {
-            
-            // DB에서 해당 대회(title)의 모든 경기 가져오기
             const q = db.collection("match").where("title", "==", tournament);
             const snapshot = await q.get();
 
@@ -309,17 +305,23 @@ async function fillMatchMenu(pathPrefix, elementId, isSidebar) {
             snapshot.forEach(doc => {
                 const data = doc.data();
                 
-                // ⭐ [수정] status가 'before'(경기전)인 것은 제외하고 담기
+                // 1. 경기전(before) 상태 제외
                 if (data.status !== 'before') {
-                    matches.push({ id: doc.id, ...data });
+                    
+                    // 2. ⭐ [핵심 추가] 사진이 있거나 스코어 데이터가 존재하는지 확인
+                    const hasPhotos = data.photo && Array.isArray(data.photo) && data.photo.length > 0;
+                    const hasScore = (data['home-score'] && data['home-score'].length > 0) || 
+                                     (data['away-score'] && data['away-score'].length > 0);
+
+                    // 사진 혹은 스코어 둘 중 하나라도 있다면 목록에 추가
+                    if (hasPhotos || hasScore) {
+                        matches.push({ id: doc.id, ...data });
+                    }
                 }
             });
 
-            // 날짜 내림차순 정렬 (최신순)
             matches.sort((a, b) => b.date.localeCompare(a.date));
 
-            
-            // Level 3 HTML 생성
             let subItemsHtml = "";
             if (matches.length === 0) {
                 subItemsHtml = `<li><span style="padding:10px; color:#999;">기록 없음</span></li>`;
@@ -330,7 +332,6 @@ async function fillMatchMenu(pathPrefix, elementId, isSidebar) {
                 });
             }
 
-            // HTML 조립
             if (isSidebar) {
                 return `
                     <li>
