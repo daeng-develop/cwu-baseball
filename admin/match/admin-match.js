@@ -478,64 +478,56 @@ function parseNameNum(value) {
 async function saveMatchRecord() {
     if (!selectedMatchId) return;
     const btn = document.getElementById('btn-save-record');
+    const status = document.getElementById('match-result-status').value; // ⭐ 상태 미리 가져오기
+
     btn.disabled = true;
     btn.innerText = "저장 중...";
 
     try {
-        const status = document.getElementById('match-result-status').value;
         const updateData = { status: status };
 
-        // 1. 점수 검증 (우리팀: 청운대 기준)
-        const nameHome = document.getElementById('name-home').textContent;
-        const nameAway = document.getElementById('name-away').textContent;
-        
-        let ourScore = 0;
-        let oppScore = 0;
+        // ⭐ [수정] '기록 없음'이 아닐 때만 데이터 검증 실시
+        if (status !== 'no_record') {
+            // 1. 점수 검증
+            const nameHome = document.getElementById('name-home').textContent;
+            const nameAway = document.getElementById('name-away').textContent;
+            
+            let ourScore = 0;
+            let oppScore = 0;
 
-        const homeRun = Number(document.getElementById(`row-home`).querySelector('.r-val').value || 0);
-        const awayRun = Number(document.getElementById(`row-away`).querySelector('.r-val').value || 0);
+            const homeRun = Number(document.getElementById(`row-home`).querySelector('.r-val').value || 0);
+            const awayRun = Number(document.getElementById(`row-away`).querySelector('.r-val').value || 0);
 
-        if (nameHome === '청운대') {
-            ourScore = homeRun;
-            oppScore = awayRun;
-        } else if (nameAway === '청운대') {
-            ourScore = awayRun;
-            oppScore = homeRun;
+            if (nameHome === '청운대') { ourScore = homeRun; oppScore = awayRun; } 
+            else if (nameAway === '청운대') { ourScore = awayRun; oppScore = homeRun; }
+
+            if (status === 'win' && ourScore <= oppScore) throw new Error("승리인데 점수가 낮거나 같습니다.");
+            if (status === 'loss' && ourScore >= oppScore) throw new Error("패배인데 점수가 높거나 같습니다.");
+            if (status === 'draw' && ourScore !== oppScore) throw new Error("무승부인데 점수가 다릅니다.");
+
+            // 2. 스타팅 라인업 필수 검증 (9명)
+            const filledStarters = Array.from(document.querySelectorAll('#table-starting .player-input'))
+                                        .filter(input => input.value.trim() !== "").length;
+            
+            if (filledStarters < 9) {
+                alert("⚠️ 스타팅 라인업 9명을 모두 입력해주세요.\n기록이 없다면 결과에서 '기록 없음'을 선택해주세요.");
+                btn.disabled = false;
+                btn.innerText = "경기 기록 저장";
+                return;
+            }
         }
 
-        // 승/패/무 상태별 점수 체크
+        // --- 데이터 수집 (기록 없음이라도 현재 입력된 값이 있다면 저장하도록 유지) ---
+        
+        // 1. 승리 정보
         if (status === 'win') {
-            if (ourScore <= oppScore) {
-                throw new Error("경기 결과가 '승리'인데 점수가 같거나 낮습니다.\n스코어 또는 결과를 확인해주세요.");
-            }
-            // 승리 정보 저장
             const winP = document.getElementById('win-pitcher').value; 
             const rbi = document.getElementById('mvp-player').value;   
             if (winP) updateData['winning-pitcher'] = winP;
             if (rbi) updateData['run-bat-in'] = rbi;
-
-        } else if (status === 'loss') {
-            if (ourScore >= oppScore) {
-                throw new Error("경기 결과가 '패배'인데 점수가 같거나 높습니다.");
-            }
-        } else if (status === 'draw') {
-            if (ourScore !== oppScore) {
-                throw new Error("경기 결과가 '무승부'인데 점수가 다릅니다.");
-            }
         }
 
-        // 2. 스타팅 라인업 필수 검증 (9명)
-        const filledStarters = Array.from(document.querySelectorAll('#table-starting .player-input'))
-                                    .filter(input => input.value.trim() !== "").length;
-        
-        if (filledStarters < 9) {
-            alert("⚠️ 스타팅 라인업 9명이 모두 입력되지 않았습니다.\n모든 선수를 입력해주세요.");
-            btn.disabled = false;
-            btn.innerText = "경기 기록 저장";
-            return; // 저장 중단
-        }
-
-        // 스코어 배열 수집
+        // 2. 스코어 및 스태츠
         const getInningScores = (team) => {
             const inputs = document.getElementById(`row-${team}`).querySelectorAll('.score-in');
             const scores = [];
@@ -545,7 +537,6 @@ async function saveMatchRecord() {
 
         updateData['home-score'] = getInningScores('home');
         updateData['away-score'] = getInningScores('away');
-
         updateData['home-run'] = document.getElementById(`row-home`).querySelector('.r-val').value || "0";
         updateData['home-hit'] = document.getElementById('h-home').value || "0";
         updateData['home-error'] = document.getElementById('e-home').value || "0";
@@ -556,7 +547,7 @@ async function saveMatchRecord() {
         updateData['away-error'] = document.getElementById('e-away').value || "0";
         updateData['away-ball'] = document.getElementById('b-away').value || "0"; 
 
-        // 라인업 데이터 수집
+        // 3. 라인업 수집
         const startLineupArr = [];
         document.querySelectorAll('#table-starting tbody tr').forEach((tr, index) => {
             const order = index + 1; 
@@ -582,35 +573,25 @@ async function saveMatchRecord() {
         });
         updateData['pitcher-line-up'] = pitcherLineupArr;
 
-        let benchLineupArr = []; // const -> let으로 변경 (정렬 위해)
-document.querySelectorAll('#table-bench tbody tr').forEach(tr => {
-            const inn = tr.querySelector('.inning-select').value; // 이닝 (문자열)
+        let benchLineupArr = [];
+        document.querySelectorAll('#table-bench tbody tr').forEach(tr => {
+            const inn = tr.querySelector('.inning-select').value;
             const rawInName = tr.querySelector('.in-player').value; 
             const reason = tr.querySelector('.reason-select').value; 
             const rawOutName = tr.querySelector('.out-player').value; 
-            
-            // 데이터가 있는 경우만 추가
             if (rawInName) {
-                // 이름/번호 분리 (parseNameNum 함수 사용한다고 가정)
-                // 만약 parseNameNum이 없다면 아래 로직 추가 필요
                 const inP = parseNameNum(rawInName); 
                 const outP = parseNameNum(rawOutName); 
-                
-                // 객체 형태로 임시 저장 (정렬을 위해)
                 benchLineupArr.push({
-                    inn: Number(inn), // 숫자 변환
-                    str: `${inn},${inP.number},${inP.name},${reason},${outP.number},${outP.name}` // 저장될 문자열 형식
+                    inn: Number(inn),
+                    str: `${inn},${inP.number},${inP.name},${reason},${outP.number},${outP.name}`
                 });
             }
         });
-
-        // ⭐ [핵심] 이닝(inn) 기준으로 오름차순 정렬 (1회 -> 9회)
         benchLineupArr.sort((a, b) => a.inn - b.inn);
-
-        // 정렬된 데이터를 다시 문자열 배열로 변환해서 저장
         updateData['bench-line-up'] = benchLineupArr.map(item => item.str);
 
-        // 사진 처리
+        // 4. 사진 처리 (기록 없음 모드에서도 가장 핵심 기능)
         if (photosPendingDelete.length > 0) {
             await Promise.all(photosPendingDelete.map(url => {
                 try { return storage.refFromURL(url).delete(); } catch(e) { return Promise.resolve(); }
@@ -632,9 +613,9 @@ document.querySelectorAll('#table-bench tbody tr').forEach(tr => {
             const newUrls = await Promise.all(uploads);
             finalPhotos = [...finalPhotos, ...newUrls];
         }
-        
         updateData['photo'] = finalPhotos;
 
+        // 최종 업데이트
         await db.collection("match").doc(selectedMatchId).update(updateData);
         await db.collection("schedule").doc(selectedMatchId).update({ status: status });
 
