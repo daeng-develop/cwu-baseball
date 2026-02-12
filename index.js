@@ -26,65 +26,37 @@ async function loadMainBanner() {
     }
 }
 
-// 2. ⭐ [수정됨] 최근 활동(경기 + 행사) 사진 5개 로드
+// 2. 최근 활동(경기 + 행사) 사진 5개 로드
 async function loadRecentActivityPhotos() {
     const container = document.getElementById('recent-photos-grid');
     
     try {
-        // (1) 경기(Match)와 행사(Event)에서 각각 최신 데이터 가져오기
-        // 사진이 없는 일정도 있을 수 있으므로 넉넉히(10개씩) 가져옵니다.
-        const matchPromise = db.collection("match")
-            .orderBy("date", "desc")
-            .limit(10)
-            .get();
+        const matchPromise = db.collection("match").orderBy("date", "desc").limit(10).get();
+        const eventPromise = db.collection("event").orderBy("date", "desc").limit(10).get();
 
-        const eventPromise = db.collection("event")
-            .orderBy("date", "desc")
-            .limit(10)
-            .get();
-
-        // 두 데이터를 동시에 요청 (병렬 처리)
         const [matchSnap, eventSnap] = await Promise.all([matchPromise, eventPromise]);
 
         let allItems = [];
-
-        // (2) 경기 데이터 정리
-        matchSnap.forEach(doc => {
-            const data = doc.data();
-            // 사진이 있는 경우만 리스트에 추가
-            if (data.photo && Array.isArray(data.photo) && data.photo.length > 0) {
-                allItems.push({
-                    type: 'match',           // 타입 구분
-                    id: doc.id,
-                    date: data.date,
-                    title: `vs ${data.opponent}`, // 제목 (툴팁용)
-                    photo: data.photo[0]     // 대표 사진 1장
-                });
-            }
-        });
-
-        // (3) 행사 데이터 정리
-        eventSnap.forEach(doc => {
+        
+        // 데이터 처리 로직 (이전과 동일)
+        const processData = (doc, type) => {
             const data = doc.data();
             if (data.photo && Array.isArray(data.photo) && data.photo.length > 0) {
                 allItems.push({
-                    type: 'event',           // 타입 구분
+                    type: type,
                     id: doc.id,
                     date: data.date,
-                    title: data.title,       // 제목
-                    photo: data.photo[0]     // 대표 사진 1장
+                    title: type === 'match' ? `vs ${data.opponent}` : data.title,
+                    location: data.location || '',
+                    photos: data.photo.slice(0, 4)
                 });
             }
-        });
+        };
 
-        // (4) 날짜 내림차순 정렬 (최신순)
-        allItems.sort((a, b) => {
-            if (a.date < b.date) return 1;
-            if (a.date > b.date) return -1;
-            return 0;
-        });
+        matchSnap.forEach(doc => processData(doc, 'match'));
+        eventSnap.forEach(doc => processData(doc, 'event'));
 
-        // (5) 최신 5개만 자르기
+        allItems.sort((a, b) => (a.date < b.date ? 1 : -1));
         const displayItems = allItems.slice(0, 5);
 
         if (displayItems.length === 0) {
@@ -92,32 +64,47 @@ async function loadRecentActivityPhotos() {
             return;
         }
 
-        // (6) HTML 생성 (클릭 시 각 상세 페이지로 이동)
         container.innerHTML = displayItems.map(item => {
-            // 타입에 따라 이동할 링크 결정
-            const linkUrl = (item.type === 'match') 
-                ? `match/match.html#${item.id}` 
-                : `event/event.html#${item.id}`;
-            
-            // 날짜 포맷 (2026-03-01 -> 03.01)
-            const dateShort = item.date.slice(5).replace('-', '.');
+            const linkUrl = (item.type === 'match') ? `match/match.html#${item.id}` : `event/event.html#${item.id}`;
+            // 날짜 포맷 (안전 처리)
+            const dateShort = (item.date && item.date.length >= 5) ? item.date.slice(5).replace('-', '.') : '';
+            const displayTitle = item.title || '제목 없음';
+            const displayLoc = item.location || '';
+            const typeLabel = item.type === 'match' ? '경기' : '행사';
+            const typeClass = item.type;
+
+            let photoGridHtml = '';
+            for (let i = 0; i < 4; i++) {
+                if (item.photos[i]) {
+                    photoGridHtml += `<img src="${item.photos[i]}" loading="lazy">`;
+                } else {
+                    photoGridHtml += `<div class="empty-photo"></div>`;
+                }
+            }
 
             return `
-                <img src="${item.photo}" 
-                     class="photo-item" 
-                     alt="${item.title}" 
-                     title="[${dateShort}] ${item.title}" 
-                     loading="lazy" 
-                     onclick="location.href='${linkUrl}'"
-                     style="cursor: pointer;">
+                <div class="photo-card" onclick="location.href='${linkUrl}'">
+                    
+                    <div class="img-wrapper">
+                        ${photoGridHtml}
+                        <span class="type-badge ${typeClass}">${typeLabel}</span>
+                    </div>
+
+                    <div class="card-info">
+                        <div class="info-date">${dateShort}</div>
+                        <div class="info-title">${displayTitle}</div>
+                        <div class="info-loc">${displayLoc}</div>
+                    </div>
+                </div>
             `;
         }).join('');
 
     } catch (error) {
         console.error("사진 로딩 오류:", error);
-        container.innerHTML = `<div class="no-data" style="grid-column:1/-1;">사진을 불러오지 못했습니다.</div>`;
+        container.innerHTML = `<div class="no-data">사진을 불러오지 못했습니다.</div>`;
     }
 }
+
 
 // 3. ⭐ [수정] 일정 로드 (오늘 기준 -2일 ~ +2일)
 async function loadSchedule5Days() {

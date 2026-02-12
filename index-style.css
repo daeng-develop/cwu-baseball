@@ -122,41 +122,183 @@
 /* =========================================
    3. 최근 경기 사진 (5장 그리드)
    ========================================= */
+CSS
+/* index-style.css */
+
+/* ... (위쪽 메인 배너 코드는 그대로 두세요) ... */
+
+/* =========================================
+   2. 최근 활동 사진 (카드 그리드)
+   ========================================= */
+.photo-section {
+    padding: 40px 20px 20px;
+    /* 중요: 가로 스크롤이 생길 때 전체 레이아웃 보호 */
+    width: 100%; 
+    box-sizing: border-box;
+}
+
+/* [PC 화면] 5개 균등 배치 */
 .photo-grid {
     display: grid;
-    /* 5개 컬럼 균등 배치 */
+    /* 화면 꽉 차게 5등분 */
     grid-template-columns: repeat(5, 1fr); 
-    gap: 12px;
+    gap: 15px;
+    width: 100%;
 }
 
-/* 모바일 대응: 가로 스크롤 */
+/* [모바일 화면] 가로 스크롤 + 카드 크기 고정 */
 @media (max-width: 768px) {
     .photo-grid {
-        display: flex;
-        overflow-x: auto;
-        padding-bottom: 10px;
-        gap: 10px;
+        display: flex; /* 그리드 해제하고 플렉스로 변경 */
+        overflow-x: auto; /* 가로 스크롤 허용 */
+        padding-bottom: 15px;
+        gap: 12px;
+        
+        /* 스크롤바 숨기기 */
+        -ms-overflow-style: none;
+        scrollbar-width: none;
     }
-    .photo-item {
-        min-width: 160px; /* 모바일 최소 너비 */
+    .photo-grid::-webkit-scrollbar {
+        display: none;
     }
+
+    .photo-card {
+        /* 화면 줄였을 때 사진이 거대해지는 것 방지 */
+        min-width: 140px; 
+        width: 140px; /* 고정 너비 */
+        flex-shrink: 0; /* 찌그러짐 방지 */
+    }
+    
+    /* 폰트 사이즈 조절 */
+    .info-title { font-size: 0.85rem !important; }
+    .info-date, .info-loc { font-size: 0.75rem !important; }
 }
 
-.photo-item {
-    width: 100%;
-    aspect-ratio: 1 / 1; /* 정사각형 */
-    object-fit: cover;
-    border-radius: 8px;
-    background-color: var(--brand-gray);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    transition: transform 0.2s;
+/* --- [카드 공통 스타일] --- */
+.photo-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden; /* 자식 요소가 튀어나오지 않게 */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
     cursor: pointer;
+    transition: transform 0.2s;
+    
+    /* 내부 요소를 세로로 쌓음 */
+    display: flex;
+    flex-direction: column;
+    
+    /* 중요: 높이 자동 조절 */
+    height: auto;
 }
 
-.photo-item:hover {
-    transform: scale(1.03);
+.photo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
+/* --- [이미지 영역] --- */
+.img-wrapper {
+    width: 100%;
+    /* ⭐ 핵심: 무조건 1:1 정사각형 비율 유지 */
+    aspect-ratio: 1 / 1; 
+    
+    /* 4장 사진을 위한 그리드 설정 */
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    grid-template-rows: 1fr 1fr;    
+    gap: 1px; /* 사진 사이 흰색 선 */
+    
+    background: #f0f0f0;
+    position: relative; /* 뱃지 배치를 위해 */
+}
+
+/* 격자 안의 이미지들 */
+.img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 찌그러짐 없이 꽉 채움 */
+    display: block;
+}
+
+/* 사진 없을 때 빈 공간 */
+.empty-photo {
+    background-color: #e0e0e0;
+    width: 100%;
+    height: 100%;
+}
+
+/* 경기/행사 뱃지 */
+.type-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    z-index: 5;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.type-badge.match { background-color: var(--main-blue); }
+.type-badge.event { background-color: var(--brand-green); }
+
+
+/* --- [텍스트 정보 영역] (안 보이는 문제 해결) --- */
+.card-info {
+    /* 1. 내부 여백 줄임 (위쪽 패딩 12px -> 6px) */
+    padding: 6px 4px; 
+    
+    text-align: center;
+    background: #fff;
+    flex-grow: 1;
+    
+    display: flex;
+    flex-direction: column;
+
+    /* 2. ⭐ 핵심: 중앙 정렬(center) -> 위쪽 정렬(flex-start)로 변경 */
+    /* 이렇게 해야 글씨가 사진 바로 밑으로 올라붙습니다. */
+    justify-content: flex-start; 
+    
+    gap: 2px; /* 줄 간격도 살짝 더 좁힘 */
+    
+    /* 최소 높이는 유지하되, 내용은 위에서부터 채워짐 */
+    min-height: 70px; 
+    z-index: 10;
+}
+
+/* 날짜 폰트도 살짝 다듬어서 공간 확보 */
+.info-date {
+    font-size: 0.75rem;
+    color: #888;
+    font-weight: 700;
+    margin-top: 2px; /* 사진과의 아주 최소한의 숨구멍 */
+    margin-bottom: 0;
+}
+
+.info-title {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #333;
+    line-height: 1.2;
+    margin-bottom: 2px;
+    
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.info-loc {
+    font-size: 0.75rem;
+    color: #999;
+    
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
 /* =========================================
    4. 하단 대시보드 (일정 / 기록)
    ========================================= */
