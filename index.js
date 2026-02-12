@@ -209,7 +209,7 @@ async function loadRecentMatchList() {
         });
 
         // 3. 필터링된 데이터 중 최신 5개만 선택
-        const displayMatches = matches.slice(0, 5);
+        const displayMatches = matches.slice(0, 5).reverse();
 
         if (displayMatches.length === 0) {
             container.innerHTML = `<div class="no-data">최근 경기 기록이 없습니다.</div>`;
