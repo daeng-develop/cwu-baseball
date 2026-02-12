@@ -31,8 +31,8 @@ async function loadRecentActivityPhotos() {
     const container = document.getElementById('recent-photos-grid');
     
     try {
-        const matchPromise = db.collection("match").orderBy("date", "desc").limit(10).get();
-        const eventPromise = db.collection("event").orderBy("date", "desc").limit(10).get();
+        const matchPromise = db.collection("match").orderBy("date", "desc").limit(20).get();
+        const eventPromise = db.collection("event").orderBy("date", "desc").limit(20).get();
 
         const [matchSnap, eventSnap] = await Promise.all([matchPromise, eventPromise]);
 
@@ -41,15 +41,22 @@ async function loadRecentActivityPhotos() {
         // 데이터 처리 로직 (이전과 동일)
         const processData = (doc, type) => {
             const data = doc.data();
-            // ⭐ 사진(photo) 필드가 배열이고, 데이터가 1개 이상 있는 경우만 추가
-            if (data.photo && Array.isArray(data.photo) && data.photo.length > 0) {
+            
+            // 사진 데이터 존재 여부를 더 확실하게 체크
+            const hasValidPhoto = data.photo && 
+                                Array.isArray(data.photo) && 
+                                data.photo.length > 0 && 
+                                data.photo[0] !== ""; // 첫 번째 요소가 빈 값이 아니어야 함
+
+            if (hasValidPhoto) {
                 allItems.push({
                     type: type,
                     id: doc.id,
                     date: data.date,
                     title: type === 'match' ? `vs ${data.opponent}` : data.title,
                     location: data.location || '',
-                    photos: data.photo.slice(0, 4)
+                    // 실제 값이 있는 사진만 골라내기 (빈 문자열 제거)
+                    photos: data.photo.filter(p => p !== "").slice(0, 4)
                 });
             }
         };
