@@ -313,7 +313,19 @@
 .dashboard-section {
     display: flex;
     gap: 24px;
-    margin-top: 10px;
+    padding: 20px 20px 80px 20px; /* 아래쪽 여유 공간 확보 */
+    align-items: stretch; /* ⭐ 중요: 자식 요소들의 높이를 동일하게 맞춤 */
+}
+
+/* 각 대시보드 박스 (일정, 최근경기) */
+.dashboard-box {
+    flex: 1;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    height: 450px; /* ⭐ 높이를 고정하여 두 박스의 사이즈를 일치시킴 */
 }
 
 /* 모바일 세로 배치 */
@@ -321,6 +333,11 @@
     .dashboard-section {
         flex-direction: column;
     }
+
+    .dashboard-box {
+        height: 400px; /* 모바일에서는 높이를 살짝 조절 가능 */
+    }
+
     .banner-title { font-size: 2rem; }
 }
 
@@ -529,22 +546,33 @@
 
 /* 1. 날짜 및 장소 */
 .match-date-loc {
-    display: flex;
+   display: flex;
     flex-direction: column;
-    width: 80px;
+    /* ⭐ 장소 이름을 위해 너비를 기존 80px에서 110px 정도로 확장 */
+    width: 110px; 
     font-size: 0.85rem;
     color: #666;
-    text-align: center;
+    text-align: left; /* 왼쪽 정렬이 긴 장소명 보기에 더 편함 */
+    padding-left: 5px;
+    flex-shrink: 0; /* 영역이 찌그러지지 않게 고정 */
 }
-.m-date { font-weight: 700; color: #444; margin-bottom: 3px; }
-.m-loc { font-size: 0.75rem; color: #999; }
+.m-date { font-weight: 700; color: #444; margin-bottom: 2px; }
+.m-loc { 
+    font-size: 0.7rem; 
+    color: #999; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; /* 너무 길면 ... 처리 */
+}
 
-/* 2. 경기 정보 (대회명 vs 상대팀) */
+/* 중앙 경기 정보 */
 .match-info-center {
     flex: 1;
-    padding: 0 15px;
+    padding: 0 10px;
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    min-width: 0; /* 텍스트 넘침 방지 */
 }
 .m-title {
     font-size: 0.75rem;
