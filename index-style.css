@@ -4,6 +4,8 @@
 .main-content {
     width: 100%;
     margin-top: 0;
+
+    padding-bottom: 20px;
 }
 
 /* --- 메인 배너 영역 --- */

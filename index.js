@@ -41,6 +41,7 @@ async function loadRecentActivityPhotos() {
         // 데이터 처리 로직 (이전과 동일)
         const processData = (doc, type) => {
             const data = doc.data();
+            // ⭐ 사진(photo) 필드가 배열이고, 데이터가 1개 이상 있는 경우만 추가
             if (data.photo && Array.isArray(data.photo) && data.photo.length > 0) {
                 allItems.push({
                     type: type,
@@ -70,7 +71,7 @@ async function loadRecentActivityPhotos() {
             const dateShort = (item.date && item.date.length >= 5) ? item.date.slice(5).replace('-', '.') : '';
             const displayTitle = item.title || '제목 없음';
             const displayLoc = item.location || '';
-            const typeLabel = item.type === 'match' ? '경기' : '행사';
+            const typeLabel = item.type === 'match' ? '경기' : '일정';
             const typeClass = item.type;
 
             let photoGridHtml = '';

@@ -237,16 +237,26 @@ async function fillEventMenu(pathPrefix, year, elementId) {
             .orderBy("date", "asc")
             .get();
 
-        if (snapshot.empty) {
+       // 1. 가져온 데이터 중 사진(photo)이 있는 것만 필터링
+        const validEvents = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.photo && Array.isArray(data.photo) && data.photo.length > 0) {
+                validEvents.push({ id: doc.id, ...data });
+            }
+        });
+
+        // 2. 필터링된 결과가 없으면 '일정 없음' 표시
+        if (validEvents.length === 0) {
             listElement.innerHTML = `<li><span style="padding: 10px 15px; color: #999; font-size: 0.9em;">일정 없음</span></li>`;
             return;
         }
 
+        // 3. 사진이 있는 일정만 HTML로 생성
         let html = "";
-        snapshot.forEach(doc => {
-            const data = doc.data();
+        validEvents.forEach(data => {
             const dateStr = data.date.slice(5).replace('-', '월 ') + '일'; 
-            html += `<li><a href="${pathPrefix}event/event.html#${doc.id}">${dateStr} ${data.title}</a></li>`;
+            html += `<li><a href="${pathPrefix}event/event.html#${data.id}">${dateStr} ${data.title}</a></li>`;
         });
         listElement.innerHTML = html;
 
