@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>관리자 - 경기 기록 관리</title>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="admin-match-style.css">
 </head>
@@ -34,23 +34,21 @@
 
             <hr class="divider">
 
-            <h3 class="section-title">스코어보드 & 상태</h3>
-
+            <h3 class="section-title">경기 결과 설정</h3>
             <div class="form-group">
-                <label>경기 결과</label>
                 <select id="match-result-status" class="input-field">
-                    <option value="before">경기전</option>
+                    <option value="before">경기 예정</option>
                     <option value="win">승리 (WIN)</option>
-                    <option value="loss">패배 (LOSE)</option>
+                    <option value="loss">패배 (LOSS)</option>
                     <option value="draw">무승부 (DRAW)</option>
+                    <option value="no_record">기록 없음 (종료됨)</option>
                     <option value="rain_cancel">우천 취소</option>
                     <option value="etc_cancel">기타 취소</option>
-                    <option value="rain_suspend">서스펜디드</option>
-                    <option value="no_record">기록 없음</option>
+                    <option value="rain_suspend">우천 서스펜디드</option>
                 </select>
             </div>
 
-            <div id="win-stats-box" class="form-grid" style="display: none;">
+            <div id="win-stats-box" class="form-grid" style="display: none; margin-top: 15px;">
                 <div class="form-group">
                     <label>승리 투수</label>
                     <div class="autocomplete-wrapper">
@@ -58,128 +56,138 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>결승타</label>
-                    <input type="text" id="mvp-player" class="input-field" placeholder="예: 나예준 (3회 1사 2루 좌전 안타)">
+                    <label>결승타/MVP</label>
+                    <input type="text" id="mvp-player" class="input-field" placeholder="예: 나예준 (3회 좌전 안타)">
                 </div>
             </div>
 
-            <div class="table-scroll">
-                <table class="scoreboard-input-table">
-                    <thead>
-                        <tr>
-                            <th>TEAM</th>
-                            <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th>
-                            <th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th>
-                            <th class="stat-head">R</th>
-                            <th class="stat-head">H</th>
-                            <th class="stat-head">E</th>
-                            <th class="stat-head">B</th> </tr>
-                    </thead>
-                    <tbody>
-                        <tr id="row-away">
-                            <td class="team-name-cell">
-                                <span id="name-away" class="team-name-label">AWAY</span>
-                            </td>
-                            <td><input type="number" class="score-in" data-idx="1" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="2" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="3" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="4" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="5" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="6" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="7" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="8" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="9" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="10" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="11" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="12" value="0"></td>
-                            <td><input type="number" class="stat-in r-val" placeholder="0"></td>
-                            <td><input type="number" id="h-away" class="stat-in" placeholder="0"></td>
-                            <td><input type="number" id="e-away" class="stat-in" placeholder="0"></td>
-                            <td><input type="number" id="b-away" class="stat-in" placeholder="0"></td> 
-                        </tr>
-                        <tr id="row-home">
-                            <td class="team-name-cell">
-                                <span id="name-home" class="team-name-label">HOME</span>
-                            </td>
-                            <td><input type="number" class="score-in" data-idx="1" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="2" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="3" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="4" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="5" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="6" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="7" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="8" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="9" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="10" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="11" value="0"></td>
-                            <td><input type="number" class="score-in" data-idx="12" value="0"></td>
-                            <td><input type="number" class="stat-in r-val" placeholder="0"></td>
-                            <td><input type="number" id="h-home" class="stat-in" placeholder="0"></td>
-                            <td><input type="number" id="e-home" class="stat-in" placeholder="0"></td>
-                            <td><input type="number" id="b-home" class="stat-in" placeholder="0"></td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div id="detail-check-wrapper" class="form-group" style="display: flex; align-items: center; gap: 10px; margin: 20px 0;">
+                <input type="checkbox" id="check-detail-record" style="width: 18px; height: 18px; cursor: pointer;">
+                <label for="check-detail-record" style="margin-bottom: 0; cursor: pointer; font-weight: bold; color: #001d3d;">
+                    상세 기록 입력 (이닝별 점수 및 라인업 포함)
+                </label>
             </div>
 
-            <hr class="divider">
+            <div id="section-scoreboard">
+                <h3 class="section-title">스코어보드</h3>
+                <div class="table-scroll">
+                    <table class="scoreboard-input-table">
+                        <thead>
+                            <tr>
+                                <th>TEAM</th>
+                                <th class="detail-column">1</th><th class="detail-column">2</th>
+                                <th class="detail-column">3</th><th class="detail-column">4</th>
+                                <th class="detail-column">5</th><th class="detail-column">6</th>
+                                <th class="detail-column">7</th><th class="detail-column">8</th>
+                                <th class="detail-column">9</th><th class="detail-column">10</th>
+                                <th class="detail-column">11</th><th class="detail-column">12</th>
+                                <th class="stat-head">R (최종)</th>
+                                <th class="stat-head detail-column">H</th>
+                                <th class="stat-head detail-column">E</th>
+                                <th class="stat-head detail-column">B</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="row-away">
+                                <td class="team-name-cell"><span id="name-away" class="team-name-label">AWAY</span></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="1" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="2" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="3" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="4" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="5" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="6" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="7" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="8" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="9" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="10" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="11" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="12" value="0"></td>
+                                <td><input type="number" class="stat-in r-val" style="width:60px; font-weight:bold; background:#fff7ed;"></td>
+                                <td class="detail-column"><input type="number" id="h-away" class="stat-in detail-score" value="0"></td>
+                                <td class="detail-column"><input type="number" id="e-away" class="stat-in detail-score" value="0"></td>
+                                <td class="detail-column"><input type="number" id="b-away" class="stat-in detail-score" value="0"></td>
+                            </tr>
+                            <tr id="row-home">
+                                <td class="team-name-cell"><span id="name-home" class="team-name-label">HOME</span></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="1" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="2" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="3" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="4" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="5" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="6" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="7" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="8" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="9" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="10" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="11" value="0"></td>
+                                <td class="detail-column"><input type="number" class="score-in detail-score" data-idx="12" value="0"></td>
+                                <td><input type="number" class="stat-in r-val" style="width:60px; font-weight:bold; background:#fff7ed;"></td>
+                                <td class="detail-column"><input type="number" id="h-home" class="stat-in detail-score" value="0"></td>
+                                <td class="detail-column"><input type="number" id="e-home" class="stat-in detail-score" value="0"></td>
+                                <td class="detail-column"><input type="number" id="b-home" class="stat-in detail-score" value="0"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-            <div class="lineup-section-wrapper">
-
-                <div class="lineup-box">
-                    <div class="lineup-header">
-                        <h4>스타팅 라인업 (Start Line Up)</h4>
+            <div id="section-lineup" style="display: none;">
+                <hr class="divider">
+                <div class="lineup-section-wrapper">
+                    <div class="lineup-box">
+                        <div class="lineup-header">
+                            <h4>스타팅 라인업 (Start Line Up)</h4>
                         </div>
-                    <table class="lineup-input-table" id="table-starting">
-                        <thead>
-                            <tr>
-                                <th width="10%">타순</th>
-                                <th width="20%">포지션</th>
-                                <th>이름</th>
-                                <th width="20%">투타</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-
-                <div class="lineup-box">
-                    <div class="lineup-header">
-                        <h4>투수 라인업 (Pitcher)</h4>
-                        <button class="btn-mini add" onclick="addPitcherRow()">+ 행 추가</button>
+                        <table class="lineup-input-table" id="table-starting">
+                            <thead>
+                                <tr>
+                                    <th width="10%">타순</th>
+                                    <th width="20%">포지션</th>
+                                    <th>이름</th>
+                                    <th width="20%">투타</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
-                    <table class="lineup-input-table" id="table-pitcher">
-                        <thead>
-                            <tr>
-                                <th width="15%">순서</th>
-                                <th>선수</th>
-                                <th width="25%">이닝</th>
-                                <th width="10%">삭제</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
 
-                <div class="lineup-box">
-                    <div class="lineup-header">
-                        <h4>교체 명단 (Bench)</h4>
-                        <button class="btn-mini add" onclick="addBenchRow()">+ 행 추가</button>
+                    <div class="lineup-box">
+                        <div class="lineup-header">
+                            <h4>투수 라인업 (Pitcher)</h4>
+                            <button type="button" class="btn-mini add" onclick="addPitcherRow()">+ 행 추가</button>
+                        </div>
+                        <table class="lineup-input-table" id="table-pitcher">
+                            <thead>
+                                <tr>
+                                    <th width="15%">순서</th>
+                                    <th>선수</th>
+                                    <th width="25%">이닝</th>
+                                    <th width="10%">삭제</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
-                    <table class="lineup-input-table" id="table-bench">
-                        <thead>
-                            <tr>
-                                <th width="15%">이닝</th>
-                                <th>IN 선수</th>
-                                <th width="20%">사유</th>
-                                <th>OUT 선수</th>
-                                <th width="10%">삭제</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
 
+                    <div class="lineup-box">
+                        <div class="lineup-header">
+                            <h4>교체 명단 (Bench)</h4>
+                            <button type="button" class="btn-mini add" onclick="addBenchRow()">+ 행 추가</button>
+                        </div>
+                        <table class="lineup-input-table" id="table-bench">
+                            <thead>
+                                <tr>
+                                    <th width="15%">이닝</th>
+                                    <th>IN 선수</th>
+                                    <th width="20%">사유</th>
+                                    <th>OUT 선수</th>
+                                    <th width="10%">삭제</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <hr class="divider">
