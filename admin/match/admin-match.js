@@ -208,9 +208,9 @@ async function handleMatchSelect(e) {
                 if (parts.length >= 5) {
                     addBenchRow({
                         inn: parts[0],
-                        inName: `${parts[2]}.${parts[1]}`, // "배번.이름"으로 복원
+                        inName: `${parts[1]}.${parts[2]}`, // "배번.이름"으로 복원
                         reason: parts[3],
-                        outName: parts[4] 
+                        outName: `${parts[4]}.${parts[5]}` // "배번.이름"으로 복원
                     });
                 }
             });
@@ -599,7 +599,7 @@ document.querySelectorAll('#table-bench tbody tr').forEach(tr => {
                 // 객체 형태로 임시 저장 (정렬을 위해)
                 benchLineupArr.push({
                     inn: Number(inn), // 숫자 변환
-                    str: `${inn},${inP.name},${inP.number},${reason},${outP.number},${outP.name}` // 저장될 문자열 형식
+                    str: `${inn},${inP.number},${inP.name},${reason},${outP.number},${outP.name}` // 저장될 문자열 형식
                 });
             }
         });
