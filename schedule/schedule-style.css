@@ -189,12 +189,100 @@
 }
 
 
-/* --- 모바일 반응형 --- */
+/* 모바일 반응형 */
 @media (max-width: 768px) {
-    /* 모바일에서도 폰트 크기 통일감 유지 */
-    .match-time, 
-    .match-result, 
+    
+    /* 1. 컨테이너: 화면 꽉 채움 */
+    .schedule-container {
+        width: 100vw;
+        margin: 0;
+        padding: 10px 0;
+        overflow-x: hidden;
+    }
+
+    /* 2. 달력 그리드 */
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        width: 100%;
+        border-top: 1px solid #eee;
+    }
+
+    /* 3. 요일 헤더 */
+    .weekday {
+        padding: 8px 0;
+        font-size: 0.75rem;
+        border-bottom: 1px solid #eee;
+        background-color: #fff;
+    }
+
+    /* 4. 날짜 셀: 높이를 90px로 넉넉하게 */
+    .calendar-cell {
+        width: auto;
+        min-width: 0; 
+        
+        /* 제목+장소 다 넣으려면 높이가 좀 있어야 함 */
+        height: 90px; 
+        
+        padding: 2px;
+        border-bottom: 1px solid #eee;
+        border-right: 1px solid #eee;
+        box-sizing: border-box;
+        overflow: hidden;
+        position: relative;
+    }
+
+    /* 5. 날짜 숫자 */
+    .date-num {
+        font-size: 0.8rem;
+        margin: 2px 0 0 2px;
+        font-weight: 500;
+        position: absolute; /* 절대 위치로 구석에 고정 */
+        top: 2px;
+        left: 4px;
+    }
+
+    /* 6. 경기 정보 박스 */
+    .match-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* 수직 중앙 정렬 */
+        align-items: center;
+        width: 100%;
+        height: 100%; /* 셀 전체 높이 사용 */
+        padding-top: 15px; /* 날짜 숫자랑 겹치지 않게 */
+        box-sizing: border-box;
+    }
+
+    /* 7. [제목] vs 상대팀 */
+    .match-result {
+        display: block;
+        width: 100%;
+        
+        font-size: 0.50rem !important; /* 글씨 작게 */
+        font-weight: 700;             /* 굵게 강조 */
+        line-height: 1.1;
+        text-align: center;
+        
+        /* 너무 길면 ... 처리 (깔끔함 유지) */
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    /* 8. ⭐ [장소] 이제 보임! */
     .match-place {
-        font-size: 0.8rem; /* 모바일은 조금만 작게 */
+        display: block !important;    /* 숨김 해제 */
+        width: 100%;
+        
+        font-size: 0.45rem !important;
+        color: #888;
+        text-align: center;
+        line-height: 1.1;
+        
+        /* 너무 길면 ... 처리 (깔끔함 유지) */
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
 }
