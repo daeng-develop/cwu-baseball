@@ -599,7 +599,7 @@ document.querySelectorAll('#table-bench tbody tr').forEach(tr => {
                 // 객체 형태로 임시 저장 (정렬을 위해)
                 benchLineupArr.push({
                     inn: Number(inn), // 숫자 변환
-                    str: `${inn},${inP.name},${inP.number},${reason},${outP.name}` // 저장될 문자열 형식
+                    str: `${inn},${inP.name},${inP.number},${reason},${outP.number},${outP.name}` // 저장될 문자열 형식
                 });
             }
         });

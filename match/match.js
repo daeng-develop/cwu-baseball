@@ -1,14 +1,30 @@
 /* match.js */
 import { db } from "../firebase/firebase.js";
 
+let selectedMatchId = null;
+
 document.addEventListener("DOMContentLoaded", () => {
-    const matchId = window.location.hash.substring(1);
+   // 1. 페이지 처음 열릴 때 확인
+    checkHashAndLoad();
+
+    // 2. ⭐ [핵심 수정] 해시(#ID)가 변경될 때마다 실행 (뒤로가기, 링크 이동 등)
+    window.addEventListener('hashchange', checkHashAndLoad);
+});
+
+// 해시값을 읽어서 경기 데이터를 불러오는 함수
+function checkHashAndLoad() {
+    // URL에서 # 제거하고 ID만 가져옴
+    const matchId = decodeURIComponent(window.location.hash.substring(1));
+    
     if (!matchId) {
-        alert("경기 정보가 없습니다.");
+        // ID가 없으면 경고 없이 종료하거나, 목록 페이지로 리다이렉트 처리 가능
+        alert("경기 정보가 없습니다."); 
         return;
     }
+    
+    // 데이터 로드 시작
     loadMatchData(matchId);
-});
+}
 
 async function loadMatchData(docId) {
     try {
