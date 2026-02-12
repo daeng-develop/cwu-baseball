@@ -571,3 +571,14 @@ CSS
     color: var(--main-blue);
     border: 1px solid var(--main-blue);
 }
+
+/* 경기 기록 리스트 내부의 '데이터 없음' 박스 최적화 */
+.match-list-container .no-data {
+    flex: 1; /* 남은 공간을 꽉 채움 */
+    display: flex;
+    align-items: center;     /* 수직 중앙 정렬 */
+    justify-content: center; /* 수평 중앙 정렬 */
+    padding: 0;              /* 넘침을 유발하는 패딩 제거 */
+    background: transparent; /* 배경 투명 (필요시) */
+    height: 100%;            /* 높이 100% */
+}

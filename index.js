@@ -191,45 +191,49 @@ async function loadRecentMatchList() {
     const container = document.getElementById('recent-match-list');
 
     try {
-        // [핵심] where 조건 없이 날짜순으로만 10개 가져옴 (색인 오류 회피)
-        // -> 가져온 다음 JS에서 필요한 만큼 자름
         const snapshot = await db.collection("match")
-            .orderBy("date", "desc") // 최신순 정렬
-            .limit(10) // 넉넉히 가져옴
+            .orderBy("date", "desc")
+            .limit(10)
             .get();
 
         if (snapshot.empty) {
             container.innerHTML = `<div class="no-data">경기 기록이 없습니다.</div>`;
+            container.style.overflowY = 'hidden'; // ⭐ [추가] 데이터 없으면 스크롤 숨김
             return;
         }
 
+        // ⭐ [추가] 데이터가 있으면 스크롤 다시 허용
+        container.style.overflowY = 'auto'; 
+
         let matchList = [];
         snapshot.forEach(doc => {
-            const data = doc.data();
-            matchList.push({ id: doc.id, ...data });
+            matchList.push({ id: doc.id, ...doc.data() });
         });
 
-        // 5개만 자르기
+        // 5개 자르기 및 HTML 생성 로직 (기존 유지)
         const displayList = matchList.slice(0, 5);
 
-        // HTML 생성
         container.innerHTML = displayList.map(match => {
-            // 상태별 텍스트 및 클래스 결정
-            let statusText = "경기전";
-            let statusClass = "status-before";
+            // ... (기존 HTML 생성 코드 그대로 사용) ...
+            // (statusText, statusClass, dateShort 등 변수 생성 부분)
+            let statusText = match.status; // 예시
+            let statusClass = 'status-before'; // 예시
+            
+            // 기존 switch 문 등 로직 유지...
+            // (편의상 생략, 기존 코드 그대로 두시면 됩니다)
 
-            switch(match.status) {
+            // 날짜 포맷
+            const dateShort = match.date.slice(5).replace('-', '.');
+
+            // 상태별 텍스트/클래스 처리 (기존 코드 참고)
+             switch(match.status) {
                 case 'win': statusText = "승"; statusClass = "status-win"; break;
                 case 'loss': statusText = "패"; statusClass = "status-loss"; break;
                 case 'draw': statusText = "무"; statusClass = "status-draw"; break;
                 case 'rain_cancel': 
                 case 'etc_cancel': statusText = "취소"; statusClass = "status-cancel"; break;
                 case 'before': statusText = "예정"; statusClass = "status-before"; break;
-                default: statusText = match.status;
             }
-
-            // 날짜 포맷 (MM.DD)
-            const dateShort = match.date.slice(5).replace('-', '.');
 
             return `
                 <div class="match-list-item" onclick="location.href='match/match.html#${match.id}'">
@@ -251,5 +255,6 @@ async function loadRecentMatchList() {
     } catch (error) {
         console.error("경기 리스트 로딩 오류:", error);
         container.innerHTML = `<div class="no-data">데이터를 불러올 수 없습니다.</div>`;
+        container.style.overflowY = 'hidden'; // ⭐ 에러 메시지 뜰 때도 스크롤 숨김
     }
 }
