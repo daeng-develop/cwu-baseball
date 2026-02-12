@@ -1,9 +1,9 @@
 /**************** 기본적인 UI 설정 ****************/
 .player-container {
-    width: 90%; 
-    max-width: 1100px; 
+    width: 95%; /* 여백을 줄여서 화면을 넓게 씀 */
+    max-width: 1400px; /* 5열 배치를 위해 최대 너비 확장 */
     margin: 0 auto;
-    padding: 40px 20px 20px 20px; 
+    padding: 40px 10px; /* 좌우 패딩 축소 */
 }
 
 /**************** 년도 및 포지션 전시 ****************/
@@ -127,27 +127,27 @@
 /**************** 선수 카드 그리드 영역 ****************/
 .player-grid {
     display: grid;   
-    grid-template-columns: repeat(3, minmax(220px, 1fr));   
-    gap: 25px; 
-    margin-top: 10px;
+    /* ⭐ [핵심 수정] 한 줄에 5개 배치 */
+    grid-template-columns: repeat(5, 1fr);   
+    gap: 15px; /* 간격을 25px -> 15px로 좁힘 */
+    margin-top: 20px;
 }
 
 /* 선수 카드 컨테이너 수정 */
 .player-card {
     background: #fff;
-    border-radius: 12px;
+    border-radius: 8px; /* 둥글기 살짝 줄임 */
     overflow: hidden; 
     text-align: center;
     border: 1px solid #f0f0f0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease;
-    padding: 0; 
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
 }
 
-/* ⭐ [수정] 4:5 비율의 이미지 영역 */
+/* 이미지 박스 */
 .player-image-box {
     width: 100%;
-    aspect-ratio: 4 / 5; /* 3/4 -> 4/5 변경 */
+    aspect-ratio: 3 / 4; /* 비율 4:5 -> 3:4로 변경 (조금 더 증명사진 느낌) */
     background-color: #e9ecef; 
     overflow: hidden;
 }
@@ -156,49 +156,60 @@
     width: 100%;
     height: 100%;
     object-fit: cover; 
+    object-position: top; /* 얼굴 위주로 보이게 */
 }
 
-/* 카드 하단 텍스트 영역 */
+/* 카드 하단 텍스트 영역 (콤팩트하게 수정) */
 .player-details {
-    padding: 15px 12px;
+    padding: 10px 5px; /* 패딩 축소 */
     display: flex;
     flex-direction: column;
-    gap: 4px; 
+    gap: 2px; /* 줄 간격 좁힘 */
 }
 
-/* 1순위: 등번호 */
+/* 1. 등번호 */
 .player-number {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: 700;
     color: #002D62; 
+    margin-bottom: 2px;
 }
 
-/* 2순위: 이름 */
+/* 2. 이름 */
 .player-name {
-    font-size: 1.3rem;
+    font-size: 1.1rem; /* 이름 크기 살짝 줄임 */
     font-weight: 800;
     color: #1a1d23; 
     margin-bottom: 4px;
+    letter-spacing: -0.5px;
 }
 
-/* 3순위: 타입, 신체조건, 학년 */
-.player-main-info, 
-.player-grade {
-    font-size: 0.95rem;
+/* 3. 정보 텍스트 공통 스타일 (생년월일, 신체조건) */
+.player-info-row {
+    font-size: 0.8rem;
+    color: #555;
     font-weight: 500;
-    color: #666; 
+    letter-spacing: -0.3px;
 }
 
-/* 4순위: 출신학교 */
+/* 구분선 (|) 스타일 */
+.divider {
+    color: #ccc;
+    margin: 0 4px;
+    font-size: 0.7rem;
+    vertical-align: middle;
+}
+
+/* 4. 출신학교 */
 .player-school {
-    font-size: 0.85rem;
+    font-size: 0.75rem; /* 제일 작게 */
     font-weight: 400;
     color: #999; 
-    margin-top: 4px;
+    margin-top: 6px; /* 위 정보들과 살짝 띄움 */
 }
 
 .player-card:hover {
-    transform: translateY(-8px);
+    transform: translateY(-5px);
 }
 
 /* 선수가 존재하지 않을때 */
@@ -211,37 +222,27 @@
 }
 
 /**************** 반응형 설정 (화면이 작아질 때) ****************/
-@media (max-width: 1024px) {
+/* 노트북/태블릿 가로 (화면이 조금 좁을 때) -> 4개 */
+@media (max-width: 1200px) {
     .player-grid {
-        /* 태블릿 등에서는 2개씩 보이게 변경 */
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(4, 1fr);
     }
 }
 
-@media (max-width: 768px) {
-
+/* 태블릿 세로 -> 3개 */
+@media (max-width: 900px) {
     .player-grid {
-        /* ⭐ [수정] 모바일에서도 2개씩(두 줄) 보이게 변경 */
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* 모바일 -> 2개 (기존 유지) */
+@media (max-width: 600px) {
+    .player-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 15px; /* 모바일에서는 간격을 조금 좁힘 */
+        gap: 10px;
     }
-
-    .page-title {
-        font-size: 2rem;
-    }
-
-    .filter-controls {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .position-selector {
-        justify-content: space-between;
-    }
-
-    .pos-btn {
-        flex: 1;
-        padding: 10px 5px;
-        font-size: 0.85rem;
-    }
+    
+    .player-name { font-size: 1rem; }
+    .player-info-row { font-size: 0.75rem; }
 }

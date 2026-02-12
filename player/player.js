@@ -77,34 +77,52 @@ async function update_page() {
     // 3. 화면에 그리기
         const listArea = document.getElementById('player-list-area');
         listArea.innerHTML = players.map(player => {
-            
-            // ⭐ [수정] 이미지가 없으면 플레이스홀더 사용
-            const playerImg = (player.photo && player.photo.trim() !== "") 
-                              ? player.photo 
-                              : DEFAULT_IMG;
+        
+        // 이미지 처리
+        const playerImg = (player.photo && player.photo.trim() !== "") 
+                          ? player.photo 
+                          : DEFAULT_IMG;
 
-            return `
-            <div class="player-card">
-                <div class="player-image-box">
-                    <img src="${playerImg}" 
-                        alt="${player.name}" 
-                        onerror="this.src='${DEFAULT_IMG}'"> 
-                </div>
-                <div class="player-details">
-                    <div class="player-number">No. ${player.number}</div>
-                    <div class="player-name">${player.name}</div>
-                    <div class="player-main-info">${player.type || posNames[currentHash]}</div> <div class="player-grade">${player.height}cm, ${player.weight}kg | ${player.grade}학년</div>
-                    <div class="player-school">${player.school}</div>
-                </div>
+        // ⭐ [수정 1] 생년월일 포맷 변경 (2002-05-10 -> 2002.05.10)
+        // 데이터가 없으면 '-' 표시, 하이픈(-)을 점(.)으로 변경
+        const birthDate = player.birth ? player.birth.replace(/-/g, '.') : '-';
+        
+        // ⭐ [수정 2] 타입(투타 정보) 처리
+        // DB에 type이 있으면 사용(예: 우투우타), 없으면 포지션 이름(예: 투수) 사용
+        const playerType = player.type || posNames[currentHash];
+
+        return `
+        <div class="player-card">
+            <div class="player-image-box">
+                <img src="${playerImg}" 
+                    alt="${player.name}" 
+                    onerror="this.src='${DEFAULT_IMG}'"> 
             </div>
-            `;
-        }).join('');
+            
+            <div class="player-details">
+                <div class="player-number">No. ${player.number}</div>
+                
+                <div class="player-name">${player.name}</div>
+                
+                <div class="player-info-row">
+                    ${birthDate} <span class="divider">|</span> ${player.grade}학년
+                </div>
 
-    } catch (error) {
-        console.error("데이터 불러오기 실패:", error);
-        listArea.innerHTML = `<div class="no-data">데이터를 불러오는 중 오류가 발생했습니다.</div>`;
+                <div class="player-info-row">
+                    ${player.height}cm, ${player.weight}kg <span class="divider">|</span> ${playerType}
+                </div>
+
+                <div class="player-school">${player.school}</div>
+            </div>
+        </div>
+        `;
+    }).join('');
+
+        } catch (error) {
+            console.error("데이터 불러오기 실패:", error);
+            listArea.innerHTML = `<div class="no-data">데이터를 불러오는 중 오류가 발생했습니다.</div>`;
+        }
     }
-}
 
 /**
  * 연도 변경 시 (Select Box)
