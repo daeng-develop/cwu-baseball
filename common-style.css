@@ -11,6 +11,7 @@
     
     /* [포인트] 청운대 그린 (버튼, 호버 강조, 포인트) */
     --brand-green: #00a73c;
+     --brand-green-light: #f0fff4;
     
     /* [보조] 청운대 그레이 (테두리 등 보조 활용) */
     --brand-gray: #eeeeee;
@@ -21,6 +22,7 @@
     --bg-gray : #6c757d;
     --bg-dark-gray : #495057;
     --bg-red :#e60012;
+    --bg-red-light :#fef2f3;
     --bg-blue : #4dabf7;
     --bg-yellow :  #f59f00;
     
@@ -32,6 +34,7 @@
     --text-dark-gray : #424242;
 
     --text-red :#e60012;
+    --text-red-light :#fef2f3;
     --text-blue :#1c7ed6;
 }
 

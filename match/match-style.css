@@ -14,8 +14,8 @@
 
 .match-status {
     display: inline-block;
-    background-color: #555;
-    color: white;
+    background-color: var(--bg-dark-gray);
+    color: var(--text-white);
     padding: 5px 12px;
     border-radius: 20px;
     font-size: 0.85rem;
@@ -25,14 +25,14 @@
 
 .tournament-title {
     font-size: 2rem;
-    color: #333;
+    color: var(--text-dark);
     margin: 10px 0;
     font-weight: 800;
     word-break: keep-all; 
 }
 
 .match-meta {
-    color: #777;
+    color: var(--text-gray);
     font-size: 1rem;
     margin-top: 5px;
 }
@@ -44,12 +44,12 @@
     align-items: center;
     gap: 30px; 
     
-    background-color: #fff;
+    background-color: var(--bg-white);
     padding: 40px;
     
     /* ⭐ [수정] 라운드 및 테두리 추가 */
     border-radius: 24px; /* 더 둥글게 */
-    border: 1px solid #e0e0e0; /* 연한 테두리 */
+    border: 1px solid var(--bg-light-gray); /* 연한 테두리 */
     box-shadow: 0 10px 30px rgba(0,0,0,0.06); /* 그림자 부드럽게 */
     
     margin-bottom: 30px;
@@ -74,24 +74,24 @@
     letter-spacing: 1px;
 }
 
-/* ⭐ [수정] HOME: 청운대 블루 */
+/* ⭐ HOME: 청운대 블루 */
 .home-badge { 
-    background-color: #e8f0fe; /* 아주 연한 블루 */
-    color: #0d47a1; /* 짙은 청운대 블루 */
-    border: 1px solid #bbdefb;
+    background-color: var(--main-blue-bright); 
+    color: var(--main-blue-dark); /* 짙은 청운대 블루 */
+    border: 1px solid var(--main-blue-light); 
 }
 
-/* ⭐ [수정] AWAY: 회색 */
+/* ⭐ AWAY: 회색 */
 .away-badge { 
-    background-color: #f5f5f5; /* 연한 회색 */
-    color: #616161; /* 진한 회색 */
-    border: 1px solid #e0e0e0;
+    background-color: var(--bg-light-gray);
+    color: var(--text-dark-gray);
+    border: 1px solid var(--bg-gray);
 }
 
 .team-name {
     font-size: 1.6rem; 
     font-weight: 700;
-    color: #222;
+    color: var(--text-dark);
     margin: 0; 
     white-space: nowrap; 
 }
@@ -113,21 +113,21 @@
     padding: 4px 16px;
     border-radius: 12px;
     margin-bottom: 8px; /* 점수와의 간격 */
-    color: white;
+    color: var(--bg-white);
     letter-spacing: 1px;
     text-transform: uppercase;
 }
 
 /* 결과별 색상 */
-.res-win { background-color: #1976d2; box-shadow: 0 2px 6px rgba(25, 118, 210, 0.3); } /* 블루 */
-.res-loss { background-color: #757575; box-shadow: 0 2px 6px rgba(117, 117, 117, 0.3); } /* 그레이 */
-.res-draw { background-color: #388e3c; box-shadow: 0 2px 6px rgba(56, 142, 60, 0.3); } /* 그린 */
+.res-win { background-color: var(--main-blue); box-shadow: 0 2px 6px rgba(25, 118, 210, 0.3); } /* 블루 */
+.res-loss { background-color: var(--brand-gray); box-shadow: 0 2px 6px rgba(117, 117, 117, 0.3); } /* 그레이 */
+.res-draw { background-color: var(--brand-green); box-shadow: 0 2px 6px rgba(56, 142, 60, 0.3); } /* 그린 */
 
 
 .score-display {
     font-size: 3.5rem; 
     font-weight: 900;
-    color: #333;
+    color: var(--text-dark);
     font-family: 'Impact', sans-serif; /* 숫자 강조 폰트 */
     display: flex;
     align-items: center;
@@ -136,7 +136,7 @@
 }
 
 .score-divider {
-    color: #ddd;
+    color: var(--text-light-gray);
     position: relative; 
     top: -4px; 
 }
@@ -144,7 +144,7 @@
 /* --- 3. 이닝별 스코어보드 (Table) --- */
 .scoreboard-table-wrapper {
     width: 100%; 
-    background: white;
+    background: var(--bg-white);
     border-radius: 15px;
     padding: 20px;
     box-sizing: border-box; 
@@ -158,26 +158,26 @@
     min-width: 750px; 
     border-collapse: collapse;
     font-size: 0.95rem;
-    color: #333;
+    color: var(--text-dark-gray);
     table-layout: fixed; 
 }
 
 .score-table thead tr {
-    background-color: #f8f9fa;
-    border-bottom: 2px solid #e9ecef;
+    background-color: var(--bg-light-gray);
+    border-bottom: 2px solid var(--brand-gray);
 }
 
 .score-table th, 
 .score-table td {
     padding: 12px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--brand-gray);
     text-align: center;
     word-break: break-all;
 }
 
 .score-table th {
     font-weight: 700;
-    color: #555;
+    color: var(--text-dark-gray);
     white-space: nowrap;
 }
 
@@ -187,7 +187,7 @@
     text-align: center !important;
     padding: 12px 0 !important;
     font-weight: bold;
-    color: #001d3d;
+    color: var(--text-dark);
 }
 
 /* 통계 칸 (R, H, E, B) */
@@ -195,24 +195,33 @@
 
 /* R, H: 파란색 계열 */
 .r-col, .r-cell, .h-col, .h-cell {
-    background-color: #e3f2fd !important;
-    color: #1565c0 !important;
+    background-color: var(--main-blue-bright) !important;
+    color: var(--main-blue) !important;
 }
-thead .r-col, thead .h-col { background-color: #bbdefb !important; }
+thead .r-col, thead .h-col { 
+    background-color: var(--main-blue-light) !important; 
+    color: var(--main-blue-bright) !important;
+}
 
 /* E: 빨간색 계열 */
 .e-col, .e-cell {
-    background-color: #fff0f1 !important;
-    color: #ef5350 !important;
+    background-color: var(--bg-red-light) !important;
+    color: var(--text-red) !important;
 }
-thead .e-col { background-color: #ffced1 !important; }
+thead .e-col { 
+    background-color: var(--bg-red) !important;
+    color: var(--text-red-light) !important;
+}
 
 /* B: 초록색 계열 */
 .b-col, .b-cell {
-    background-color: #e8f5e9 !important;
-    color: #2e7d32 !important;
+    background-color: var(--brand-green-light) !important;
+    color: var(--brand-green) !important;
 }
-thead .b-col { background-color: #c8e6c9 !important; }
+thead .b-col { 
+    background-color: var(--brand-green) !important;
+    color: var(--brand-green-light) !important;
+}
 
 
 /* --- 4. 주요 경기 기록 --- */
@@ -220,7 +229,7 @@ thead .b-col { background-color: #c8e6c9 !important; }
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    background-color: #fff;
+    background-color: var(--bg-white);
     border-radius: 12px;
     padding: 15px 30px;
     margin-bottom: 30px;
@@ -231,16 +240,16 @@ thead .b-col { background-color: #c8e6c9 !important; }
 
 .stat-item { display: flex; align-items: center; gap: 12px; }
 .stat-label {
-    background-color: #f1f3f5;
-    color: #495057;
+    background-color: var(--bg-light-gray);
+    color: var(--text-dark-gray);
     font-size: 0.85rem;
     font-weight: 800;
     padding: 6px 12px;
     border-radius: 6px;
     white-space: nowrap; 
 }
-.stat-value { font-size: 1rem; color: #333; font-weight: 500; }
-.stat-divider { width: 1px; height: 15px; background-color: #ddd; }
+.stat-value { font-size: 1rem; color: var(--text-dark); font-weight: 500; }
+.stat-divider { width: 1px; height: 15px; background-color: var(--bg-light-gray); }
 
 
 /* --- 5. 라인업 --- */
@@ -254,7 +263,7 @@ thead .b-col { background-color: #c8e6c9 !important; }
 .left-col, .right-col { flex: 1; }
 
 .lineup-box {
-    background: #fff;
+    background: var(--bg-white);
     border-radius: 12px;
     padding: 15px 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -263,9 +272,9 @@ thead .b-col { background-color: #c8e6c9 !important; }
 .lineup-title {
     font-size: 1.1rem;
     font-weight: 800;
-    color: #333;
+    color: var(--text-dark);
     margin: 0 0 15px 0;
-    border-left: 5px solid #0056b3; 
+    border-left: 5px solid var(--main-blue);
     padding-left: 10px;
     text-align: left;
 }
@@ -279,33 +288,76 @@ thead .b-col { background-color: #c8e6c9 !important; }
 }
 
 .lineup-table th {
-    background-color: #f8f9fa;
-    color: #555;
+    background-color: var(--bg-light-gray);
+    color: var(--text-dark-gray);
     font-weight: 700;
     padding: 8px;
-    border-bottom: 2px solid #eee;
+    border-bottom: 2px solid var(--brand-gray);
     text-align: center;
 }
 .lineup-table td {
     padding: 10px 8px;
-    border-bottom: 1px solid #f1f1f1;
-    color: #333;
+    border-bottom: 1px solid var(--bg-light-gray);
+    color: var(--text-dark);
     text-align: center;
 }
 
-.no-col { width: 40px; color: #888; }
-.name-col { width: 110px; padding-left: 0 !important; font-weight: bold; color: #222; }
-.pos-col { width: 50px; font-weight: bold; color: #555; background-color: #fcfcfc; }
-.type-col { width: 80px; font-weight: bold; color: #777; letter-spacing: -1px; }
-.inn-col { width: 60px; font-weight: bold; color: #555; background-color: #fcfcfc; }
-.change-type-col { width: 50px; font-size: 0.85rem; font-weight: bold; color: #e64980; }
-.change-out-col { width: 90px; font-size: 0.9rem; color: #999; }
-.empty-msg { color: #aaa; font-size: 0.85rem; padding: 20px 0; }
+.no-col {
+    width: 40px;
+    color: var(--text-gray);
+}
+
+.name-col {
+    width: 110px;
+    padding-left: 0 !important;
+    font-weight: bold;
+    color: var(text-dark);
+}
+
+.pos-col {
+    width: 50px;
+    font-weight: bold;
+    color: var(--text-dark-gray);
+    background-color: var(--bg-light-gray);
+}
+
+.type-col {
+    width: 80px;
+    font-weight: bold;
+    color: var(--text-light-gray);
+    letter-spacing: -1px;
+}
+
+.inn-col {
+    width: 60px;
+    font-weight: bold;
+    color: var(--text-dark-gray);
+    background-color: var(--bg-light-gray);
+}
+
+.change-type-col {
+    width: 50px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: var(--text-red);
+}
+
+.change-out-col {
+    width: 90px;
+    font-size: 0.9rem;
+    color: var(--text-gray);
+}
+
+.empty-msg {
+    color: var(--text-light-gray);
+    font-size: 0.85rem;
+    padding: 20px 0;
+}
 
 
 /* --- 6. 사진 갤러리 --- */
 .match-photos-container {
-    background: #fff;
+    background: var(--bg-white);
     border-radius: 12px;
     padding: 20px 20px 30px 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -314,9 +366,9 @@ thead .b-col { background-color: #c8e6c9 !important; }
 .section-title {
     font-size: 1.3rem;
     font-weight: 800;
-    color: #333;
+    color: var(--text-dark);
     margin: 0 0 20px 0;
-    border-left: 5px solid #001d3d;
+    border-left: 5px solid var(--main-blue);
     padding-left: 12px;
     text-align: left;
 }
@@ -338,7 +390,7 @@ thead .b-col { background-color: #c8e6c9 !important; }
     
     border-radius: 8px;
     overflow: hidden;
-    background-color: #f8f9fa;
+    background-color: var(--bg-light-gray);
     
     /* ⭐ 깜빡임 방지 및 렌더링 최적화 */
     transform: translateZ(0); 
