@@ -10,41 +10,27 @@
 
 /* --- 메인 배너 영역 --- */
 .main-banner {
-    /* 1. [사이즈 제한] 화면이 커져도 배너가 무식하게 커지지 않도록 최대폭 설정 */
-    /* 1200px 정도가 일반적인 웹사이트 메인 배너 크기로 적당합니다. */
-    max-width: 1200px; 
+    width: 100%;
+    max-width: none;
+    margin: 0;
 
-    /* 2. [여백 및 중앙 정렬] */
-    /* 가로: 전체 화면에서 좌우 30px씩(총 60px) 뺀 크기 */
-    width: calc(100% - 60px); 
+    /* ⭐ [PC 설정] 웹에서는 3:1 비율 */
+    aspect-ratio: 3 / 1; 
     
-    /* 위아래 30px, 좌우는 자동(중앙 정렬) */
-    margin: 30px auto 30px auto; 
-
-    /* 3. [비율 유지] 가로 3 : 세로 2 */
-    aspect-ratio: 3 / 2;
-    
-    /* 4. [디자인] 둥근 모서리와 그림자 */
-    border-radius: 20px; /* 세련된 둥근 테두리 */
-    box-shadow: 0 10px 20px rgba(0,0,0,0.15); /* 살짝 떠있는 듯한 그림자 효과 */
-    
+    height: auto;
     position: relative;
-    overflow: hidden;   /* 이미지가 둥근 모서리 밖으로 튀어나가지 않게 자름 */
-    background-color:var(--main-blue);
+    overflow: hidden;
+    background-color: var(--main-blue);
+    border-radius: 0;
 }
 
 /* 배너 이미지 */
 .banner-img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* 비율 유지하며 꽉 채우기 */
+    object-fit: cover; 
     object-position: center;
-    
-    /* 1. 처음엔 투명하게 (페이드인 준비) */
     opacity: 0; 
-    
-    /* 2. ⭐ [핵심] 콤마(,)로 연결해서 두 효과를 동시에 적용합니다. */
-    /* opacity는 로딩될 때 0.5s 동안 변함 / transform은 마우스 올릴 때 0.5s 동안 변함 */
     transition: transform 0.5s ease, opacity 0.5s ease-in-out;
 }
 
@@ -88,20 +74,23 @@
 /* --- 모바일 반응형 --- */
 @media (max-width: 768px) {
     .main-banner {
-        /* 모바일에서는 좌우 여백을 조금 줄여서 배너를 더 크게 보여줌 */
-        width: calc(100% - 40px); 
-        margin-top: 20px;
-        border-radius: 15px;
+        /* ⭐ [모바일 설정] 모바일에서는 3:2 비율로 변경 */
+        aspect-ratio: 3 / 2; 
+        margin-top: 0;
+    }
+
+    /* 배너가 세로로 더 길어지므로 폰트 사이즈를 조금 더 키워도 좋습니다. */
+    .banner-title {
+        font-size: 1.0rem; 
     }
     
-    .banner-title {
-        font-size: 1.5rem;
-    }
     .banner-subtitle {
-        font-size: 0.9rem;
+        font-size: 0.7rem;
     }
+    
     .banner-overlay {
-        padding: 25px 25px 15px 25px;
+        padding: 20px;
+        height: 50%; /* 그라데이션 높이 조정 */
     }
 }
 
@@ -337,8 +326,6 @@
     .dashboard-box {
         height: 400px; /* 모바일에서는 높이를 살짝 조절 가능 */
     }
-
-    .banner-title { font-size: 2rem; }
 }
 
 .dashboard-card {
@@ -686,31 +673,4 @@
     /* (선택) 경기 제목과 상대팀 글씨도 살짝 조절하여 밸런스 맞춤 */
     .m-title { font-size: 0.7rem; margin-bottom: 2px; }
     .m-vs { font-size: 0.85rem; }
-
-    .main-banner {
-        width: calc(100% - 40px); 
-        margin-top: 20px;
-        border-radius: 15px;
-        /* 모바일에서는 비율을 조금 더 가로로 길게 해서 덜 답답하게 (선택사항) */
-        aspect-ratio: 16 / 9; 
-    }
-    
-    .banner-title {
-        font-size: 0.75rem; 
-        line-height: 1.2; /* 줄 간격도 좁혀서 높이 차지 줄임 */
-    }
-
-    .banner-subtitle {
-        font-size: 0.45rem; 
-        margin-top: 4px; /* 제목과의 간격도 줄임 */
-        opacity: 0.9;
-    }
-
-    .banner-overlay {
-        /* ⭐ [수정] 패딩을 줄여서 텍스트가 구석으로 더 붙게 함 */
-        padding: 10px 20px; 
-        
-        /* 그라데이션 높이를 60% -> 50%로 줄여서 사진을 더 많이 보여줌 */
-        height: 50%; 
-    }
 }

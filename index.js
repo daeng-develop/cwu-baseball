@@ -2,20 +2,33 @@
 import { db, storage } from './firebase/firebase.js'; 
 
 document.addEventListener("DOMContentLoaded", () => {
-    loadMainBanner();
     loadRecentActivityPhotos();
     loadSchedule5Days(); // 5일치 일정
     loadRecentMatchList(); // 최근 경기 리스트
 });
 
-// 1. 메인 배너 이미지 로드
+// 현재 적용된 배너 모드 저장 (중복 로드 방지용)
+let currentBannerMode = ""; 
+
 async function loadMainBanner() {
     try {
-        const bannerRef = storage.ref().child('index/main-banner.webp');
+        const isMobile = window.innerWidth <= 768;
+        const newMode = isMobile ? "mob" : "web";
+
+        // ⭐ 이미 현재 모드에 맞는 이미지가 로드되어 있다면 중단 (무한 로딩 방지)
+        if (currentBannerMode === newMode) return;
+        
+        currentBannerMode = newMode;
+        const fileName = isMobile ? 'main-banner-mob.jpg' : 'main-banner-web.jpg';
+        
+        const bannerRef = storage.ref().child(`index/${fileName}`);
         const url = await bannerRef.getDownloadURL();
 
         const bannerImg = document.querySelector('.banner-img');
         if (bannerImg) {
+            // 이미지 교체 시 자연스럽게 보이도록 투명도 조절
+            bannerImg.style.opacity = 0; 
+            
             bannerImg.src = url;
             bannerImg.onload = () => {
                 bannerImg.style.opacity = 1; 
@@ -25,6 +38,19 @@ async function loadMainBanner() {
         console.error("배너 로드 실패:", error);
     }
 }
+
+// ⭐ 화면 크기가 변할 때마다 배너 체크 (디바운싱 적용으로 성능 최적화)
+let resizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        loadMainBanner();
+    }, 200); // 0.2초 동안 크기 변화가 멈추면 실행
+});
+
+// 초기 로드 실행
+loadMainBanner();
+
 
 // 2. 최근 활동(경기 + 행사) 사진 5개 로드
 async function loadRecentActivityPhotos() {
