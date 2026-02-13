@@ -15,7 +15,7 @@
         }
 
         .menu-container {
-            background-color: white;
+            background-color: var(--bg-white);
             padding: 40px;
             border-radius: 15px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
@@ -31,11 +31,11 @@
             align-items: center;
             margin-bottom: 30px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #f1f1f1;
+            border-bottom: 2px solid var(--bg-light-gray);
         }
 
         h1 {
-            color: #333;
+            color: var(--text-dark);
             font-size: 1.5rem;
             margin: 0;
         }
@@ -43,18 +43,18 @@
         /* 메인으로 돌아가기 링크 스타일 */
         .to-main-link {
             text-decoration: none;
-            color: #777;
+            color: var(--text-gray);
             font-size: 0.9rem;
             font-weight: bold;
             padding: 5px 10px;
             border-radius: 4px;
             transition: all 0.2s;
-            background-color: #f8f9fa;
+            background-color: var(--bg-light-gray);
         }
 
         .to-main-link:hover {
-            background-color: #e9ecef;
-            color: #333;
+            background-color: var(--main-blue);
+            color: var(--text-white);
         }
 
         /* 메인 메뉴 버튼들 */
@@ -63,8 +63,8 @@
             width: 100%;
             padding: 18px;
             margin-bottom: 15px;
-            background-color: #001d3d; 
-            color: white;
+            background-color: var(--main-blue);
+            color: var(--text-white);
             border: none;
             border-radius: 8px;
             font-size: 1.1rem;
@@ -75,13 +75,14 @@
         }
 
         .menu-btn:hover {
-            background-color: #003366;
+            background-color: var(--main-blue-bright);
+            color: var(--main-blue);
             transform: translateY(-2px);
         }
 
         .info-text {
             text-align: center;
-            color: #888;
+            color: var(--text-gray);
             font-size: 0.85rem;
             margin-bottom: 20px;
         }
@@ -93,21 +94,21 @@
         
         <div class="menu-header">
             <h1>관리자 메뉴</h1>
-            <a href="../index.html" class="to-main-link">🏠 메인으로</a>
+            <a href="../index.html" class="to-main-link">메인으로</a>
         </div>
 
         <p class="info-text">관리하실 항목을 선택해주세요.</p>
 
         <button class="menu-btn" onclick="location.href='player/admin-player.html'">
-            🏃 선수 명단 관리
+            선수 명단 관리
         </button>
 
         <button class="menu-btn" onclick="location.href='schedule/admin-schedule.html'">
-            📅 일정 관리
+            일정 관리
         </button>
 
         <button class="menu-btn" onclick="location.href='match/admin-match.html'">
-            ⚾ 경기 기록
+            경기 기록
         </button>
 
     </div>
