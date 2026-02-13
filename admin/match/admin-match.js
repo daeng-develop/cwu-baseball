@@ -598,15 +598,6 @@ if (!selectedMatchId) return;
             if (status === 'win' && ourScore <= oppScore) throw new Error("승리인데 점수가 낮거나 같습니다.");
             if (status === 'loss' && ourScore >= oppScore) throw new Error("패배인데 점수가 높거나 같습니다.");
             if (status === 'draw' && ourScore !== oppScore) throw new Error("무승부인데 점수가 다릅니다.");
-
-            // 상세 기록 모드일 때만 라인업 9명 검증
-            if (isDetailChecked) {
-                const filledStarters = Array.from(document.querySelectorAll('#table-starting .player-input'))
-                                            .filter(input => input.value.trim() !== "").length;
-                if (filledStarters < 9) {
-                    throw new Error("⚠️ 스타팅 라인업 9명을 모두 입력해주세요.");
-                }
-            }
         }
 
         // 3. [데이터 수집]
@@ -628,7 +619,7 @@ if (!selectedMatchId) return;
             updateData['home-score'] = getInningScores('home');
             updateData['away-score'] = getInningScores('away');
 
-            // 라인업 수집 로직 (기존과 동일)
+           // 라인업 수집 (입력된 행만 수집되므로 0명이어도 에러 없이 빈 배열로 저장됨)
             const startLineupArr = [];
             document.querySelectorAll('#table-starting tbody tr').forEach((tr, index) => {
                 const pos = tr.querySelector('.pos-select').value; 
