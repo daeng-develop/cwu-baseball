@@ -13,7 +13,7 @@
     align-items: flex-start;
     gap: 10px;
     margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--bg-light-gray);
     padding-bottom: 15px;
 }
 
@@ -21,7 +21,7 @@
 .page-title {
     font-size: 2.5rem;
     font-weight: 800;
-    color: #1a1d23;
+    color: var(--text-dark);
     letter-spacing: -1.5px;
     margin: 0;
 }
@@ -32,14 +32,14 @@
     display: block;
     width: 45px;
     height: 5px;
-    background-color: #002D62; 
+    background-color: var(--main-blue); 
     margin-top: 10px;
     border-radius: 3px;
 }
 
 /* 강조 텍스트 색상 */
 #display-year, #display-position {
-    color: #0056b3;
+    color:var(--main-blue);
 }
 
 /* --- 포지션 필터 컨트롤러 영역 --- */
@@ -54,7 +54,7 @@
 /* 포지션 버튼 그룹 */
 .position-selector {
     display: flex;
-    background-color: #f1f3f5;
+    background-color: var(--brand-gray);
     padding: 5px;
     border-radius: 12px;
 }
@@ -63,7 +63,7 @@
     padding: 10px 20px;
     border: none;
     background: transparent;
-    color: #495057;
+    color: var(--bg-dark-gray);
     border-radius: 8px;
     cursor: pointer;
     font-size: 0.95rem;
@@ -73,13 +73,13 @@
 
 /* 활성화된 포지션 버튼 */
 .position-btn.active {
-    background-color: #ffffff;
-    color: #002D62;
+    background-color: var(--bg-white);
+    color: var(--main-blue); 
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .position-btn:hover:not(.active) {
-    color: #002D62;
+    color: var(--brand-green); 
 }
 
 /* --- 연도 선택 셀렉트 박스 --- */
@@ -91,9 +91,9 @@
     padding: 10px 40px 10px 16px; 
     font-size: 0.95rem;
     font-weight: 600;
-    color: #333;
-    background-color: #ffffff;
-    border: 1px solid #e0e4e8;
+    color: var(--text-dark-gray);
+    background-color: var(--bg-light-gray);
+    border: 1px solid var(--bg-gray);
     border-radius: 10px;
     cursor: pointer;
     
@@ -107,20 +107,19 @@
 
     -webkit-appearance: none; 
     border-radius: 10px;      
-    background-color: #ffffff;
+    background-color: var(--bg-light-gray);
     
     line-height: normal;
     display: block;
 }
 
 #year-select:hover {
-    border-color: #0056b3;
-    background-color: #f8fbff;
+    border-color: var(--main-blue);
 }
 
 #year-select:focus {
     outline: none;
-    border-color: #0056b3;
+    border-color:  var(--main-blue);
     box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1); 
 }
 
@@ -135,11 +134,11 @@
 
 /* 선수 카드 컨테이너 수정 */
 .player-card {
-    background: #fff;
+    background: var(--bg-white);
     border-radius: 8px; /* 둥글기 살짝 줄임 */
     overflow: hidden; 
     text-align: center;
-    border: 1px solid #f0f0f0;
+    border: 1px solid var(--bg-light-gray);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s ease;
 }
@@ -148,7 +147,7 @@
 .player-image-box {
     width: 100%;
     aspect-ratio: 3 / 4; /* 비율 4:5 -> 3:4로 변경 (조금 더 증명사진 느낌) */
-    background-color: #e9ecef; 
+    background-color:var(--bg-light-gray);
     overflow: hidden;
 }
 
@@ -171,7 +170,7 @@
 .player-number {
     font-size: 0.8rem;
     font-weight: 700;
-    color: #002D62; 
+    color: var(--main-blue);
     margin-bottom: 2px;
 }
 
@@ -179,7 +178,7 @@
 .player-name {
     font-size: 1.1rem; /* 이름 크기 살짝 줄임 */
     font-weight: 800;
-    color: #1a1d23; 
+    color: var(--text-dark);
     margin-bottom: 4px;
     letter-spacing: -0.5px;
 }
@@ -187,14 +186,14 @@
 /* 3. 정보 텍스트 공통 스타일 (생년월일, 신체조건) */
 .player-info-row {
     font-size: 0.8rem;
-    color: #555;
+    color: var(--text-dark-gray);
     font-weight: 500;
     letter-spacing: -0.3px;
 }
 
 /* 구분선 (|) 스타일 */
 .divider {
-    color: #ccc;
+    color: var(--text-dark-gray);
     margin: 0 4px;
     font-size: 0.7rem;
     vertical-align: middle;
@@ -204,7 +203,7 @@
 .player-school {
     font-size: 0.75rem; /* 제일 작게 */
     font-weight: 400;
-    color: #999; 
+    color: var(--text-gray);
     margin-top: 6px; /* 위 정보들과 살짝 띄움 */
 }
 
@@ -217,7 +216,7 @@
     grid-column: 1 / -1; 
     text-align: center;
     padding: 50px;
-    color: #999;
+    color: var(--text-gray);
     font-size: 1.1rem;
 }
 
