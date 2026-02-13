@@ -10,42 +10,50 @@ document.addEventListener("DOMContentLoaded", () => {
 // 현재 적용된 배너 모드 저장 (중복 로드 방지용)
 let currentBannerMode = ""; 
 
-async function loadMainBanner() {
-    try {
-        const isMobile = window.innerWidth <= 768;
-        const newMode = isMobile ? "mob" : "web";
 
-        // ⭐ 이미 현재 모드에 맞는 이미지가 로드되어 있다면 중단 (무한 로딩 방지)
-        if (currentBannerMode === newMode) return;
-        
-        currentBannerMode = newMode;
-        const fileName = isMobile ? 'main-banner-mob.jpg' : 'main-banner-web.jpg';
-        
-        const bannerRef = storage.ref().child(`index/${fileName}`);
-        const url = await bannerRef.getDownloadURL();
+// 1. 메인 배너 이미지 로드 함수 (로컬 폴더 사용 버전)
+function loadMainBanner() {
+    const isMobile = window.innerWidth <= 768;
+    const newMode = isMobile ? "mob" : "web";
 
-        const bannerImg = document.querySelector('.banner-img');
-        if (bannerImg) {
-            // 이미지 교체 시 자연스럽게 보이도록 투명도 조절
-            bannerImg.style.opacity = 0; 
-            
-            bannerImg.src = url;
-            bannerImg.onload = () => {
-                bannerImg.style.opacity = 1; 
-            };
-        }
-    } catch (error) {
-        console.error("배너 로드 실패:", error);
+    // 중복 로드 방지
+    if (currentBannerMode === newMode) return;
+    
+    currentBannerMode = newMode;
+    
+    // ⭐ [수정] Storage 호출 대신 로컬 경로 설정
+    // 이미지 파일이 프로젝트 루트의 image 폴더 안에 있어야 합니다.
+    const fileName = isMobile ? 'main-banner-mob.png' : 'main-banner-web.png';
+    const localPath = `image/${fileName}`;
+
+    const bannerImg = document.querySelector('.banner-img');
+    if (bannerImg) {
+        bannerImg.style.opacity = 0; 
+        
+        // 경로 변경
+        bannerImg.src = localPath;
+        
+        bannerImg.onload = () => {
+            bannerImg.style.opacity = 1; 
+        };
+
+        // 이미지 로딩 실패 시 에러 처리
+        bannerImg.onerror = () => {
+            const mainBlue = getComputedStyle(document.documentElement)
+                            .getPropertyValue('--main-blue').trim();
+                
+            bannerImg.style.backgroundColor = mainBlue;
+        };
     }
 }
 
-// ⭐ 화면 크기가 변할 때마다 배너 체크 (디바운싱 적용으로 성능 최적화)
+// 2. 화면 크기 변화 감지 (리사이즈 이벤트)
 let resizeTimer;
 window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
         loadMainBanner();
-    }, 200); // 0.2초 동안 크기 변화가 멈추면 실행
+    }, 200);
 });
 
 // 초기 로드 실행
