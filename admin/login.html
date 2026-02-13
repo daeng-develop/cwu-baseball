@@ -16,7 +16,7 @@
         }
 
         .login-box {
-            background: white;
+            background: var(--bg-white);
             padding: 40px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -26,17 +26,16 @@
 
         h2 {
             margin-top: 0;
-            color: #333;
+            color: var(--text-dark);
         }
 
         input[type="password"] {
             width: 100%;
             padding: 12px;
             margin: 20px 0;
-            border: 1px solid #ddd;
+            border: 1px solid var(--bg-gray);
             border-radius: 6px;
             box-sizing: border-box;
-            /* 패딩 포함 크기 계산 */
         }
 
         button {
@@ -51,21 +50,22 @@
         }
 
         .login-btn {
-            background-color: #001d3d;
-            color: white;
+            background-color: var(--main-blue);
+            color: var(--bg-white);
         }
 
         .login-btn:hover {
-            background-color: #003366;
+            background-color: var(--main-blue-dark);
         }
 
         .back-btn {
-            background-color: #e9ecef;
-            color: #333;
+            background-color: var(--brand-gray);
+            color: var(--text-dark);
         }
 
         .back-btn:hover {
-            background-color: #dee2e6;
+            background-color: var(--brand-green);
+            color: var(--text-white);
         }
     </style>
 </head>
