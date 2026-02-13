@@ -152,14 +152,14 @@
 
 /* --- [카드 공통 스타일] --- */
 .photo-card {
-    background: #fff;
+    background: var(--bg-white);
     /* 둥근 모서리와 넘침 숨김 (필수) */
     border-radius: 12px; 
     overflow: hidden; 
     
     /* 그림자 효과 */
     box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    border: 1px solid #eee;
+    border: 1px solid var(--brand-gray);
     
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
@@ -187,9 +187,9 @@
     
     /* ⭐ [수정] gap 방식 대신 오버레이 방식을 쓰므로 gap은 0으로 설정 */
     gap: 0; 
-    background: #f0f0f0; 
+    background: var(--bg-white);
     
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--brand-gray);
     position: relative; /* 십자선 배치를 위한 기준점 */
 }
 
@@ -201,7 +201,7 @@
     left: 0;
     width: 100%;
     height: 2px; /* 선 두께 */
-    background-color: #ffffff; /* 선 색상 (흰색) */
+    background-color: var(--bg-white); /* 선 색상 (흰색) */
     z-index: 2; /* 사진보다 위에 오도록 설정 */
     transform: translateY(-50%); /* 정확히 중앙 정렬 */
     pointer-events: none; /* 클릭 방해 안 함 */
@@ -215,7 +215,7 @@
     left: 50%;
     width: 2px; /* 선 두께 */
     height: 100%;
-    background-color: #ffffff; /* 선 색상 (흰색) */
+    background-color: var(--bg-white); /* 선 색상 (흰색) */
     z-index: 2; /* 사진보다 위에 오도록 설정 */
     transform: translateX(-50%); /* 정확히 중앙 정렬 */
     pointer-events: none;
@@ -232,7 +232,7 @@
 
 /* 사진 없을 때 빈 공간 */
 .empty-photo {
-    background-color: #e0e0e0; /* 연한 회색 */
+    background-color: var(--brand-gray);
     width: 100%;
     height: 100%;
 }
@@ -245,7 +245,7 @@
     font-size: 0.7rem;
     padding: 3px 8px;
     border-radius: 4px;
-    color: white;
+    color: var(--text-white);
     font-weight: bold;
     z-index: 10; /* 십자선(z-index:2)보다 높게 */
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -258,7 +258,7 @@
 .card-info {
     padding: 6px 4px;
     text-align: center;
-    background: #fff;
+    background: var(--bg-white);
     flex-grow: 1;
     
     display: flex;
@@ -270,17 +270,17 @@
     z-index: 10;
 }
 
-/* ... (아래 폰트 설정 등은 기존과 동일) ... */
+
 .info-date {
     font-size: 0.75rem;
-    color: #888;
+    color: var(--text-gray);
     font-weight: 700;
     margin-top: 2px;
 }
 .info-title {
     font-size: 0.9rem;
     font-weight: 800;
-    color: #333;
+    color: var(--text-dark-gray);
     line-height: 1.2;
     margin-bottom: 2px;
     white-space: nowrap;
@@ -290,7 +290,7 @@
 }
 .info-loc {
     font-size: 0.75rem;
-    color: #999;
+    color: var(--text-light-gray);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -310,7 +310,7 @@
 /* 각 대시보드 박스 (일정, 최근경기) */
 .dashboard-box {
     flex: 1;
-    background: #fff;
+    background: var(--bg-white);
     border-radius: 15px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     display: flex;
@@ -332,7 +332,7 @@
 .dashboard-card {
     flex: 1; /* 1:1 분할 */
     background: var(--bg-white);
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--bg-light-gray);
     border-radius: 12px;
     padding: 24px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.03);
@@ -359,7 +359,7 @@
 
 .more-link {
     font-size: 0.85rem;
-    color: #888;
+    color: var(--text-gray);
     text-decoration: none;
     transition: color 0.2s;
 }
@@ -385,7 +385,7 @@
 
 /* 오늘 날짜 강조 */
 .sch-row.today {
-    background-color: #f0f7ff; /* 연한 블루 배경 */
+    background-color: var(--main-blue-bright);
     border-left: 4px solid var(--main-blue);
 }
 
@@ -395,7 +395,7 @@
     align-items: center;
     min-width: 60px;
     margin-right: 15px;
-    color: #666;
+    color: var(--text-gray);
     font-weight: 700;
 }
 
@@ -403,7 +403,7 @@
 .sch-badge {
     font-size: 0.7rem;
     background: var(--brand-green); /* 포인트 컬러 */
-    color: white;
+    color: var(--text-white);
     padding: 2px 6px;
     border-radius: 4px;
 }
@@ -421,7 +421,7 @@
 /* ⭐ [추가] 1번째 줄: 상대팀/제목 */
 .sch-title {
     font-weight: 700;       /* 굵게 */
-    color: #333;
+    color: var(--text-dark-gray);
     margin-bottom: 2px;     /* 장소와의 간격 */
     line-height: 1.2;
 }
@@ -429,12 +429,12 @@
 /* ⭐ [추가] 2번째 줄: 장소 */
 .sch-location {
     font-size: 0.8rem;      /* 제목보다 작게 */
-    color: #888;            /* 회색으로 처리 */
+    color: var(--text-gray);
     font-weight: 400;
 }
 .sch-sub {
     font-size: 0.8rem;
-    color: #999;
+    color: var(--text-gray);
     margin-left: 5px;
 }
 
@@ -454,13 +454,9 @@
     border-radius: 20px;
     font-size: 0.9rem;
     font-weight: bold;
-    color: white;
+    color: var(--text-white);
     margin-bottom: 15px;
 }
-/* 승패 색상 */
-.tag-win { background-color: var(--main-blue); }
-.tag-loss { background-color: #e63946; } /* 빨강은 별도 지정 */
-.tag-draw { background-color: #6c757d; }
 
 .scoreboard-mini {
     display: flex;
@@ -486,7 +482,7 @@
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    color: #999;
+    color: var(--text-gray);
     margin-bottom: 8px;
     font-size: 0.8rem;
 }
@@ -507,8 +503,8 @@
 .match-meta-info {
     text-align: center;
     font-size: 0.9rem;
-    color: #777;
-    background-color: var(--bg-gray);
+    color: var(--text-gray);
+    background-color: var(--bg-light-gray);
     padding: 8px 20px;
     border-radius: 20px;
 }
@@ -517,9 +513,9 @@
 .loading-box, .no-data {
     width: 100%;
     text-align: center;
-    color: #aaa;
+    color: var(--text-gray);
     padding: 30px;
-    background: var(--bg-gray);
+    background: var(--bg-light-gray);
     border-radius: 8px;
 }
 
@@ -539,7 +535,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 12px 10px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid  var(--bg-light-gray);
     transition: background-color 0.2s;
     cursor: pointer;
 }
@@ -549,7 +545,7 @@
 }
 
 .match-list-item:hover {
-    background-color: #f8f9fa;
+    background-color:  var(--bg-light-gray);
 }
 
 /* 1. 날짜 및 장소 */
@@ -558,7 +554,7 @@
     flex-direction: column;
     width: 110px;        /* PC에서는 넉넉하게 */
     font-size: 0.85rem;
-    color: #666;
+    color: var(--text-gray);
     text-align: left;
     padding-left: 5px;
     flex-shrink: 0;      /* 영역 고정 */
@@ -567,14 +563,14 @@
 /* 날짜 텍스트 */
 .m-date { 
     font-weight: 700; 
-    color: #444; 
+    color: var(--text-dark-gray);
     margin-bottom: 2px; 
 }
 
 /* 장소 텍스트 (PC: 한 줄 말줄임) */
 .m-loc { 
     font-size: 0.7rem; 
-    color: #999; 
+    color: var(--text-gray);
     width: 100%;
     
     white-space: nowrap;      /* PC는 한 줄 */
@@ -605,26 +601,27 @@
 }
 
 /* 3. 결과 뱃지 (상태별 색상) */
+/* 공통 뱃지 스타일 보완 */
 .match-result-badge {
     padding: 4px 10px;
     border-radius: 12px;
     font-size: 0.8rem;
     font-weight: 700;
-    color: white;
+    color: var(--bg-white);
     min-width: 50px;
     text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 약간의 입체감 */
 }
 
 /* 상태별 색상 정의 */
-.status-win { background-color: var(--main-blue); }       /* 승리 (파랑) */
-.status-loss { background-color: #d62828; }               /* 패배 (빨강) */
-.status-draw { background-color: #6c757d; }               /* 무승부 (회색) */
-.status-cancel { background-color: #adb5bd; }             /* 취소 (연회색) */
-.status-before {                                          /* 경기전 (테두리만) */
-    background-color: #fff;
-    color: var(--main-blue);
-    border: 1px solid var(--main-blue);
-}
+.status-win { background-color: var(--main-blue); }
+.status-loss { background-color: var(--bg-red); }
+.status-draw { background-color:  var(--brand-green);}
+.status-no-record { background-color: var(--main-blue-light); }
+.status-rain { background-color:  var(--bg-blue);} 
+.status-suspend { background-color: var(--bg-yellow);}
+.status-cancel { background-color: var(--bg-gray); }
+.status-end { background-color: var(--bg-dark-gray); }
 
 /* 경기 기록 리스트 내부의 '데이터 없음' 박스 최적화 */
 .match-list-container .no-data {

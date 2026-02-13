@@ -271,13 +271,22 @@ async function loadRecentMatchList() {
             let statusClass = "";
 
             switch(match.status) {
-                case 'win': statusText = "승"; statusClass = "status-win"; break;
-                case 'loss': statusText = "패"; statusClass = "status-loss"; break;
-                case 'draw': statusText = "무"; statusClass = "status-draw"; break;
-                case 'no_record': statusText = "기록"; statusClass = "status-draw"; break; // 기록없음 대응
+                case 'win': 
+                    statusText = "승"; statusClass = "status-win"; break;
+                case 'loss': 
+                    statusText = "패"; statusClass = "status-loss"; break;
+                case 'draw': 
+                    statusText = "무"; statusClass = "status-draw"; break;
+                case 'no_record': 
+                    statusText = "기록 없음"; statusClass = "status-no-record"; break; // 클래스명 분리
                 case 'rain_cancel': 
-                case 'etc_cancel': statusText = "취소"; statusClass = "status-cancel"; break;
-                default: statusText = "종료"; statusClass = "status-cancel";
+                    statusText = "우취"; statusClass = "status-rain"; break; // 우천 취소 전용
+                case 'etc_cancel': 
+                    statusText = "취소"; statusClass = "status-cancel"; break; // 기타 취소 전용
+                case 'rain_suspend':
+                    statusText = "중단"; statusClass = "status-suspend"; break; // 서스펜디드 대응
+                default: 
+                    statusText = "종료"; statusClass = "status-end";
             }
 
             return `
