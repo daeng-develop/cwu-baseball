@@ -338,7 +338,7 @@ async function fillMatchMenu(pathPrefix, elementId, isSidebar) {
 
             let subItemsHtml = "";
             if (matches.length === 0) {
-                subItemsHtml = `<li><span style="padding:10px; color: var(--text-gray);">기록 없음</span></li>`;
+                subItemsHtml = `<li><span style="padding:10px; color: var(--text-light-gray);">기록 없음</span></li>`;
             } else {
                 matches.forEach(m => {
                     const dateShort = m.date ? m.date.slice(5).replace('-', '.') : '00.00'; 
