@@ -25,7 +25,7 @@ async function draw_menu_tree() {
                 <button class="toggle-btn">▼</button>
             </div>
             <ul class="top-menu-category-level3" id="top-event-${year}" style="display: none;">
-                <li><span style="padding:10px; color:#999;">로딩 중...</span></li>
+                <li><span style="padding:10px; color: var(--text-gray);">로딩 중...</span></li>
             </ul>
         </li>
     `).join('');
@@ -38,7 +38,7 @@ async function draw_menu_tree() {
                 <button class="toggle-btn">▼</button>
             </div>
             <ul class="sidebar-category-level3" id="sidebar-event-${year}" style="display: none;">
-                <li><span style="padding:10px; color:#999;">로딩 중...</span></li>
+                <li><span style="padding:10px; color: var(--text-gray);">로딩 중...</span></li>
             </ul>
         </li>
     `).join('');
@@ -73,7 +73,7 @@ async function draw_menu_tree() {
                     <button class="toggle-btn">▼</button>
                 </div>
                 <ul class="top-menu-category-level2" id="top-match-menu" style="display: none;">
-                    <li><span style="padding:10px; color:#999;">로딩 중...</span></li>
+                    <li><span style="padding:10px; color: var(--text-gray);">로딩 중...</span></li>
                 </ul>
             </li>
 
@@ -127,7 +127,7 @@ async function draw_menu_tree() {
                     <button class="toggle-btn">▼</button>
                 </div>
                 <ul class="sidebar-category-level2" id="sidebar-match-menu" style="display: none;">
-                    <li><span style="padding:10px; color:#999;">로딩 중...</span></li>
+                    <li><span style="padding:10px; color: var(--text-gray);">로딩 중...</span></li>
                 </ul>
             </li>
 
@@ -248,7 +248,7 @@ async function fillEventMenu(pathPrefix, year, elementId) {
 
         // 2. 필터링된 결과가 없으면 '일정 없음' 표시
         if (validEvents.length === 0) {
-            listElement.innerHTML = `<li><span style="padding: 10px 15px; color: #999; font-size: 0.9em;">일정 없음</span></li>`;
+            listElement.innerHTML = `<li><span style="padding: 10px 15px; color: var(--text-gray); font-size: 0.9em;">일정 없음</span></li>`;
             return;
         }
 
@@ -285,7 +285,7 @@ async function fillMatchMenu(pathPrefix, elementId, isSidebar) {
         const listDoc = await db.collection("match").doc("match-list").get();
         
         if (!listDoc.exists) {
-            container.innerHTML = `<li><span style="padding:10px; color:#999;">대회 정보 없음</span></li>`;
+            container.innerHTML = `<li><span style="padding:10px; color: var(--text-gray);">대회 정보 없음</span></li>`;
             return;
         }
 
@@ -293,7 +293,7 @@ async function fillMatchMenu(pathPrefix, elementId, isSidebar) {
         const tournamentNames = data['match-name']; 
 
         if (!tournamentNames || tournamentNames.length === 0) {
-            container.innerHTML = `<li><span style="padding:10px; color:#999;">등록된 대회가 없습니다.</span></li>`;
+            container.innerHTML = `<li><span style="padding:10px; color: var(--text-gray);">등록된 대회가 없습니다.</span></li>`;
             return;
         }
 
@@ -338,7 +338,7 @@ async function fillMatchMenu(pathPrefix, elementId, isSidebar) {
 
             let subItemsHtml = "";
             if (matches.length === 0) {
-                subItemsHtml = `<li><span style="padding:10px; color:#999;">기록 없음</span></li>`;
+                subItemsHtml = `<li><span style="padding:10px; color: var(--text-gray);">기록 없음</span></li>`;
             } else {
                 matches.forEach(m => {
                     const dateShort = m.date ? m.date.slice(5).replace('-', '.') : '00.00'; 
