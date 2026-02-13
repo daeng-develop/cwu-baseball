@@ -83,11 +83,17 @@ async function update_page() {
                           ? player.photo 
                           : DEFAULT_IMG;
 
-        // ⭐ [수정 1] 생년월일 포맷 변경 (2002-05-10 -> 2002.05.10)
-        // 데이터가 없으면 '-' 표시, 하이픈(-)을 점(.)으로 변경
-        const birthDate = player.birth ? player.birth.replace(/-/g, '.') : '-';
+        // ⭐ [수정] yyyymmdd -> yyyy.mm.dd 포맷팅
+        let birthDate = '-'; 
+        if (player.birth && player.birth.length === 8) {
+            // 0~4자(연도), 4~6자(월), 6~8자(일)를 잘라서 합칩니다.
+            const year = player.birth.substring(0, 4);
+            const month = player.birth.substring(4, 6);
+            const day = player.birth.substring(6, 8);
+            birthDate = `${year}.${month}.${day}`;
+        }
         
-        // ⭐ [수정 2] 타입(투타 정보) 처리
+        // ⭐타입(투타 정보) 처리
         // DB에 type이 있으면 사용(예: 우투우타), 없으면 포지션 이름(예: 투수) 사용
         const playerType = player.type || posNames[currentHash];
 
