@@ -30,6 +30,9 @@
     --text-light-gray : #bdbdbd;
     --text-gray : #757575;
     --text-dark-gray : #424242;
+
+    --text-red :#e60012;
+    --text-blue :#1c7ed6;
 }
 
 /**************** 기본적인 폰트 및 배경 설정 ****************/
