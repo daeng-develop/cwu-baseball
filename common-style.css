@@ -1,8 +1,17 @@
 /* 1. 폰트 불러오기 */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
 
-/* 2. 색상 변수 정의 (청운대 브랜드 컬러 적용) */
+/* Gowun Dodum: 전반적으로 둥글고 아기자기하면서 가독성이 매우 좋음 */
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap');
+
+/* 만약 더 손글씨 느낌을 원하신다면 '고운 바탕'도 함께 불러올 수 있습니다 */
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap');
+
+/* 변수 정의 */
 :root {
+
+    --main-font: 'Gowun Dodum', sans-serif;
+
     /* [메인] 청운대 블루 (사이드바, 푸터 배경) */
     --main-blue: #004ea2; 
     --main-blue-dark: #003264;
@@ -43,7 +52,7 @@ body {
     margin: 0;/* 화면에 꽉 차게 (하얀 테두리 삭제) */
     display: flex;/* 정렬 상자로 변신 */
     flex-direction: column;/* 위에서 아래로 차례대로 배치 */
-    font-family: "Noto Sans KR", sans-serif;/*폰트 적용*/
+   font-family: var(--main-font);
 
     background-color: var(--bg-light-gray);
 
