@@ -232,7 +232,7 @@ async function loadMatchList() {
 
     } catch (error) {
         console.error("경기 목록 로딩 실패:", error);
-        tableBody.innerHTML = `<tr><td colspan="4" style="color:red;">데이터 로딩 실패</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="4" style="color: var(--text-red);">데이터 로딩 실패</td></tr>`;
     }
 }
 
@@ -545,7 +545,7 @@ async function loadEventList() {
 
     } catch (error) {
         console.error("목록 불러오기 실패:", error);
-        tableBody.innerHTML = `<tr><td colspan="4" style="color:red;">데이터 로딩 실패</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="4" style="color: var(--text-red);">데이터 로딩 실패</td></tr>`;
     }
 }
 
