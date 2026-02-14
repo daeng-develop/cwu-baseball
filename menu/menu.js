@@ -334,7 +334,7 @@ async function fillMatchMenu(pathPrefix, elementId, isSidebar) {
                 }
             });
 
-            matches.sort((a, b) => b.date.localeCompare(a.date));
+            matches.sort((b, a) => b.date.localeCompare(a.date));
 
             let subItemsHtml = "";
             if (matches.length === 0) {
