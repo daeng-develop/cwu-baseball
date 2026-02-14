@@ -2,7 +2,7 @@
 .home-btn {
     font-size: 1.5rem;
     font-weight: 800;
-    color: var(--brand-gray);
+    color: var(--text-white);
     white-space: nowrap;/* 로고가 줄바꿈되지 않도록 고정 */
 
     height: 40px;/* ⭐ 추가된 코드: 메뉴 1단계 높이(40px)와 맞춤 */
@@ -15,14 +15,14 @@
 /* 홈 버튼 링크 스타일 초기화 */
 .home-btn-link {
     text-decoration: none; /* 밑줄 제거 */
-    color: var(--brand-gray);
+    color: var(--text-white);
     display: flex;
     align-items: center;
 }
 
 .home-btn:hover {
     opacity: 0.8;
-    color: var(--brand-green);
+    color: var(--point-clr);
 }
 
 /**************** 토글 버튼 ****************/
@@ -38,23 +38,16 @@
 /* 2. [상단 메뉴] 전용 스타일 */
 .top-menu .toggle-btn {
     font-size: 0.7rem;
-    color: var(--brand-gray);
+    color: var(--text-white);
     
     margin-left: 8px;   /* ⭐ 글자와 버튼 사이 간격 (상단 메뉴용) */
 }
 
 /* [사이드바 전용] 스타일 (흰색, 작게) */
 .sidebar .toggle-btn {
-    color: var(--brand-gray);
+    color: var(--text-white);
     font-size: 0.75rem;
 }
-
-/* [사이드바 호버 시] 밝게 */
-.sidebar-category-level1:hover .toggle-btn,
-.sidebar-category-level2-group:hover .toggle-btn {
-    color: var(--text-white);
-}
-
 
 /**************** 상단바 ****************/
 .top-menu {
@@ -63,7 +56,7 @@
     align-items: flex-start;/* ⭐ center에서 flex-start로 변경 */
     padding: 10px 30px; /* 좌우 간격을 조금 줄여서 공간 확보 */
 
-    background-color: var(--main-blue);
+    background-color: var(--main-clr);
 
     position: sticky;/* 스크롤을 내려도 상단에 고정 */
     top: 0;/* 여백없이 상단에 딱 붙어서 전시 될 수 있도록 구현 */
@@ -100,7 +93,7 @@
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: var(--brand-gray);
+    color: var(--text-white);
 }
 
 /* --- 레벨별 특화 스타일 --- */
@@ -128,11 +121,11 @@
     transition: all 0.2s ease;
 
     border-radius: 6px;
-    color: var(--brand-gray);
+    color: var(--text-white);
     background-color: transparent;
 
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     white-space: nowrap;
 
     /* 상단 고정 */
@@ -162,7 +155,7 @@ a.top-menu-category-level1 {
 
 .top-menu-category-level1:hover
 {
-   background-color: color-mix(in srgb, var(--brand-green), transparent 30%);
+   background-color: color-mix(in srgb, var(--point-clr), transparent 30%);
 }
 
 /* --- Level 2: 중분류 라벨 --- */
@@ -171,7 +164,7 @@ a.top-menu-category-level1 {
     padding-left: 0; 
     
     font-weight: 600;
-    font-size: 0.87rem;
+    font-size: 1.1rem;
     
     white-space: normal !important;
     max-width: 155px; 
@@ -206,7 +199,7 @@ a.top-menu-category-level1 {
 
 .top-menu-category-level2-label:hover
 {
-   background-color: color-mix(in srgb, var(--brand-green), transparent 20%);
+   background-color: color-mix(in srgb, var(--point-clr), transparent 20%);
 }
 
 
@@ -236,9 +229,9 @@ a.top-menu-category-level1 {
     width: fit-content;
     text-decoration: none;
 
-    color: var(--brand-gray);
+    color: var(--text-white);
 
-    font-size: 0.83rem;
+    font-size: 0.9rem;
 
     padding: 4px 8px;
     margin: 1px 0;
@@ -256,7 +249,7 @@ a.top-menu-category-level1 {
     
     width: 2px;             /* 선 두께 (얇게) */
     height: 10px;           /* 선 높이 */
-    background-color:var(--brand-gray);
+    background-color:var(--bg-white);
     
     margin-right: 8px;      /* 글자와의 간격 */
     vertical-align: middle; /* 글자 중간 높이에 맞춤 */
@@ -270,11 +263,11 @@ a.top-menu-category-level1 {
 /* 호버 시 변경 (포인트 컬러) */
 .top-menu-category-level3 a:hover,
 .top-menu-category-level3 span:hover {
-    background-color: var(--brand-green); /* 초록색으로 변경 */
+    background-color: var(--point-clr); /* 초록색으로 변경 */
 }
 .top-menu-category-level3 a:hover::before,
 .top-menu-category-level3 span:hover::before {
-    background-color: var(--brand-green); /* 초록색으로 변경 */
+    background-color: var(--point-clr); /* 초록색으로 변경 */
 }
 
 
@@ -284,11 +277,15 @@ a.top-menu-category-level1 {
     left: 20px;/* 버튼을 왼쪽 구석에 고정 */
     background: none;
     border: none;
-     color: var(--brand-gray);
+    color: var(--text-white);
     font-size: 2rem;
     cursor: pointer;
 
     display: none; /* PC에서는 사이드바 버튼을 숨김 */
+}
+
+.sidebar-btn:hover {
+    color: var(--point-clr);
 }
 
 
@@ -303,7 +300,7 @@ a.top-menu-category-level1 {
     z-index: 2000;
     transition: left 0.3s ease;
 
-    background-color:  var(--main-blue);
+    background-color:  var(--main-clr);
     opacity: 0.95;
 
     width: 280px;              
@@ -329,7 +326,7 @@ a.top-menu-category-level1 {
 }
 
 .sidebar-title {
-    color: var(--brand-gray);
+    color: var(--text-white);
     font-size: 1.2rem;
     font-weight: 800;
     margin: 0;
@@ -339,7 +336,7 @@ a.top-menu-category-level1 {
 .sidebar-close-btn {
     background: none;
     border: none;
-    color: var(--brand-gray);
+    color: var(--text-white);
     font-size: 1.5rem;
     cursor: pointer;
     padding: 5px;
@@ -375,10 +372,10 @@ a.top-menu-category-level1 {
     align-items: center;
     padding: 15px 25px;  
    
-    color: var(--brand-gray);     
+    color: var(--text-white);   
     
     text-decoration: none;
-    font-size: 1.05rem;
+    font-size: 1.3rem;
     font-weight: 500;
     cursor: pointer;
     
@@ -389,7 +386,7 @@ a.top-menu-category-level1 {
 
 .sidebar-category-level1:hover
 {
-   background-color: color-mix(in srgb, var(--brand-green), transparent 30%);
+   background-color: color-mix(in srgb, var(--point-clr), transparent 30%);
    transform: scale(1.05); /* 살짝 커지는 효과 */
 }
 
@@ -406,7 +403,8 @@ a.sidebar-category-level1 {
     list-style: none;
     padding: 0;
     margin: 0;
-    background-color: var(--main-blue-dark);
+    font-size: 1.1rem;
+    background-color: var(--main-clr-dark);
 }
 
 /* --- Case A: Level 2가 링크일 때 (선수 정보) --- */
@@ -414,9 +412,8 @@ a.sidebar-category-level1 {
     display: block;
     padding: 12px 25px 12px 45px; /* 왼쪽 패딩을 45px로 늘려 들여쓰기 */
     
-    color: var(--brand-gray);
+    color: var(--text-white);
     text-decoration: none;
-    font-size: 0.95rem;
     font-weight: 400;
     transition: all 0.2s ease;
     border-left: 4px solid transparent;
@@ -424,27 +421,27 @@ a.sidebar-category-level1 {
 
 /* 호버 효과 */
 .sidebar-category-level2 a:hover {
-    background-color: color-mix(in srgb, var(--brand-green), transparent 20%);
-    border-left: 4px solid var(--brand-gray);
+    background-color: color-mix(in srgb, var(--point-clr), transparent 20%);
+    border-left: 4px solid var(--bg-light-gray);
 }
 
 
 /* --- Case B: Level 2가 하위 그룹일 때 (경기 기록) --- */
 .sidebar-category-level2-group {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 25px 12px 45px; /* 링크와 동일한 들여쓰기 */
+    display: block;
+    padding: 12px 25px 12px 45px; /* 왼쪽 패딩을 45px로 늘려 들여쓰기 */
     
-    color: var(--brand-gray);
-    cursor: pointer;
+    color: var(--text-white);
+    text-decoration: none;
+
+    font-weight: 400;
     transition: all 0.2s ease;
     border-left: 4px solid transparent;
 }
 
 /* 그룹형 호버 효과 */
 .sidebar-category-level2-group:hover {
-    background-color: color-mix(in srgb, var(--brand-green), transparent 20%);
+    background-color: color-mix(in srgb, var(--point-clr), transparent 20%);
 }
 
 /**************** 사이드바 Level 3 디자인 (경기 외 - 세부항목) ****************/
@@ -462,24 +459,19 @@ a.sidebar-category-level1 {
     /* Level 2(45px)보다 더 깊게 들여쓰기 (65px) */
     padding: 12px 25px 12px 65px; 
     
-   color: var(--brand-gray);
+    color: var(--text-white);
     text-decoration: none; /* 밑줄 제거 */
-    font-size: 0.85rem; /* 글자 크기 살짝 작게 */
+    font-size: 0.9rem; /* 글자 크기 살짝 작게 */
     transition: all 0.2s ease;
     border-left: 4px solid transparent; /* 호버 효과를 위한 투명 테두리 */
 }
 
 /* 3. 마우스 올렸을 때 효과 */
 .sidebar-category-level3 li a:hover {
-    background-color: var(--brand-green);
-    border-left: 4px solid var(--brand-gray);
+    background-color: var(--point-clr);
+    border-left: 4px solid var(--bg-light-gray);
 }
 
-/* Level 2 내부 텍스트 */
-.sidebar-sub-label {
-    font-size: 0.95rem;
-    font-weight: 400;
-}
 
 /* --- 모바일 스타일 (800px 이하) --- */
 @media (max-width: 800px) {
@@ -509,8 +501,8 @@ a.sidebar-category-level1 {
 /**************** 푸터 스타일 ****************/
 .main-footer {
     width: 100%;
-    background-color: var(--main-blue);
-    border-top: 1px solid var(--main-blue);
+    background-color: var(--main-clr);
+    border-top: 1px solid var(--main-clr);
     padding: 10px 0;
     margin-top: auto;
 }
@@ -527,7 +519,7 @@ a.sidebar-category-level1 {
 .copyright {
     margin: 0;
     font-size: 0.7rem;
-    color: var(--brand-gray);
+    color: var(--text-light-gray);
     font-weight: 300;
     letter-spacing: 0.5px;
 }
@@ -535,7 +527,7 @@ a.sidebar-category-level1 {
 .admin-link-btn {
     background-color: rgba(255, 255, 255, 0.1); /* 살짝 비치는 흰색 배경 */
     border: 1px solid rgba(255, 255, 255, 0.3);
-   color: var(--brand-gray);
+    color: var(--text-white);
     padding: 6px 14px;
     border-radius: 4px;
     font-size: 0.8rem;

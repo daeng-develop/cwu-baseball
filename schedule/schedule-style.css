@@ -35,14 +35,14 @@
     font-size: 1.2rem;
     cursor: pointer;
     transition: 0.2s;
-    color: var(--main-blue);
+    color: var(--main-clr);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .nav-btn:hover {
-    background-color: var(--main-blue-dark);
+    background-color: var(--main-clr-dark);
     color: var(--text-white);
-    border-color: var(--main-blue-dark);
+    border-color: var(--main-clr-dark);
 }
 
 
@@ -124,12 +124,12 @@
 
 /* --- ⭐ [핵심 수정] 경기가 있는 날 스타일 --- */
 .calendar-cell.has-match {
-    background-color: var(--main-blue-bright);
+    background-color: var(--main-clr-bright);
 }
 
 /* 경기가 있는 날 호버 시 조금 더 진하게 */
 .calendar-cell.has-match:hover {
-    background-color: color-mix(in srgb, var(--main-blue-light), transparent 70%);
+    background-color: color-mix(in srgb, var(--main-clr-light), transparent 70%);
 }
 
 /* --- 경기 정보 (Cell 내부 링크) --- */

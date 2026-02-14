@@ -147,7 +147,7 @@ async function loadMonthlySchedules(year, month, reqId) {
                     // 행사는 보통 vs가 없으므로 그대로 출력 (필요시 여기도 shortName 적용 가능)
                     titleSpan.textContent = data.opponent; 
                 } else {
-                    titleSpan.style.color = 'var(--main-blue)'; 
+                    titleSpan.style.color = 'var(--main-clr)'; 
                     
                     // ⭐ [핵심 변경] innerHTML을 사용하여 PC용과 모바일용 태그를 따로 심습니다.
                     // view-pc: "vs 풀네임" (기존 방식)

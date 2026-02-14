@@ -32,14 +32,14 @@
     display: block;
     width: 45px;
     height: 5px;
-    background-color: var(--main-blue); 
+    background-color: var(--main-clr); 
     margin-top: 10px;
     border-radius: 3px;
 }
 
 /* 강조 텍스트 색상 */
 #display-year, #display-position {
-    color:var(--main-blue);
+    color:var(--main-clr);
 }
 
 /* --- 포지션 필터 컨트롤러 영역 --- */
@@ -74,12 +74,12 @@
 /* 활성화된 포지션 버튼 */
 .position-btn.active {
     background-color: var(--bg-white);
-    color: var(--main-blue); 
+    color: var(--main-clr); 
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .position-btn:hover:not(.active) {
-    color: var(--brand-green); 
+    color: var(--point-clr); 
 }
 
 /* --- 연도 선택 셀렉트 박스 --- */
@@ -114,12 +114,12 @@
 }
 
 #year-select:hover {
-    border-color: var(--main-blue);
+    border-color: var(--main-clr);
 }
 
 #year-select:focus {
     outline: none;
-    border-color:  var(--main-blue);
+    border-color:  var(--main-clr);
     box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1); 
 }
 
@@ -170,7 +170,7 @@
 .player-number {
     font-size: 0.8rem;
     font-weight: 700;
-    color: var(--main-blue);
+    color: var(--main-clr);
     margin-bottom: 2px;
 }
 

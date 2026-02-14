@@ -11,14 +11,14 @@
     --main-font: 'OmuDaye', sans-serif;
 
     /* [메인] 청운대 블루 (사이드바, 푸터 배경) */
-    --main-blue: #004ea2; 
-    --main-blue-dark: #003264;
-    --main-blue-light: #4c8cdb;   /* 부드러운 하이라이트 */
-    --main-blue-bright: #eef6fd;  /* 아주 연한 배경색 (포커스용) */
+    --main-clr: #004ea2; 
+    --main-clr-dark: #003264;
+    --main-clr-light: #4c8cdb;   /* 부드러운 하이라이트 */
+    --main-clr-bright: #eef6fd;  /* 아주 연한 배경색 (포커스용) */
     
     /* [포인트] 청운대 그린 (버튼, 호버 강조, 포인트) */
-    --brand-green: #00a73c;
-    --brand-green-light: #f0fff4;
+    --point-clr: #00a73c;
+    --point-clr-light: #f0fff4;
     
     /* [보조] 청운대 그레이 (테두리 등 보조 활용) */
     --brand-gray: #eeeeee;

@@ -20,7 +20,7 @@
     height: auto;
     position: relative;
     overflow: hidden;
-    background-color: var(--main-blue);
+    background-color: var(--main-clr);
     border-radius: 0;
 }
 
@@ -105,10 +105,10 @@
 .section-header {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--main-blue-dark); /* 변수 사용 */
+    color: var(--main-clr-dark); /* 변수 사용 */
     margin-bottom: 20px;
     padding-left: 12px;
-    border-left: 5px solid var(--main-blue); /* 변수 사용 */
+    border-left: 5px solid var(--main-clr); /* 변수 사용 */
 }
 
 /* =========================================
@@ -250,8 +250,8 @@
     z-index: 10; /* 십자선(z-index:2)보다 높게 */
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
-.type-badge.match { background-color: var(--main-blue); }
-.type-badge.event { background-color: var(--brand-green); }
+.type-badge.match { background-color: var(--main-clr); }
+.type-badge.event { background-color: var(--point-clr); }
 
 
 /* --- [텍스트 정보 영역] --- */
@@ -354,7 +354,7 @@
     margin: 0;
     font-size: 1.25rem;
     font-weight: 800;
-    color: var(--main-blue);
+    color: var(--main-clr);
 }
 
 .more-link {
@@ -363,7 +363,7 @@
     text-decoration: none;
     transition: color 0.2s;
 }
-.more-link:hover { color: var(--main-blue); }
+.more-link:hover { color: var(--main-clr); }
 
 
 /* [좌측] 일정 리스트 스타일 */
@@ -385,8 +385,8 @@
 
 /* 오늘 날짜 강조 */
 .sch-row.today {
-    background-color: var(--main-blue-bright);
-    border-left: 4px solid var(--main-blue);
+    background-color: var(--main-clr-bright);
+    border-left: 4px solid var(--main-clr);
 }
 
 .sch-date-box {
@@ -402,7 +402,7 @@
 .sch-label { font-size: 0.8rem; margin-bottom: 2px; }
 .sch-badge {
     font-size: 0.7rem;
-    background: var(--brand-green); /* 포인트 컬러 */
+    background: var(--point-clr); /* 포인트 컬러 */
     color: var(--text-white);
     padding: 2px 6px;
     border-radius: 4px;
@@ -496,7 +496,7 @@
 .sb-score {
     font-size: 2.2rem;
     font-weight: 900;
-    color: var(--main-blue);
+    color: var(--main-clr);
     letter-spacing: 2px;
 }
 
@@ -590,7 +590,7 @@
 }
 .m-title {
     font-size: 0.75rem;
-    color: var(--main-blue);
+    color: var(--main-clr);
     margin-bottom: 4px;
     font-weight: 500;
 }
@@ -614,10 +614,10 @@
 }
 
 /* 상태별 색상 정의 */
-.status-win { background-color: var(--main-blue); }
+.status-win { background-color: var(--main-clr); }
 .status-loss { background-color: var(--bg-red); }
-.status-draw { background-color:  var(--brand-green);}
-.status-no-record { background-color: var(--main-blue-light); }
+.status-draw { background-color:  var(--point-clr);}
+.status-no-record { background-color: var(--main-clr-light); }
 .status-rain { background-color:  var(--bg-blue);} 
 .status-suspend { background-color: var(--bg-yellow);}
 .status-cancel { background-color: var(--bg-gray); }

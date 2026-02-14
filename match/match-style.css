@@ -75,9 +75,9 @@
 
 /* ⭐ HOME: 청운대 블루 */
 .home-badge { 
-    background-color: var(--main-blue-bright); 
-    color: var(--main-blue-dark); /* 짙은 청운대 블루 */
-    border: 1px solid var(--main-blue-light); 
+    background-color: var(--main-clr-bright); 
+    color: var(--main-clr-dark); /* 짙은 청운대 블루 */
+    border: 1px solid var(--main-clr-light); 
 }
 
 /* ⭐ AWAY: 회색 */
@@ -118,9 +118,9 @@
 }
 
 /* 결과별 색상 */
-.res-win { background-color: var(--main-blue); box-shadow: 0 2px 6px rgba(25, 118, 210, 0.3); } /* 블루 */
+.res-win { background-color: var(--main-clr); box-shadow: 0 2px 6px rgba(25, 118, 210, 0.3); } /* 블루 */
 .res-loss { background-color: var(--brand-gray); box-shadow: 0 2px 6px rgba(117, 117, 117, 0.3); } /* 그레이 */
-.res-draw { background-color: var(--brand-green); box-shadow: 0 2px 6px rgba(56, 142, 60, 0.3); } /* 그린 */
+.res-draw { background-color: var(--point-clr); box-shadow: 0 2px 6px rgba(56, 142, 60, 0.3); } /* 그린 */
 
 
 .score-display {
@@ -194,12 +194,12 @@
 
 /* R, H: 파란색 계열 */
 .r-col, .r-cell, .h-col, .h-cell {
-    background-color: var(--main-blue-bright) !important;
-    color: var(--main-blue) !important;
+    background-color: var(--main-clr-bright) !important;
+    color: var(--main-clr) !important;
 }
 thead .r-col, thead .h-col { 
-    background-color: var(--main-blue-light) !important; 
-    color: var(--main-blue-bright) !important;
+    background-color: var(--main-clr-light) !important; 
+    color: var(--main-clr-bright) !important;
 }
 
 /* E: 빨간색 계열 */
@@ -214,12 +214,12 @@ thead .e-col {
 
 /* B: 초록색 계열 */
 .b-col, .b-cell {
-    background-color: var(--brand-green-light) !important;
-    color: var(--brand-green) !important;
+    background-color: var(--point-clr-light) !important;
+    color: var(--point-clr) !important;
 }
 thead .b-col { 
-    background-color: var(--brand-green) !important;
-    color: var(--brand-green-light) !important;
+    background-color: var(--point-clr) !important;
+    color: var(--point-clr-light) !important;
 }
 
 
@@ -273,7 +273,7 @@ thead .b-col {
     font-weight: 800;
     color: var(--text-dark);
     margin: 0 0 15px 0;
-    border-left: 5px solid var(--main-blue);
+    border-left: 5px solid var(--main-clr);
     padding-left: 10px;
     text-align: left;
 }
@@ -367,7 +367,7 @@ thead .b-col {
     font-weight: 800;
     color: var(--text-dark);
     margin: 0 0 20px 0;
-    border-left: 5px solid var(--main-blue);
+    border-left: 5px solid var(--main-clr);
     padding-left: 12px;
     text-align: left;
 }

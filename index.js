@@ -40,7 +40,7 @@ function loadMainBanner() {
         // 이미지 로딩 실패 시 에러 처리
         bannerImg.onerror = () => {
             const mainBlue = getComputedStyle(document.documentElement)
-                            .getPropertyValue('--main-blue').trim();
+                            .getPropertyValue('--main-clr').trim();
                 
             bannerImg.style.backgroundColor = mainBlue;
         };
