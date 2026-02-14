@@ -29,6 +29,7 @@
     /* 배경색*/
     --bg-white: #ffffff;
     --bg-light-gray: #f8f9fa;
+    --bg-sub-gray: #eeeeee; /* 테두리나 구분을 위한 색으로 사용*/
     --bg-gray : #6c757d;
     --bg-dark-gray : #495057;
     --bg-red :#e60012;
