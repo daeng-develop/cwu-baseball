@@ -409,3 +409,19 @@ select.input-field:focus {
     min-width: 100px;
     background-color:var(--bg-light-gray); /* 살짝 회색빛으로 도우미 느낌 */
 }
+
+.date-time-row {
+    display: flex;   /* 가로 배치 핵심 */
+    gap: 10px;       /* 입력창 사이 간격 */
+}
+
+/* 날짜 입력창: 남은 공간을 꽉 채움 */
+.date-time-row input[type="date"] {
+    flex: 1;
+}
+
+/* 시간 입력창: 적당한 고정 너비 유지 */
+.date-time-row input[type="time"] {
+    width: 140px;    /* 시간 표시에 충분한 너비 */
+    min-width: 120px; /* 모바일에서 너무 작아지지 않게 방지 */
+}

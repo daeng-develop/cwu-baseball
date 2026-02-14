@@ -103,14 +103,15 @@ async function register_match() {
     console.log("경기 등록 시작...");
 
     const dateVal = document.getElementById('match-date').value;
+    const timeVal = document.getElementById('match-time').value;
     const title = document.getElementById('match-title').value.trim();
     const opponent = document.getElementById('match-opponent').value.trim();
     const location = document.getElementById('match-location').value.trim();
     const homeAway = document.getElementById('match-home-away').value;
     const status = document.getElementById('match-status').value;
 
-    if (!dateVal || !title || !opponent || !location) {
-        alert("모든 필수 정보를 입력해주세요.");
+   if (!dateVal || !timeVal || !title || !opponent || !location) {
+        alert("모든 필수 정보(시간 포함)를 입력해주세요.");
         return;
     }
 
@@ -158,6 +159,7 @@ async function register_match() {
         // (1) Match 데이터
         const matchData = {
             date: dateVal,
+            time: timeVal, // ⭐ [추가] DB에 시간 저장
             title: title,
             opponent: opponent,
             location: location,
@@ -165,19 +167,19 @@ async function register_match() {
             status: status,
         };
 
-        // (2) Schedule 데이터 (통합 일정용)
+        // (2) Schedule 데이터
         const scheduleData = {
             date: dateVal,
+            time: timeVal, // ⭐ [추가] 캘린더용 데이터에도 시간 저장
             location: location,
-            opponent: opponent, // 경기 상대
-            status: status      // 경기 상태 (before, end 등)
+            opponent: opponent,
+            status: status
         };
 
-        // DB 저장 (두 컬렉션 모두 저장)
         await db.collection("match").doc(docId).set(matchData);
         await db.collection("schedule").doc(docId).set(scheduleData); 
 
-        alert(`[${dateVal}] ${title} vs ${opponent} 경기 일정이 등록되었습니다.`);
+        alert(`[${dateVal} ${timeVal}] ${title} vs ${opponent} 경기 일정이 등록되었습니다.`);
         window.location.reload();
 
     } catch (error) {
@@ -210,22 +212,23 @@ async function loadMatchList() {
         snapshot.forEach(doc => {
             const data = doc.data();
             const id = doc.id; 
+
+            const timeDisplay = data.time ? `<span style="color:var(--main-clr) ; font-size:0.9em; margin-left:5px;">(${data.time})</span>` : '';
             
             html += `
-                <tr>
-                    <td>${count}</td>
-                    <td>${data.date}</td>
-                    <td>
-                        <span style="font-weight:bold;">${data.title}</span> 
-                        <span style="color:#666; font-size:0.9em;">(vs ${data.opponent})</span>
-                    </td>
-                    <td>
-                        <button class="btn-list edit" onclick="prepareEditMatch('${id}')">수정</button>
-                        <button class="btn-list delete" onclick="deleteMatch('${id}', '${data.title}')">삭제</button>
-                    </td>
-                </tr>
-            `;
-            count++;
+            <tr>
+                <td>${count}</td>
+                <td>${data.date} ${timeDisplay}</td> <td>
+                    <span style="font-weight:bold;">${data.title}</span> 
+                    <span style="color:var(--text-gray); font-size:0.9em;">(vs ${data.opponent})</span>
+                </td>
+                <td>
+                    <button class="btn-list edit" onclick="prepareEditMatch('${id}')">수정</button>
+                    <button class="btn-list delete" onclick="deleteMatch('${id}', '${data.title}')">삭제</button>
+                </td>
+            </tr>
+        `;
+        count++;
         });
 
         tableBody.innerHTML = html;
@@ -247,6 +250,7 @@ window.prepareEditMatch = async function(docId) {
         const data = doc.data();
 
         document.getElementById('match-date').value = data.date;
+        document.getElementById('match-time').value = data.time || '';
         document.getElementById('match-title').value = data.title;
         document.getElementById('match-opponent').value = data.opponent;
         document.getElementById('match-location').value = data.location;
@@ -276,6 +280,7 @@ async function update_match() {
     if (!isMatchEditMode || !currentMatchEditId) return;
 
     const dateVal = document.getElementById('match-date').value;
+    const timeVal = document.getElementById('match-time').value;
     const title = document.getElementById('match-title').value.trim();
     const opponent = document.getElementById('match-opponent').value.trim();
     const location = document.getElementById('match-location').value.trim();
@@ -298,6 +303,7 @@ async function update_match() {
     try {
         const matchData = {
             date: dateVal,
+            time: timeVal, // ⭐ [추가]
             title: title,
             opponent: opponent,
             location: location,
@@ -307,6 +313,7 @@ async function update_match() {
 
         const scheduleData = {
             date: dateVal,
+            time: timeVal, // ⭐ [추가]
             location: location,
             opponent: opponent,
             status: status
