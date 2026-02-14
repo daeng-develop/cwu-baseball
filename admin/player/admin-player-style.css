@@ -1,16 +1,4 @@
 /* admin-player-style.css */
-
-/* 기본 설정 */
-body {
-    font-family: 'Noto Sans KR', sans-serif;
-    background-color: #f8f9fa;
-    margin: 0;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    min-height: 100vh;
-}
-
 /* 전체 컨테이너 */
 .admin-container {
     width: 100%;

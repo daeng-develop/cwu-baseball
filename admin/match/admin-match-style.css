@@ -1,16 +1,4 @@
 /* admin-match-style.css */
-
-/* --- 공통 레이아웃 --- */
-body {
-    font-family: 'Noto Sans KR', sans-serif;
-    background-color: #f0f2f5;
-    margin: 0;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    min-height: 100vh;
-}
-
 .admin-container {
     width: 100%;
     /* ⭐ 너비를 넓혀서 한 줄 전시 유도 */

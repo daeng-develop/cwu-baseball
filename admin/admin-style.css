@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+@font-face {
+    font-family: 'OmuDaye';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-01@1.0/omyu_pretty.woff2') format('woff2');
+    font-weight: normal;
+    font-display: swap;
+}
+
+:root {
+
+    --main-font: 'OmuDaye', sans-serif;
+
+    /* [메인] 청운대 블루 (사이드바, 푸터 배경) */
+    --main-blue: #004ea2; 
+    --main-blue-dark: #003264;
+    --main-blue-light: #4c8cdb;   /* 부드러운 하이라이트 */
+    --main-blue-bright: #eef6fd;  /* 아주 연한 배경색 (포커스용) */
+    
+    /* [포인트] 청운대 그린 (버튼, 호버 강조, 포인트) */
+    --brand-green: #00a73c;
+    --brand-green-light: #f0fff4;
+    
+    /* [보조] 청운대 그레이 (테두리 등 보조 활용) */
+    --brand-gray: #eeeeee;
+
+    /* 배경색*/
+    --bg-white: #ffffff;
+    --bg-light-gray: #f8f9fa;
+    --bg-gray : #6c757d;
+    --bg-dark-gray : #495057;
+    --bg-red :#e60012;
+    --bg-red-light :#fef2f3;
+    --bg-blue : #4dabf7;
+    --bg-yellow :  #f59f00;
+    
+    /* 텍스트 기본 색상 */
+    --text-dark: #191919;
+    --text-white: #fafafa;
+    --text-light-gray : #bdbdbd;
+    --text-gray : #757575;
+    --text-dark-gray : #424242;
+
+    --text-red :#e60012;
+    --text-red-light :#fef2f3;
+    --text-blue :#1c7ed6;
+}
+
+
+body {
+    font-family: var(--main-font);
+    background-color: var(--bg-light-gray);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}

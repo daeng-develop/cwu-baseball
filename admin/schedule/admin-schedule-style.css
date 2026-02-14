@@ -1,14 +1,4 @@
 /* admin/admin-schedule-style.css */
-
-/* 기본 설정 */
-body {
-    margin: 0;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    min-height: 100vh;
-}
-
 /* 전체 컨테이너 */
 .admin-container {
     width: 100%;
