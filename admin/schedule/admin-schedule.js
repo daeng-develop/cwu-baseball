@@ -12,6 +12,7 @@ let photosPendingDelete = [];
 // [경기(Match)용 변수]
 let isMatchEditMode = false;
 let currentMatchEditId = null;
+let currentMatchOriginalStatus = null; // ⭐ 수정 전 원래 상태 저장용 변수
 
 document.addEventListener("DOMContentLoaded", () => {
     // ---------------------------------------------
@@ -255,7 +256,19 @@ window.prepareEditMatch = async function(docId) {
         document.getElementById('match-opponent').value = data.opponent;
         document.getElementById('match-location').value = data.location;
         document.getElementById('match-home-away').value = data.homeAway;
-        document.getElementById('match-status').value = data.status;
+
+        currentMatchOriginalStatus = data.status; // 원래 상태 저장해두기
+        const finishedList = ['win', 'loss', 'draw', 'no_record'];
+        const statusSelect = document.getElementById('match-status');
+
+        if (finishedList.includes(data.status)) {
+            // 이미 결과가 나온 경기라면 화면에는 '경기 종료(end)'로 표시
+            statusSelect.value = 'end';
+        } else {
+            // 그 외(before, rain_cancel 등)는 있는 그대로 표시
+            statusSelect.value = data.status;
+        }
+        
 
         isMatchEditMode = true;
         currentMatchEditId = docId;
@@ -285,11 +298,18 @@ async function update_match() {
     const opponent = document.getElementById('match-opponent').value.trim();
     const location = document.getElementById('match-location').value.trim();
     const homeAway = document.getElementById('match-home-away').value;
-    const status = document.getElementById('match-status').value;
+
+    let selectedStatus = document.getElementById('match-status').value;
 
     if (!dateVal || !title || !opponent || !location) {
         alert("필수 정보를 모두 입력해주세요.");
         return;
+    }
+
+    const finishedList = ['win', 'loss', 'draw', 'no_record'];
+    
+    if (selectedStatus === 'end' && finishedList.includes(currentMatchOriginalStatus)) {
+        selectedStatus = currentMatchOriginalStatus;
     }
 
     // [수정 완료] YYYYMMDD 형식으로 변경
@@ -308,7 +328,7 @@ async function update_match() {
             opponent: opponent,
             location: location,
             homeAway: homeAway,
-            status: status,
+            status: selectedStatus,
         };
 
         const scheduleData = {
@@ -316,7 +336,7 @@ async function update_match() {
             time: timeVal, // ⭐ [추가]
             location: location,
             opponent: opponent,
-            status: status
+            status: selectedStatus
         };
 
         if (isDateChanged) {
