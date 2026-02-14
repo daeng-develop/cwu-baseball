@@ -56,8 +56,8 @@
 }
 
 .banner-title {
-    color: var(--brand-gray);
-    font-size: 2.5rem; /* 사이즈 살짝 조정 */
+    color: var(--text-white);
+    font-size: 2.2rem; /* 사이즈 살짝 조정 */
     font-weight: 900;
     margin: 0;
     line-height: 1.2;
@@ -65,9 +65,9 @@
 }
 
 .banner-subtitle {
-    color: var(--brand-gray);
-    font-size: 1.1rem;
-    margin-top: 10px;
+    color: var(--text-white);
+    font-size: 1.5rem;
+    margin-top: 5px;
     font-weight: 400;
 }
 
@@ -159,7 +159,7 @@
     
     /* 그림자 효과 */
     box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    border: 1px solid var(--brand-gray);
+    border: 1px solid var(--border-light);
     
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
@@ -189,7 +189,7 @@
     gap: 0; 
     background: var(--bg-white);
     
-    border-bottom: 1px solid var(--brand-gray);
+    border-bottom: 1px solid var(--border-light);
     position: relative; /* 십자선 배치를 위한 기준점 */
 }
 
@@ -232,7 +232,7 @@
 
 /* 사진 없을 때 빈 공간 */
 .empty-photo {
-    background-color: var(--brand-gray);
+    background-color: var(--bg-gray);
     width: 100%;
     height: 100%;
 }
@@ -347,7 +347,7 @@
     align-items: center;
     margin-bottom: 20px;
     padding-bottom: 12px;
-    border-bottom: 2px solid var(--brand-gray);
+    border-bottom: 2px solid var(--border-light);
 }
 
 .card-title {
@@ -438,86 +438,6 @@
     margin-left: 5px;
 }
 
-
-/* [우측] 스코어보드 스타일 */
-.match-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.result-tag {
-    display: inline-block;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    color: var(--text-white);
-    margin-bottom: 15px;
-}
-
-.scoreboard-mini {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    margin-bottom: 15px;
-}
-
-.sb-team {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 35%;
-}
-
-.sb-logo {
-    width: 50px;
-    height: 50px;
-    background-color: var(--brand-gray);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    color: var(--text-gray);
-    margin-bottom: 8px;
-    font-size: 0.8rem;
-}
-
-.sb-name {
-    font-weight: 700;
-    font-size: 1rem;
-    color: var(--text-dark);
-}
-
-.sb-score {
-    font-size: 2.2rem;
-    font-weight: 900;
-    color: var(--main-clr);
-    letter-spacing: 2px;
-}
-
-.match-meta-info {
-    text-align: center;
-    font-size: 0.9rem;
-    color: var(--text-gray);
-    background-color: var(--bg-light-gray);
-    padding: 8px 20px;
-    border-radius: 20px;
-}
-
-/* 로딩/데이터 없음 텍스트 */
-.loading-box, .no-data {
-    width: 100%;
-    text-align: center;
-    color: var(--text-gray);
-    padding: 30px;
-    background: var(--bg-light-gray);
-    border-radius: 8px;
-}
 
 /* =========================================
    [우측] 경기 기록 리스트 스타일 (새로 추가)

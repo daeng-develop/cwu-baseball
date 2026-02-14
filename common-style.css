@@ -22,9 +22,6 @@
     /* [포인트] 청운대 그린 (버튼, 호버 강조, 포인트) */
     --point-clr: #00a73c;
     --point-clr-light: #f0fff4;
-    
-    /* [보조] 청운대 그레이 (테두리 등 보조 활용) */
-    --brand-gray: #eeeeee;
 
     /* 배경색*/
     --bg-white: #ffffff;

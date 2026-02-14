@@ -11,12 +11,12 @@
 /* --- 헤더 영역 --- */
 .event-header {
     margin-bottom: 50px;
-    border-bottom: 2px solid var(--brand-gray); /* 하단 구분선 */
+    border-bottom: 2px solid var(--border-dark); /* 하단 구분선 */
     padding-bottom: 30px;
 }
 
 .event-title {
-    font-size: 2.2rem;
+    font-size: 3.0rem;
     font-weight: 900;
     color: var(--text-dark);
     margin: 0 0 15px 0;
@@ -24,7 +24,7 @@
 }
 
 .event-meta {
-    font-size: 1rem;
+    font-size: 1.2rem;
     color: var(--text-gray);
     margin: 0;
     font-weight: 500;
