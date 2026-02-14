@@ -163,8 +163,17 @@ async function loadMonthlySchedules(year, month, reqId) {
                 placeSpan.className = 'match-place';
                 placeSpan.textContent = data.location;
 
+                // ⭐ [추가] (3) 시간 (맨 아래에 표시)
+                const timeSpan = document.createElement('span');
+                timeSpan.className = 'match-time';
+                // 데이터에 시간이 있으면 표시, 없으면 빈 문자열
+                timeSpan.textContent = data.time ? data.time : ''; 
+
+                // 순서대로 추가: 제목 -> 장소 -> 시간
                 linkEl.appendChild(titleSpan);
                 linkEl.appendChild(placeSpan);
+                linkEl.appendChild(timeSpan); // ⭐ 맨 아래 추가
+
                 targetCell.appendChild(linkEl);
             }
         });

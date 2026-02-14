@@ -180,6 +180,17 @@
     font-size: 0.8rem;
 }
 
+.match-time {
+    color: var(--text-gray);
+    font-size: 0.8rem;
+    
+    /* 말줄임표 처리 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
 /* 1. 기본 상태 (PC 화면) */
 .view-pc {
     display: inline;
@@ -207,6 +218,21 @@
     /* (기존 match-result 스타일 보완) */
     .match-result {
         /* 폰트가 작아졌으므로 줄바꿈이 자연스럽게 되도록 설정 */
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    .match-time {
+        display: block !important;
+        width: 100%;
+
+        font-size: 0.6rem !important; /* 장소(0.55rem)보다 살짝 크게 */
+        color: var(--text-gray);
+
+        text-align: left; /* 왼쪽 정렬 */
+        line-height: 1.2;
+
         white-space: nowrap !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
