@@ -225,12 +225,12 @@ select.input-field:focus {
     font-weight: 700;
     padding: 15px 12px;
     text-align: center;
-    border-bottom: 2px solid var(--brand-gray); /* 헤더 아래 진한 줄 */
+    border-bottom: 2px solid var(--border-dark); /* 헤더 아래 진한 줄 */
 }
 
 /* 테이블 본문 행 (tr) */
 .admin-list-table tbody tr {
-    border-bottom: 1px solid var(--brand-gray); /* 행 사이 얇은 줄 */
+    border-bottom: 1px solid var(--border-light); /* 행 사이 얇은 줄 */
     transition: background-color 0.2s;
 }
 
@@ -351,7 +351,7 @@ select.input-field:focus {
     padding: 10px;
     background: var(--bg-light-gray);
     border-radius: 6px;
-    border: 1px solid var(--brand-gray);
+    border: 1px solid var(--border-light);
 }
 
 /* 개별 사진 카드 */
@@ -361,7 +361,7 @@ select.input-field:focus {
     height: 80px;
     border-radius: 4px;
     overflow: hidden;
-    border: 1px solid var(--brand-gray);
+    border: 1px solid var(--border-light);
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 

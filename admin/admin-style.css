@@ -40,6 +40,10 @@
     --text-red :#e60012;
     --text-red-light :#fef2f3;
     --text-blue :#1c7ed6;
+
+    /* 구분선 사용 색상 */
+    --border-light: #eeeeee /* 연한 회색 */;
+    --border-dark: #cccccc /* 진한 회색 */;
 }
 
 
