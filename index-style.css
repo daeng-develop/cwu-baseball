@@ -272,14 +272,14 @@
 
 
 .info-date {
-    font-size: 0.75rem;
+    font-size: 0.9rem;
     color: var(--text-gray);
-    font-weight: 700;
+    font-weight: 500;
     margin-top: 2px;
 }
 .info-title {
-    font-size: 0.9rem;
-    font-weight: 800;
+    font-size: 1.4rem;
+    font-weight: 600;
     color: var(--text-dark-gray);
     line-height: 1.2;
     margin-bottom: 2px;
@@ -289,7 +289,7 @@
     width: 100%;
 }
 .info-loc {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: var(--text-light-gray);
     white-space: nowrap;
     overflow: hidden;
@@ -352,8 +352,8 @@
 
 .card-title {
     margin: 0;
-    font-size: 1.25rem;
-    font-weight: 800;
+    font-size: 1.2rem;
+    font-weight: 600;
     color: var(--main-clr);
 }
 
@@ -399,9 +399,9 @@
     font-weight: 700;
 }
 
-.sch-label { font-size: 0.8rem; margin-bottom: 2px; }
+.sch-label { font-size: 1.5rem; margin-bottom: 2px; }
 .sch-badge {
-    font-size: 0.7rem;
+    font-size: 0.9rem;
     background: var(--point-clr); /* 포인트 컬러 */
     color: var(--text-white);
     padding: 2px 6px;
@@ -428,12 +428,12 @@
 
 /* ⭐ [추가] 2번째 줄: 장소 */
 .sch-location {
-    font-size: 0.8rem;      /* 제목보다 작게 */
+    font-size: 1.0rem;      /* 제목보다 작게 */
     color: var(--text-gray);
     font-weight: 400;
 }
 .sch-sub {
-    font-size: 0.8rem;
+    font-size: 0.6rem;
     color: var(--text-gray);
     margin-left: 5px;
 }
@@ -473,7 +473,7 @@
     display: flex;
     flex-direction: column;
     width: 110px;        /* PC에서는 넉넉하게 */
-    font-size: 0.85rem;
+    font-size: 1.0rem;
     color: var(--text-gray);
     text-align: left;
     padding-left: 5px;
@@ -482,14 +482,14 @@
 
 /* 날짜 텍스트 */
 .m-date { 
-    font-weight: 700; 
+    font-weight: 600; 
     color: var(--text-dark-gray);
     margin-bottom: 2px; 
 }
 
 /* 장소 텍스트 (PC: 한 줄 말줄임) */
 .m-loc { 
-    font-size: 0.7rem; 
+    font-size: 0.8rem; 
     color: var(--text-gray);
     width: 100%;
     
@@ -509,14 +509,15 @@
     min-width: 0; /* 텍스트 넘침 방지 */
 }
 .m-title {
-    font-size: 0.75rem;
+    font-size: 0.9rem;
     color: var(--main-clr);
     margin-bottom: 4px;
     font-weight: 500;
 }
-.m-vs {
-    font-size: 0.95rem;
-    font-weight: 700;
+.m-vs,
+.m-time {
+    font-size: 1.1rem;
+    font-weight: 500;
     color: var(--text-dark);
 }
 

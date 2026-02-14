@@ -210,8 +210,16 @@ async function loadSchedule5Days() {
             const isEvent = (e.status === 'event');
             const title = isEvent ? `[행사] ${e.opponent}` : `vs ${e.opponent}`;
             
-            // ⭐ [수정] 괄호()를 제거하고 장소 텍스트만 남김
-            const location = e.location ? e.location : "";
+            // ⭐ [수정] 시간 정보 가져오기 (데이터가 있으면 표시)
+            const timeStr = e.time ? `<span class="sch-time">${e.time}</span>` : "";
+            
+            // ⭐ [수정] 장소 정보 가져오기
+            const locStr = e.location ? e.location : "";
+
+            // 장소나 시간이 하나라도 있으면 출력
+            const metaInfo = (timeStr || locStr) 
+                           ? `<div class="sch-location">${locStr} ${timeStr}</div>` 
+                           : '';
 
             return `
                 <div class="${rowClass}">
@@ -222,8 +230,7 @@ async function loadSchedule5Days() {
                     
                     <div class="sch-info">
                         <div class="sch-title">${title}</div>
-                        ${location ? `<div class="sch-location">${location}</div>` : ''}
-                    </div>
+                        ${metaInfo} </div>
                 </div>
             `;
         }).join('');
@@ -289,6 +296,10 @@ async function loadRecentMatchList() {
                     statusText = "종료"; statusClass = "status-end";
             }
 
+            const timeDisplay = match.time 
+                ? `<span class="m-time">${match.time}</span>` 
+                : "";
+
             return `
                 <div class="match-list-item" onclick="location.href='match/match.html#${match.id}'">
                     <div class="match-date-loc">
@@ -297,7 +308,7 @@ async function loadRecentMatchList() {
                     </div>
                     <div class="match-info-center">
                         <span class="m-title">${match.title}</span>
-                        <span class="m-vs">vs ${match.opponent}</span>
+                        <span class="m-vs">vs ${match.opponent} ${timeDisplay}</span>
                     </div>
                     <div class="match-result-badge ${statusClass}">
                         ${statusText}
