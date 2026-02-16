@@ -11,22 +11,29 @@
     align-items: center;
     margin-bottom: 20px;
 }
-.admin-header h2 { margin: 0; color: #333; }
+.admin-header h2 { margin: 0; color: var(--main-clr); }
 
 .back-link {
     text-decoration: none;
-    color: #555;
+    color: var(--main-clr);
     font-weight: bold;
-    padding: 5px 10px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    padding: 6px 12px;
+    background-color: var(--bg-white);
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
     font-size: 0.9rem;
+    transition: 0.2s;
 }
+
+.back-link:hover {
+    background-color: var(--main-clr);
+    color: var(--main-clr-bright);
+}
+
 
 /* --- 경기 선택 섹션 --- */
 .selection-section {
-    background: #fff;
+    background: var(--bg-white);
     padding: 25px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
@@ -39,12 +46,12 @@
     margin-bottom: 15px;
     font-size: 1.1rem;
     font-weight: 700;
-    color: #001d3d;
+    color: var(--main-clr);
 }
 
 /* --- 폼 컨테이너 --- */
 .form-container {
-    background: #fff;
+    background: var(--bg-white);
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
@@ -58,22 +65,22 @@
 
 /* --- 기본 정보 카드 --- */
 .info-card {
-    background-color: #f8f9fa;
+    background-color: var(--bg-light-gray);
     padding: 15px;
-    border-left: 4px solid #001d3d;
+    border-left: 4px solid var(--main-clr);
     border-radius: 4px;
 }
-.info-card h3 { margin: 0 0 5px 0; color: #001d3d; }
-.info-card p { margin: 0; color: #666; font-size: 0.9rem; }
+.info-card h3 { margin: 0 0 5px 0; color: var(--main-clr); }
+.info-card p { margin: 0; color: var(--text-gray); font-size: 0.9rem; }
 
 /* --- 공통 입력 필드 (Select Box 디자인 적용) --- */
 .form-group { margin-bottom: 15px; }
-.form-group label { display: block; margin-bottom: 6px; font-weight: 700; color: #444; }
+.form-group label { display: block; margin-bottom: 6px; font-weight: 700; color: var(--text-dark); }
 
 .input-field {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-light);
     border-radius: 5px;
     font-size: 0.95rem;
     box-sizing: border-box;
@@ -84,7 +91,7 @@ select.input-field {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    background-color: #fff;
+    background-color: var(--bg-white);
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 12px center;
@@ -113,19 +120,19 @@ select.input-field {
 }
 
 .scoreboard-input-table th {
-    background: #001d3d;
-    color: white;
+    background: var(--main-clr);
+    color: var(--text-white);
     padding: 8px;
     font-size: 0.9rem;
 }
 .scoreboard-input-table td {
-    border: 1px solid #eee;
+    border: 1px solid var(--border-light);
     padding: 4px;
 }
 .scoreboard-input-table input {
     width: 40px;
     text-align: center;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-light);
     border-radius: 4px;
     padding: 4px;
 }
@@ -136,7 +143,7 @@ select.input-field {
 .team-name-cell {
     width: 120px; 
     min-width: 100px;
-    background-color: #f9f9f9; /* 약간 회색 배경으로 구분감 주기 */
+    background-color: var(--bg-light-gray); /* 약간 회색 배경으로 구분감 주기 */
     padding: 0 10px;
     vertical-align: middle; /* 세로 중앙 정렬 */
 }
@@ -152,8 +159,8 @@ select.input-field {
     padding: 8px 0;
 }
 
-.stat-head { background: #444 !important; }
-.stat-in { background: #f0f0f0; font-weight: bold; }
+.stat-head { background: var(--main-clr-dark) !important; color: var(--text-white); }
+.stat-in { background: var(--bg-light-gray); font-weight: bold; }
 
 /* --- 라인업 섹션 --- */
 .lineup-section-wrapper {
@@ -163,7 +170,7 @@ select.input-field {
 }
 
 .lineup-box {
-    border: 1px solid #eee;
+    border: 1px solid var(--border-light);
     padding: 15px;
     border-radius: 8px;
 }
@@ -173,7 +180,7 @@ select.input-field {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
-    border-bottom: 2px solid #eee;
+    border-bottom: 2px solid var(--border-light);
     padding-bottom: 8px;
 }
 
@@ -182,15 +189,15 @@ select.input-field {
     border-collapse: collapse;
 }
 .lineup-input-table th {
-    background: #f1f3f5;
-    color: #444;
+    background: var(--bg-light-gray);
+    color: var(--text-dark);
     padding: 8px;
     font-size: 0.85rem;
     text-align: center;
 }
 .lineup-input-table td {
     padding: 4px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-light);
 }
 
 /* 테이블 안의 Select Box도 스타일 적용 */
@@ -198,7 +205,7 @@ select.input-field {
 .lineup-input-table input {
     width: 100%;
     padding: 6px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-light);
     border-radius: 4px;
     box-sizing: border-box;
     font-size: 0.9rem;
@@ -212,18 +219,18 @@ select.input-field {
     border-radius: 4px;
     cursor: pointer;
 }
-.btn-mini.add { background: #28a745; color: white; }
-.btn-mini.del { background: #e63946; color: white; width: 100%; }
+.btn-mini.add { background: var(--point-clr); color: var(--text-white); }
+.btn-mini.del { background: var(--bg-red); color: var(--text-white); width: 100%; }
 
 /* --- 사진 업로드 --- */
 .file-upload-box {
-    border: 2px dashed #ccc;
+    border: 2px dashed var(--border-light);
     padding: 15px;
-    background: #fafafa;
+    background: var(--bg-light-gray);
     text-align: center;
     border-radius: 6px;
 }
-.warning-text { color: #e63946; font-size: 0.85rem; margin-top: 5px; }
+.warning-text { color: var(--text-red); font-size: 0.85rem; margin-top: 5px; }
 
 .photo-preview-container {
     display: flex;
@@ -235,7 +242,7 @@ select.input-field {
     position: relative;
     width: 70px;
     height: 70px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-light);
     border-radius: 4px;
     overflow: hidden;
 }
@@ -245,7 +252,7 @@ select.input-field {
     top: 0; right: 0;
     width: 20px; height: 20px;
     background: rgba(0,0,0,0.6);
-    color: white; border: none; cursor: pointer;
+    color: var(--text-white); border: none; cursor: pointer;
 }
 
 /* --- 하단 버튼 --- */
@@ -262,11 +269,11 @@ select.input-field {
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
-    color: white;
+    color: var(--text-white);
 }
-.btn-register { background: #001d3d; }
-.btn-cancel { background: #6c757d; }
-.divider { border: 0; height: 1px; background: #ddd; margin: 30px 0; }
+.btn-register { background: var(--main-clr); }
+.btn-cancel { background: var(--bg-gray); }
+.divider { border: 0; height: 1px; background: var(--border-light); margin: 30px 0; }
 
 
 /* --- 커스텀 자동완성 스타일 --- */
@@ -279,14 +286,14 @@ select.input-field {
 /* 자동완성 목록 박스 */
 .autocomplete-items {
     position: absolute;
-    border: 1px solid #d4d4d4;
+    border: 1px solid var(--border-light);
     border-bottom: none;
     border-top: none;
     z-index: 99;
     top: 100%; /* 입력창 바로 아래 */
     left: 0;
     right: 0;
-    background-color: #fff;
+    background-color: var(--bg-white);
     max-height: 200px; /* 너무 길어지면 스크롤 */
     overflow-y: auto;
     border-radius: 0 0 5px 5px;
@@ -297,8 +304,8 @@ select.input-field {
 .autocomplete-item {
     padding: 10px;
     cursor: pointer;
-    background-color: #fff;
-    border-bottom: 1px solid #d4d4d4;
+    background-color: var(--bg-white);
+    border-bottom: 1px solid var(--border-light);
     font-size: 0.9rem;
     text-align: left;
     display: flex;
@@ -307,47 +314,47 @@ select.input-field {
 
 /* 마우스 올렸을 때 */
 .autocomplete-item:hover {
-    background-color: #e9e9e9;
+    background-color: var(--bg-gray);
 }
 
 /* 포지션 텍스트 (회색, 작게) */
 .item-pos {
-    color: #888;
+    color: var(--text-gray);
     font-size: 0.8rem;
     font-weight: normal;
 }
 
 /* 검색어와 일치하는 부분 강조 (선택사항) */
 .autocomplete-item strong {
-    color: #001d3d;
+    color: var(--main-clr);
 }
 
 /* 포지션 선택 박스 */
 .pos-select {
     width: 100%;
     padding: 8px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-light);
     border-radius: 4px;
     font-size: 0.9rem;
     text-align: center;
-    background-color: #fff;
+    background-color: var(--bg-white);
 }
 
 /* 타순 컬럼 (숫자) */
 #table-starting td:first-child {
     text-align: center;
-    background-color: #f9f9f9;
-    border-right: 1px solid #eee;
+    background-color: var(--bg-light-gray);
+    border-right: 1px solid var(--border-light);
 }
 
 /* Readonly Input (투타) */
 .type-input {
-    border: 1px solid #eee !important;
+    border: 1px solid var(--border-light) !important;
     text-align: center;
     cursor: default;
 }
 .type-input:focus {
-    border-color: #eee !important;
+    border-color: var(--border-light) !important;
     box-shadow: none !important;
 }
 
@@ -371,13 +378,13 @@ select.input-field {
 /* "회" 라벨 */
 .inning-label {
     font-weight: bold;
-    color: #444;
+    color: var(--text-dark-gray);
     font-size: 0.95rem;
 }
 
 input:disabled, select:disabled {
-    background-color: #f2f2f2 !important;
-    color: #999 !important;
+    background-color: var(--bg-light-gray)   !important;
+    color: var(--text-gray) !important;
     cursor: not-allowed;
 }
 
@@ -387,8 +394,8 @@ input:disabled, select:disabled {
 
 /* 비활성화된 입력창 스타일 */
 .detail-score:disabled {
-    background-color: #f8f9fa !important;
-    color: #ccc !important;
+    background-color: var(--bg-light-gray) !important;
+    color: var(--text-gray) !important;
     cursor: not-allowed;
-    border-color: #eee !important;
+    border-color: var(--border-light) !important;
 }
