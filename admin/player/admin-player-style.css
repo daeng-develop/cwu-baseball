@@ -15,37 +15,38 @@
 
 .admin-header h2 {
     margin: 0;
-    color: #333;
+    color: var(--text-dark);
 }
 
 .back-link {
     text-decoration: none;
-    color: #555;
+    color: var(--main-clr);
     font-weight: bold;
     padding: 6px 12px;
-    background-color: #fff;
-    border: 1px solid #ddd;
+    background-color: var(--bg-white);
+    border: 1px solid var(--border-light);
     border-radius: 6px;
     font-size: 0.9rem;
     transition: 0.2s;
 }
 
 .back-link:hover {
-    background-color: #e9ecef;
+    background-color: var(--main-clr);
+    color: var(--main-clr-bright);
 }
 
 /* 섹션 타이틀 */
 .section-title {
     font-size: 1.2rem;
-    color: #001d3d;
+    color: var(--main-clr);
     margin-bottom: 15px;
-    border-left: 5px solid #001d3d;
+    border-left: 5px solid var(--main-clr);
     padding-left: 10px;
 }
 
 /* 폼 카드 스타일 */
 .form-card {
-    background-color: white;
+    background-color: var(--bg-white);
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
@@ -80,21 +81,21 @@
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #444;
+    color: var(--text-dark);
     font-size: 0.9rem;
 }
 
 .input-field {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-light);
     border-radius: 6px;
     font-size: 1rem;
     box-sizing: border-box;
 }
 
 .input-field:focus {
-    border-color: #001d3d;
+    border-color: var(--main-clr);
     outline: none;
 }
 
@@ -105,16 +106,16 @@
     gap: 10px;
 }
 .unit {
-    color: #777;
+    color: var(--text-gray);
     font-weight: 500;
 }
 
 /* 파일 업로드 박스 */
 .file-upload-box {
-    border: 2px dashed #ccc;
+    border: 2px dashed var(--border-light);
     padding: 10px;
     border-radius: 6px;
-    background-color: #fafafa;
+    background-color: var(--bg-light-gray);
     text-align: left;
 }
 .file-upload-box input[type="file"] {
@@ -124,7 +125,7 @@
 /* 경고 문구 */
 .warning-text {
     font-size: 0.85rem;
-    color: #e63946;
+    color: var(--text-red);
     margin-top: 8px;
     margin-bottom: 0;
 }
@@ -133,18 +134,18 @@
 .divider {
     border: 0;
     height: 1px;
-    background-color: #ddd;
+    background-color: var(--border-light);
     margin: 40px 0;
 }
 
 /* 하단 목록 임시 스타일 */
 .list-placeholder {
-    background-color: #fff;
+    background-color: var(--bg-white);
     padding: 40px;
     text-align: center;
     border-radius: 12px;
-    color: #aaa;
-    border: 1px solid #eee;
+    color: var(--text-gray);
+    border: 1px solid var(--border-light);
 }
 
 /* --- [추가] Select Box 커스텀 디자인 --- */
@@ -156,7 +157,7 @@ select.input-field {
     appearance: none;          /* 표준 */
 
     /* 2. 배경색 및 커스텀 화살표 추가 */
-    background-color: #fff;
+    background-color: var(--bg-white);
     
     /* SVG 화살표 아이콘 (회색) */
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -169,18 +170,18 @@ select.input-field {
     padding-right: 40px; 
     
     cursor: pointer;
-    color: #444;
+    color: var(--text-dark);
     font-weight: 500;
 }
 
 /* 마우스를 올렸을 때 살짝 진해짐 */
 select.input-field:hover {
-    border-color: #888;
+    border-color: var(--main-clr);
 }
 
 /* 클릭했을 때 (포커스) - 테두리 색상 강조 & 화살표 색상 변경(선택사항) */
 select.input-field:focus {
-    border-color: #001d3d;
+    border-color: var(--main-clr-bright);
     outline: none;
     box-shadow: 0 0 0 3px rgba(0, 29, 61, 0.1); /* 부드러운 파란색 번짐 효과 */
 }
@@ -203,33 +204,35 @@ select.input-field:focus {
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: white;    /* 글씨색 흰색 */
+    color: var(--text-white);    /* 글씨색 흰색 */
 }
 
 /* 1. 등록 버튼 (메인 - 네이비) */
 .btn-register {
-    background-color: #001d3d;
+    background-color: var(--main-clr);
 }
 .btn-register:hover {
-    background-color: #003366;
+    background-color: var(--main-clr-bright);
+    color: var(--main-clr);
     transform: translateY(-2px);
 }
 
 /* 2. 수정 버튼 (포인트 - 청록색/초록) */
 .btn-edit {
-    background-color: #0056b3;
+    background-color: var(--main-clr);
 }
 .btn-edit:hover {
-    background-color:#004494;
+    background-color: var(--main-clr-bright);
+    color: var(--main-clr);
     transform: translateY(-2px);
 }
 
 /* 3. 취소 버튼 (서브 - 회색) */
 .btn-cancel {
-    background-color: #6c757d;
+    background-color: var(--bg-gray);
 }
 .btn-cancel:hover {
-    background-color: #5a6268;
+    background-color: var(--bg-dark-gray);
     transform: translateY(-2px);
 }
 
@@ -246,17 +249,17 @@ select.input-field:focus {
 /* 연도 선택 박스 (기존 select 스타일 재사용 + 크기 조절) */
 .year-select {
     padding: 8px 30px 8px 12px; /* 오른쪽 여백은 화살표 공간 */
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-light);
     border-radius: 6px;
     font-size: 0.95rem;
     font-weight: bold;
-    color: #333;
+    color: var(--text-dark);
     cursor: pointer;
     
     /* 커스텀 화살표 적용 (기존 select.input-field와 동일) */
     -webkit-appearance: none;
     appearance: none;
-    background-color: #fff;
+    background-color: var(--bg-white);
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 8px center;
@@ -274,7 +277,7 @@ select.input-field:focus {
 .player-table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #fff;
+    background-color: var(--bg-white);
     font-size: 0.95rem;
     text-align: center; /* 내용 가운데 정렬 */
     white-space: nowrap; /* 줄바꿈 방지 */
@@ -282,23 +285,23 @@ select.input-field:focus {
 
 /* 헤더 셀 (th) */
 .player-table th {
-    background-color: #001d3d; /* 메인 네이비 */
-    color: white;
+    background-color: var(--main-clr); /* 메인 네이비 */
+    color: var(--text-white);
     padding: 12px;
     font-weight: 500;
-    border-bottom: 2px solid #00152e;
+    border-bottom: 2px solid var(--border-light);
 }
 
 /* 데이터 셀 (td) */
 .player-table td {
     padding: 12px;
-    border-bottom: 1px solid #eee;
-    color: #444;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-dark);
 }
 
 /* 마우스 올렸을 때 행 강조 */
 .player-table tr:hover td {
-    background-color: #f8f9fa;
+    background-color: var(--main-clr-bright); /* 부드러운 하이라이트 */
 }
 
 /* --- 관리 버튼 (수정/삭제) --- */
@@ -309,22 +312,26 @@ select.input-field:focus {
     font-size: 0.8rem;
     cursor: pointer;
     margin: 0 2px;
-    color: white;
+    color: var(--text-white);
     transition: 0.2s;
 }
 
 /* 수정 버튼 */
 .btn-list.edit {
-    background-color: #0056b3;
+    background-color: var(--main-clr-bright);
+    color: var(--main-clr);
 }
 .btn-list.edit:hover {
-    background-color: #004494;
+    background-color: var(--main-clr);
+    color: var(--main-clr-bright);
 }
 
 /* 삭제 버튼 (빨강) */
 .btn-list.delete {
-    background-color: #e63946;
+    background-color: var(--bg-red-light);
+    color: var(--text-red);
 }
 .btn-list.delete:hover {
-    background-color: #d62828;
+    background-color: var(--bg-red);
+    color: var(--text-white);
 }
