@@ -58,41 +58,81 @@ function renderMatchUI(data) {
 
 
     // --- 2. 스코어보드 ---
+    // ⭐ [추가 1] 점수-경기 상태 불일치 검증
+    const ourRun = data.homeAway === 'home' ? Number(data['home-run'] || 0) : Number(data['away-run'] || 0);
+    const oppRun = data.homeAway === 'home' ? Number(data['away-run'] || 0) : Number(data['home-run'] || 0);
+    
+    let isMismatch = false;
+    // 승, 패, 무승부인데 점수가 논리적으로 맞지 않는 경우 (스코어 미입력 포함)
+    if (data.status === 'win' && ourRun <= oppRun) isMismatch = true;
+    if (data.status === 'loss' && ourRun >= oppRun) isMismatch = true;
+    if (data.status === 'draw' && ourRun !== oppRun) isMismatch = true;
+
+    // 특수 상태(취소, 중단, 경기전 등)인 경우도 점수 무효화
+    const specialStatuses = ['no_record', 'rain_cancel', 'etc_cancel', 'rain_suspend', 'before'];
+    if (specialStatuses.includes(data.status)) isMismatch = true;
+
+    // ⭐ [추가 2] 이닝 배열이 모두 0으로만 채워져 있는지 확인 (단순 기록 모드 판별용)
+    const isAllZeros = (arr) => Array.isArray(arr) && arr.length > 0 && arr.every(val => val === "0" || val === 0 || val === "");
+
+    // 스코어 변수 초기화
+    let homeScoreArr = data['home-score'] || [];
+    let awayScoreArr = data['away-score'] || [];
+    let homeR = data['home-run'] || 0;
+    let awayR = data['away-run'] || 0;
+    let homeH = data['home-hit'] || 0;
+    let awayH = data['away-hit'] || 0;
+    let homeE = data['home-error'] || 0;
+    let awayE = data['away-error'] || 0;
+    let homeB = data['home-ball'] || 0;
+    let awayB = data['away-ball'] || 0;
+
+    if (isMismatch) {
+        // 불일치하거나 특수 상태면 모든 기록을 '-' 로 처리
+        homeScoreArr = []; awayScoreArr = [];
+        homeR = '-'; awayR = '-';
+        homeH = '-'; awayH = '-';
+        homeE = '-'; awayE = '-';
+        homeB = '-'; awayB = '-';
+    } else {
+        // 정상 상태지만, 이닝 기록이 모두 0이면(상세 모드 미입력) 이닝만 '-' 표시
+        if (isAllZeros(homeScoreArr)) homeScoreArr = [];
+        if (isAllZeros(awayScoreArr)) awayScoreArr = [];
+    }
+
     let topTeam = {}; 
     let btmTeam = {}; 
 
     if (data.homeAway === 'home') {
-        // 우리가 홈 (말공격)
         topTeam = { 
             name: data.opponent, 
-            runs: data['away-score'] || [], 
-            r: data['away-run'], h: data['away-hit'], e: data['away-error'], b: data['away-ball']
+            runs: awayScoreArr, 
+            r: awayR, h: awayH, e: awayE, b: awayB
         };
         btmTeam = { 
             name: "청운대학교", 
-            runs: data['home-score'] || [], 
-            r: data['home-run'], h: data['home-hit'], e: data['home-error'] , b: data['home-ball']
+            runs: homeScoreArr, 
+            r: homeR, h: homeH, e: homeE , b: homeB
         };
     } else {
-        // 우리가 어웨이 (초공격)
         topTeam = { 
             name: "청운대학교", 
-            runs: data['away-score'] || [], 
-            r: data['away-run'], h: data['away-hit'], e: data['away-error'] , b: data['away-ball']
+            runs: awayScoreArr, 
+            r: awayR, h: awayH, e: awayE , b: awayB
         };
         btmTeam = { 
             name: data.opponent, 
-            runs: data['home-score'] || [], 
-            r: data['home-run'], h: data['home-hit'], e: data['home-error'] , b: data['home-ball']
+            runs: homeScoreArr, 
+            r: homeR, h: homeH, e: homeE , b: homeB
         };
     }
 
-    // 메인 스코어보드
+    // 메인 스코어보드 (이제 '-'값도 정상적으로 들어갑니다)
     const sbMain = document.querySelector('.scoreboard-main');
     sbMain.querySelector('.away .team-name').textContent = topTeam.name;
     sbMain.querySelector('.home .team-name').textContent = btmTeam.name;
-    sbMain.querySelector('.away-score').textContent = topTeam.r || 0;
-    sbMain.querySelector('.home-score').textContent = btmTeam.r || 0;
+    sbMain.querySelector('.away-score').textContent = topTeam.r;
+    sbMain.querySelector('.home-score').textContent = btmTeam.r;
 
     // 경기 결과 뱃지
     const resLabel = document.querySelector('.match-result-label');
@@ -114,7 +154,6 @@ function renderMatchUI(data) {
         resLabel.style.display = 'none';
     }
 
-
     // 상세 스코어 테이블
     const tableBody = document.querySelector('.score-table tbody');
     const rows = tableBody.querySelectorAll('tr'); 
@@ -122,8 +161,6 @@ function renderMatchUI(data) {
         fillScoreRow(rows[0], topTeam);
         fillScoreRow(rows[1], btmTeam);
     }
-
-
     // --- 3. 주요 기록 ---
     const statsContainer = document.querySelector('.match-key-stats');
     statsContainer.innerHTML = ''; 

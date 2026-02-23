@@ -61,29 +61,30 @@ function updateFormVisibility() {
         if (scoreboardSection) scoreboardSection.style.display = 'none';
         if (lineupSection) lineupSection.style.display = 'none';
         if (detailCheckWrapper) detailCheckWrapper.style.display = 'none';
+        if (winBox) winBox.style.display = 'none'; // ⭐ 특수 상태일 때도 숨김
     } else {
         // 2. 일반 결과 (승/패/무)
         if (scoreboardSection) scoreboardSection.style.display = 'block';
         if (detailCheckWrapper) detailCheckWrapper.style.display = 'flex';
         
-        // ⭐ 핵심: 상세 기록 체크 여부에 따라 테이블 열 숨김/노출
         const detailColumns = document.querySelectorAll('.detail-column');
         if (isDetailChecked) {
             // 상세 모드: 모든 열 노출 및 라인업 노출
             detailColumns.forEach(el => el.style.display = ''); 
             if (lineupSection) lineupSection.style.display = 'block';
-            // 자동 계산 기능을 위해 이닝 점수 입력 활성화
             document.querySelectorAll('.detail-score').forEach(el => el.disabled = false);
+            
+            // ⭐ 상세 모드이면서 '승리(win)'일 때만 승리 정보 노출
+            if (winBox) winBox.style.display = (status === 'win') ? 'grid' : 'none';
         } else {
-            // 단순 모드: 이닝 점수, H, E, B 열 모두 숨김 (최종 R만 남음)
+            // 단순 모드: 이닝 점수, H, E, B 열 모두 숨김
             detailColumns.forEach(el => el.style.display = 'none');
             if (lineupSection) lineupSection.style.display = 'none';
-            // 최종 점수 직접 입력을 방해하지 않도록 이닝 입력칸 비활성화
             document.querySelectorAll('.detail-score').forEach(el => el.disabled = true);
+            
+            // ⭐ 단순 모드일 때는 승리/결승타 입력창 무조건 숨김
+            if (winBox) winBox.style.display = 'none';
         }
-
-        // 승리 정보 박스
-        if (winBox) winBox.style.display = (status === 'win') ? 'grid' : 'none';
     }
 }
 
@@ -318,16 +319,20 @@ async function handleMatchSelect(e) {
 // [헬퍼 함수들]
 // ------------------------------------
 
-// ⭐ [복구됨] 승리 투수/결승타 입력창 토글 함수
+// ⭐ [수정] 승리 투수/결승타 입력창 토글 함수
 function toggleWinStats() {
-const statusEl = document.getElementById('match-result-status');
+    const statusEl = document.getElementById('match-result-status');
     const winBox = document.getElementById('win-stats-box');
+    const detailCheckEl = document.getElementById('check-detail-record'); // ⭐ 추가
     
-    // ⭐ 요소가 존재하는지 먼저 확인 (에러 방지)
-    if (!statusEl || !winBox) return;
+    // 요소가 존재하는지 먼저 확인 (에러 방지)
+    if (!statusEl || !winBox || !detailCheckEl) return;
 
     const status = statusEl.value;
-    winBox.style.display = (status === 'win') ? 'grid' : 'none';
+    const isDetailChecked = detailCheckEl.checked; // ⭐ 추가
+    
+    // ⭐ 승리(win) 상태이면서 상세 기록(isDetailChecked)일 때만 표시
+    winBox.style.display = (status === 'win' && isDetailChecked) ? 'grid' : 'none';
 }
 
 function fillScoreboardNewFormat(team, inningArr, fullData) {
@@ -595,21 +600,28 @@ if (!selectedMatchId) return;
             let ourScore = (nameHome === '청운대') ? homeRun : awayRun;
             let oppScore = (nameHome === '청운대') ? awayRun : homeRun;
 
-            if (status === 'win' && ourScore <= oppScore) throw new Error("승리인데 점수가 낮거나 같습니다.");
-            if (status === 'loss' && ourScore >= oppScore) throw new Error("패배인데 점수가 높거나 같습니다.");
-            if (status === 'draw' && ourScore !== oppScore) throw new Error("무승부인데 점수가 다릅니다.");
+            // ⭐ [수정] 점수가 1점이라도 입력되었을 때만 검증 로직 작동 (0:0 이면 검증 패스)
+            const isScoreEntered = (homeRun > 0 || awayRun > 0);
+
+           if (isScoreEntered) {
+                if (status === 'win' && ourScore <= oppScore) throw new Error("승리인데 점수가 낮거나 같습니다.");
+                if (status === 'loss' && ourScore >= oppScore) throw new Error("패배인데 점수가 높거나 같습니다.");
+                if (status === 'draw' && ourScore !== oppScore) throw new Error("무승부인데 점수가 다릅니다.");
+            }
         }
 
         // 3. [데이터 수집]
         if (isSpecialStatus || !isDetailChecked) {
-            // ⭐ 단순 모드이거나 특수 상태일 때: 라인업 데이터 비우기
+            // ⭐ 단순 모드이거나 특수 상태일 때
             updateData['start-line-up'] = [];
             updateData['pitcher-line-up'] = [];
             updateData['bench-line-up'] = [];
-            
-            // 단순 모드일 때 이닝별 점수는 모두 "0"으로 초기화
             updateData['home-score'] = Array(12).fill("0");
             updateData['away-score'] = Array(12).fill("0");
+            
+           // ⭐ 단순 모드로 저장할 경우 승리 투수와 결승타 기록 초기화
+            updateData['winning-pitcher'] = "";
+            updateData['run-bat-in'] = "";
         } else {
             // 상세 모드일 때: 이닝별 점수 및 라인업 수집
             const getInningScores = (team) => {
@@ -660,6 +672,16 @@ if (!selectedMatchId) return;
             });
             benchLineupArr.sort((a, b) => a.inn - b.inn);
             updateData['bench-line-up'] = benchLineupArr.map(item => item.str);
+
+            if (status === 'win') {
+                const winPitcherEl = document.getElementById('win-pitcher');
+                const mvpPlayerEl = document.getElementById('mvp-player');
+                updateData['winning-pitcher'] = winPitcherEl ? winPitcherEl.value : "";
+                updateData['run-bat-in'] = mvpPlayerEl ? mvpPlayerEl.value : "";
+            } else {
+                updateData['winning-pitcher'] = "";
+                updateData['run-bat-in'] = "";
+            }
         }
 
         // 4. 공통 데이터 (최종 점수 및 사진) 수집
