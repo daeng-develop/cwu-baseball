@@ -21,11 +21,15 @@ document.addEventListener("DOMContentLoaded", () => {
         statusEl.addEventListener('change', updateFormVisibility);
     }
 
-    const detailCheckEl = document.getElementById('check-detail-record');
-    if (detailCheckEl) {
-        detailCheckEl.addEventListener('change', updateFormVisibility);
+    const checkScoreboardEl = document.getElementById('check-detail-scoreboard');
+    if (checkScoreboardEl) {
+        checkScoreboardEl.addEventListener('change', updateFormVisibility);
+        checkScoreboardEl.addEventListener('change', toggleWinStats);
     }
-
+    const checkLineupEl = document.getElementById('check-detail-lineup');
+    if (checkLineupEl) {
+        checkLineupEl.addEventListener('change', updateFormVisibility);
+    }
     const winPitcherEl = document.getElementById('win-pitcher');
     if (winPitcherEl) {
         setupAutocomplete(winPitcherEl);
@@ -38,16 +42,18 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /**
- * ⭐ UI 가시성 제어 핵심 함수
+ * ⭐ UI 가시성 제어 핵심 함수 (체크 박스 별 분리)
  */
 function updateFormVisibility() {
     const statusEl = document.getElementById('match-result-status');
-    const detailCheckEl = document.getElementById('check-detail-record');
+    const checkScoreboardEl = document.getElementById('check-detail-scoreboard');
+    const checkLineupEl = document.getElementById('check-detail-lineup');
     
-    if (!statusEl || !detailCheckEl) return;
+    if (!statusEl) return;
 
     const status = statusEl.value;
-    const isDetailChecked = detailCheckEl.checked;
+    const isScoreboardChecked = checkScoreboardEl ? checkScoreboardEl.checked : false;
+    const isLineupChecked = checkLineupEl ? checkLineupEl.checked : false;
     
     const scoreboardSection = document.getElementById('section-scoreboard');
     const lineupSection = document.getElementById('section-lineup');
@@ -61,33 +67,32 @@ function updateFormVisibility() {
         if (scoreboardSection) scoreboardSection.style.display = 'none';
         if (lineupSection) lineupSection.style.display = 'none';
         if (detailCheckWrapper) detailCheckWrapper.style.display = 'none';
-        if (winBox) winBox.style.display = 'none'; // ⭐ 특수 상태일 때도 숨김
+        if (winBox) winBox.style.display = 'none'; 
     } else {
-        // 2. 일반 결과 (승/패/무)
+        // 2. 일반 결과
         if (scoreboardSection) scoreboardSection.style.display = 'block';
         if (detailCheckWrapper) detailCheckWrapper.style.display = 'flex';
         
+        // (1) 상세 스코어보드 제어
         const detailColumns = document.querySelectorAll('.detail-column');
-        if (isDetailChecked) {
-            // 상세 모드: 모든 열 노출 및 라인업 노출
+        if (isScoreboardChecked) {
             detailColumns.forEach(el => el.style.display = ''); 
-            if (lineupSection) lineupSection.style.display = 'block';
             document.querySelectorAll('.detail-score').forEach(el => el.disabled = false);
-            
-            // ⭐ 상세 모드이면서 '승리(win)'일 때만 승리 정보 노출
             if (winBox) winBox.style.display = (status === 'win') ? 'grid' : 'none';
         } else {
-            // 단순 모드: 이닝 점수, H, E, B 열 모두 숨김
             detailColumns.forEach(el => el.style.display = 'none');
-            if (lineupSection) lineupSection.style.display = 'none';
             document.querySelectorAll('.detail-score').forEach(el => el.disabled = true);
-            
-            // ⭐ 단순 모드일 때는 승리/결승타 입력창 무조건 숨김
             if (winBox) winBox.style.display = 'none';
+        }
+
+        // (2) 라인업 제어
+        if (isLineupChecked) {
+            if (lineupSection) lineupSection.style.display = 'block';
+        } else {
+            if (lineupSection) lineupSection.style.display = 'none';
         }
     }
 }
-
 // ==========================================
 // 1. 초기 데이터 로딩
 // ==========================================
@@ -296,12 +301,17 @@ async function handleMatchSelect(e) {
         renderPhotoPreviews();
 
         // 2. 체크박스 및 UI 가시성 제어
-        // ⭐ 여기서 'doc' 대신 위에서 선언한 'data' 변수를 그대로 사용합니다.
         const hasLineup = data['start-line-up'] && data['start-line-up'].length > 0;
-        const detailCheckEl = document.getElementById('check-detail-record');
-        if (detailCheckEl) {
-            detailCheckEl.checked = hasLineup;
-        }
+        
+        // 스코어 배열이 전부 0으로만 채워져있는지 확인
+        const isAllZeros = (arr) => Array.isArray(arr) && arr.length > 0 && arr.every(val => val === "0" || val === 0 || val === "");
+        const hasDetailScore = data['home-score'] && data['home-score'].length > 0 && !isAllZeros(data['home-score']);
+
+        const checkScoreboardEl = document.getElementById('check-detail-scoreboard');
+        const checkLineupEl = document.getElementById('check-detail-lineup');
+        
+        if (checkScoreboardEl) checkScoreboardEl.checked = hasDetailScore;
+        if (checkLineupEl) checkLineupEl.checked = hasLineup;
 
         // 폼을 먼저 보이게 설정
         const recordForm = document.getElementById('record-form');
@@ -323,16 +333,14 @@ async function handleMatchSelect(e) {
 function toggleWinStats() {
     const statusEl = document.getElementById('match-result-status');
     const winBox = document.getElementById('win-stats-box');
-    const detailCheckEl = document.getElementById('check-detail-record'); // ⭐ 추가
+    const checkScoreboardEl = document.getElementById('check-detail-scoreboard'); 
     
-    // 요소가 존재하는지 먼저 확인 (에러 방지)
-    if (!statusEl || !winBox || !detailCheckEl) return;
+    if (!statusEl || !winBox || !checkScoreboardEl) return;
 
     const status = statusEl.value;
-    const isDetailChecked = detailCheckEl.checked; // ⭐ 추가
+    const isScoreboardChecked = checkScoreboardEl.checked; 
     
-    // ⭐ 승리(win) 상태이면서 상세 기록(isDetailChecked)일 때만 표시
-    winBox.style.display = (status === 'win' && isDetailChecked) ? 'grid' : 'none';
+    winBox.style.display = (status === 'win' && isScoreboardChecked) ? 'grid' : 'none';
 }
 
 function fillScoreboardNewFormat(team, inningArr, fullData) {
@@ -610,20 +618,27 @@ if (!selectedMatchId) return;
             }
         }
 
-        // 3. [데이터 수집]
-        if (isSpecialStatus || !isDetailChecked) {
-            // ⭐ 단순 모드이거나 특수 상태일 때
-            updateData['start-line-up'] = [];
-            updateData['pitcher-line-up'] = [];
-            updateData['bench-line-up'] = [];
+        const checkScoreboardEl = document.getElementById('check-detail-scoreboard');
+        const checkLineupEl = document.getElementById('check-detail-lineup');
+        const isScoreboardChecked = checkScoreboardEl ? checkScoreboardEl.checked : false;
+        const isLineupChecked = checkLineupEl ? checkLineupEl.checked : false;
+
+       // 3. [데이터 수집] - 분리된 로직
+        
+        // (1) 상세 스코어보드 데이터 수집
+        if (isSpecialStatus || !isScoreboardChecked) {
             updateData['home-score'] = Array(12).fill("0");
             updateData['away-score'] = Array(12).fill("0");
-            
-           // ⭐ 단순 모드로 저장할 경우 승리 투수와 결승타 기록 초기화
             updateData['winning-pitcher'] = "";
             updateData['run-bat-in'] = "";
+            
+            updateData['home-hit'] = "0";
+            updateData['home-error'] = "0";
+            updateData['home-ball'] = "0";
+            updateData['away-hit'] = "0";
+            updateData['away-error'] = "0";
+            updateData['away-ball'] = "0";
         } else {
-            // 상세 모드일 때: 이닝별 점수 및 라인업 수집
             const getInningScores = (team) => {
                 const inputs = document.getElementById(`row-${team}`).querySelectorAll('.score-in');
                 return Array.from(inputs).map(inp => inp.value || "0");
@@ -631,7 +646,30 @@ if (!selectedMatchId) return;
             updateData['home-score'] = getInningScores('home');
             updateData['away-score'] = getInningScores('away');
 
-           // 라인업 수집 (입력된 행만 수집되므로 0명이어도 에러 없이 빈 배열로 저장됨)
+            updateData['home-hit'] = document.getElementById('h-home').value || "0";
+            updateData['home-error'] = document.getElementById('e-home').value || "0";
+            updateData['home-ball'] = document.getElementById('b-home').value || "0";
+            updateData['away-hit'] = document.getElementById('h-away').value || "0";
+            updateData['away-error'] = document.getElementById('e-away').value || "0";
+            updateData['away-ball'] = document.getElementById('b-away').value || "0";
+
+            if (status === 'win') {
+                const winPitcherEl = document.getElementById('win-pitcher');
+                const mvpPlayerEl = document.getElementById('mvp-player');
+                updateData['winning-pitcher'] = winPitcherEl ? winPitcherEl.value : "";
+                updateData['run-bat-in'] = mvpPlayerEl ? mvpPlayerEl.value : "";
+            } else {
+                updateData['winning-pitcher'] = "";
+                updateData['run-bat-in'] = "";
+            }
+        }
+
+        // (2) 라인업 데이터 수집
+        if (isSpecialStatus || !isLineupChecked) {
+            updateData['start-line-up'] = [];
+            updateData['pitcher-line-up'] = [];
+            updateData['bench-line-up'] = [];
+        } else {
             const startLineupArr = [];
             document.querySelectorAll('#table-starting tbody tr').forEach((tr, index) => {
                 const pos = tr.querySelector('.pos-select').value; 
@@ -672,19 +710,10 @@ if (!selectedMatchId) return;
             });
             benchLineupArr.sort((a, b) => a.inn - b.inn);
             updateData['bench-line-up'] = benchLineupArr.map(item => item.str);
-
-            if (status === 'win') {
-                const winPitcherEl = document.getElementById('win-pitcher');
-                const mvpPlayerEl = document.getElementById('mvp-player');
-                updateData['winning-pitcher'] = winPitcherEl ? winPitcherEl.value : "";
-                updateData['run-bat-in'] = mvpPlayerEl ? mvpPlayerEl.value : "";
-            } else {
-                updateData['winning-pitcher'] = "";
-                updateData['run-bat-in'] = "";
-            }
         }
 
-        // 4. 공통 데이터 (최종 점수 및 사진) 수집
+        // 4. 공통 데이터 (총점수) 수집
+        // 총 점수는 체크 여부와 상관없이 항상 화면 값을 가져옴
         updateData['home-run'] = document.getElementById(`row-home`).querySelector('.r-val').value || "0";
         updateData['away-run'] = document.getElementById(`row-away`).querySelector('.r-val').value || "0";
         
