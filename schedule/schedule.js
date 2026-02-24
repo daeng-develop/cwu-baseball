@@ -139,6 +139,7 @@ async function loadMonthlySchedules(year, month, reqId) {
                 // ⭐ [핵심 로직] 학교 이름 줄이기 (고등학교 -> 고, 대학교 -> 대)
                 // 정규식(/.../g)을 사용하여 문자를 치환합니다.
                 let shortName = data.opponent
+                    .replace(/중학교/g, '중')
                     .replace(/고등학교/g, '고')
                     .replace(/대학교/g, '대');
 
@@ -163,11 +164,32 @@ async function loadMonthlySchedules(year, month, reqId) {
                 placeSpan.className = 'match-place';
                 placeSpan.textContent = data.location;
 
-                // ⭐ [추가] (3) 시간 (맨 아래에 표시)
+                //(3) 시간 혹은 결과
                 const timeSpan = document.createElement('span');
                 timeSpan.className = 'match-time';
-                // 데이터에 시간이 있으면 표시, 없으면 빈 문자열
-                timeSpan.textContent = data.time ? data.time : ''; 
+
+                if (data.status === 'event') timeSpan.textContent = ''; 
+                else
+                {
+                    const today = new Date();
+                    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                    if ((data.date <= todayStr) && (data.status !== 'before')) //과거 혹은 오늘의 경우 경기 기록이 입력된 경우
+                    {
+                        timeSpan.textContent = GetMatchStatus(data.status) || '경기 종료';
+
+                        if (data.status === 'win') {
+                            timeSpan.style.color = 'var(--main-clr)';
+                        } else if (data.status === 'loss') {
+                            timeSpan.style.color = 'var(--bg-gray)';
+                        } else if (data.status === 'draw') {
+                            timeSpan.style.color = 'var(--point-clr)';
+                        }
+                    }
+                    else //미래
+                    {
+                        timeSpan.textContent = data.time ? data.time : '';
+                    }
+                }
 
                 // 순서대로 추가: 제목 -> 장소 -> 시간
                 linkEl.appendChild(titleSpan);
@@ -181,6 +203,22 @@ async function loadMonthlySchedules(year, month, reqId) {
     } catch (error) {
         console.error("일정 로딩 실패:", error);
     }
+}
+
+function GetMatchStatus(status)
+{
+    const statusMap = {
+        'win': '승리',
+        'loss': '패배',
+        'draw': '무승부',
+        'no_record': ' ',
+        'rain_cancel': '우천 취소',
+        'etc_cancel': '경기 취소',
+        'rain_suspend': '서스펜디드',
+        'end': '경기 종료',
+    };
+
+    return statusMap[status];
 }
 
 // 5. 버튼 이벤트
