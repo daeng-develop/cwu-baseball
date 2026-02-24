@@ -305,32 +305,49 @@ async function fillMatchMenu(pathPrefix, elementId, isSidebar) {
             snapshot.forEach(doc => {
                 const data = doc.data();
                 
-                // 1. 경기전(before) 상태는 기본적으로 제외
+                // 경기전(before) 상태는 기본적으로 제외
                 if (data.status !== 'before') {
                     
-                    // 2. 데이터 존재 여부 체크
+                    // ⭐ 전시 조건
+                    //[조건 1]
+                    //win loss draw의 경우에는 논리적으로 맞는 경우에는 그냥 추가
+                    //논리적으로 맞지 않는 경우에는 사진이 있는지 확인하고 전시
+                    //[조건 2]
+                    //취소, 중단, 기록없음의 경우 사진이 있으면 전시함
+
+                    let add_match_list = false;
+
+                    // 사진 존재 여부 체크
                     const hasPhotos = data.photo && 
                           Array.isArray(data.photo) && 
                           data.photo.length > 0 && 
                           data.photo[0] !== "" && // 빈 문자열 체크
                           data.photo[0] !== null;  // null 체크
-                    const hasScore = (data['home-score'] && data['home-score'].length > 0) || 
-                                    (data['away-score'] && data['away-score'].length > 0);
 
-                    // 3. ⭐ [조건 수정] 
-                    // status가 'no_record'인 경우 -> 무조건 사진이 있어야 함
-                    // 그 외(win, loss, draw 등) -> 사진이 있거나 스코어가 있어야 함
-                    if (data.status === 'no_record') {
+                    const ourRun = data.homeAway === 'home' ? Number(data['home-run'] || 0) : Number(data['away-run'] || 0);
+                    const oppRun = data.homeAway === 'home' ? Number(data['away-run'] || 0) : Number(data['home-run'] || 0);
+                    
+                    let isMismatch = false; //논리적으로 오류가 있는지 true : 오류 있음 / false : 오류 없음
 
-                        console.log("No Record Match Check:", doc.id, "Has Photos:", hasPhotos);
-                        if (hasPhotos) {
-                            matches.push({ id: doc.id, ...data });
-                        }
-                    } else {
-                        if (hasPhotos || hasScore) {
-                            matches.push({ id: doc.id, ...data });
-                        }
+                    if(data.status === 'win' ||
+                       data.status === 'loss' ||
+                       data.status === 'draw')
+                    {
+                        if (data.status === 'win' && ourRun <= oppRun) isMismatch = true;
+                        if (data.status === 'loss' && ourRun >= oppRun) isMismatch = true;
+                        if (data.status === 'draw' && ourRun !== oppRun) isMismatch = true;
+                        
+                        //논리적 오류가 없거나 있지만 사진이 있는 경우에는 전시
+                        if (isMismatch === false) add_match_list = true;
+                        if((isMismatch === true) && (hasPhotos)) add_match_list = true;
                     }
+                    else
+                    {
+                        if (hasPhotos) add_match_list = true;
+                    }
+                    
+                    
+                    if (add_match_list) matches.push({ id: doc.id, ...data });
                 }
             });
 
