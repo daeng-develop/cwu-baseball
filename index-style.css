@@ -120,35 +120,88 @@
     box-sizing: border-box;
 }
 
-/* [PC 화면] 5개 균등 배치 */
+/* --- 1. PC 화면: 카드 크기 제한 및 그리드 --- */
 .photo-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr); 
+    display: flex; /* grid 대신 flex로 변경하여 크기 제어 용이하게 함 */
+    flex-wrap: wrap; /* 자리가 부족하면 다음 줄로 넘어감 */
     gap: 15px;
     width: 100%;
+    margin-bottom: 20px;
 }
 
-/* [모바일 화면] 가로 스크롤 */
+.photo-card {
+    width: calc(25% - 15px); /* PC에서 4개씩 나란히 (여백 제외) */
+    min-width: 180px; /* 아무리 작아져도 180px 유지 */
+    max-width: 220px; /* 카드가 무식하게 커지는 것을 방지 (최대 220px) */
+    
+    background: var(--bg-white);
+    border: 1px solid var(--bg-light-gray);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.photo-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* --- 2. 이미지 영역: 카드 크기에 맞춰 꽉 차게 --- */
+.img-wrapper.single-wrapper {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5; 
+    position: relative;
+    overflow: hidden;
+    background-color: var(--bg-gray); /* 사진 로딩 전 배경색 */
+}
+
+.img-wrapper.single-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 사진 비율이 깨지지 않고 지정된 틀 안에 꽉 차도록 잘림 */
+    display: block;
+}
+
+/* --- 3. 모바일 반응형: 작고 귀여운 가로 스크롤 --- */
 @media (max-width: 768px) {
     .photo-grid {
         display: flex;
+        flex-wrap: nowrap; /* 모바일은 줄바꿈 없이 가로로 쭉 나열 */
         overflow-x: auto;
-        padding-bottom: 15px;
         gap: 12px;
-        -ms-overflow-style: none;
-        scrollbar-width: none;
+        padding-bottom: 12px;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
     }
+
+    /* 모바일 스크롤바 작게 디자인 */
     .photo-grid::-webkit-scrollbar {
-        display: none;
+        height: 5px; 
     }
+    .photo-grid::-webkit-scrollbar-thumb {
+        background-color: var(--border-light);
+        border-radius: 10px;
+    }
+
     .photo-card {
-        min-width: 140px; 
-        width: 140px;
-        flex-shrink: 0;
+        /* 모바일에서 카드 너비를 140px로 고정 (한 화면에 2.5개 정도 보여서 스와이프 유도) */
+        flex: 0 0 140px; 
+        max-width: 140px; 
+        scroll-snap-align: start; /* 넘길 때 카드 시작점에 딱딱 맞물림 */
     }
+
+    /* 텍스트 정보 영역 여백 살짝 축소 */
+    .card-info {
+        padding: 10px;
+    }
+
     .info-title { font-size: 0.85rem !important; }
     .info-date, .info-loc { font-size: 0.75rem !important; }
 }
+
 
 /* --- [카드 공통 스타일] --- */
 .photo-card {
@@ -175,60 +228,6 @@
     box-shadow: 0 8px 20px rgba(0,0,0,0.12);
 }
 
-/* --- [이미지 영역 (격자 무늬)] --- */
-.img-wrapper {
-    width: 100%;
-    aspect-ratio: 1 / 1; 
-    
-    /* 2x2 그리드 설정 */
-    display: grid;
-    grid-template-columns: 1fr 1fr; 
-    grid-template-rows: 1fr 1fr;    
-    
-    /* ⭐ [수정] gap 방식 대신 오버레이 방식을 쓰므로 gap은 0으로 설정 */
-    gap: 0; 
-    background: var(--bg-white);
-    
-    border-bottom: 1px solid var(--border-light);
-    position: relative; /* 십자선 배치를 위한 기준점 */
-}
-
-/* ⭐ [추가] 가로 선 강제 그리기 (사진 위에 뜸) */
-.img-wrapper::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 100%;
-    height: 2px; /* 선 두께 */
-    background-color: var(--bg-white); /* 선 색상 (흰색) */
-    z-index: 2; /* 사진보다 위에 오도록 설정 */
-    transform: translateY(-50%); /* 정확히 중앙 정렬 */
-    pointer-events: none; /* 클릭 방해 안 함 */
-}
-
-/* ⭐ [추가] 세로 선 강제 그리기 (사진 위에 뜸) */
-.img-wrapper::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 2px; /* 선 두께 */
-    height: 100%;
-    background-color: var(--bg-white); /* 선 색상 (흰색) */
-    z-index: 2; /* 사진보다 위에 오도록 설정 */
-    transform: translateX(-50%); /* 정확히 중앙 정렬 */
-    pointer-events: none;
-}
-
-/* 격자 안의 이미지들 */
-.img-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    /* 이미지가 선을 덮지 않도록 z-index 기본값 유지 */
-}
 
 /* 사진 없을 때 빈 공간 */
 .empty-photo {

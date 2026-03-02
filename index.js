@@ -115,20 +115,20 @@ async function loadRecentActivityPhotos() {
             const typeLabel = item.type === 'match' ? '경기' : '일정';
             const typeClass = item.type;
 
-            let photoGridHtml = '';
-            for (let i = 0; i < 4; i++) {
-                if (item.photos[i]) {
-                    photoGridHtml += `<img src="${item.photos[i]}" loading="lazy">`;
-                } else {
-                    photoGridHtml += `<div class="empty-photo"></div>`;
-                }
+            // ⭐ [수정된 부분] 4번 반복하는 for문을 지우고, 첫 번째 사진(index 0) 1장만 가져옵니다.
+            let singlePhotoHtml = '';
+            if (item.photos && item.photos.length > 0) {
+                // 사진이 있을 경우 첫 번째 사진만 삽입
+                singlePhotoHtml = `<img src="${item.photos[0]}" loading="lazy" alt="최근 사진">`;
+            } else {
+                // 사진이 없을 경우 빈 박스
+                singlePhotoHtml = `<div class="empty-photo"></div>`;
             }
 
             return `
                 <div class="photo-card" onclick="location.href='${linkUrl}'">
                     
-                    <div class="img-wrapper">
-                        ${photoGridHtml}
+                    <div class="img-wrapper single-wrapper"> ${singlePhotoHtml}
                         <span class="type-badge ${typeClass}">${typeLabel}</span>
                     </div>
 
