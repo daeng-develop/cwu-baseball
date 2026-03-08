@@ -576,10 +576,10 @@ function parseNameNum(value) {
 }
 
 // ==========================================
-// 3. 경기 기록 저장 (검증 포함)
+// 3. 경기 기록 저장
 // ==========================================
 async function saveMatchRecord() {
-if (!selectedMatchId) return;
+    if (!selectedMatchId) return;
     const btn = document.getElementById('btn-save-record');
     const statusEl = document.getElementById('match-result-status');
     if (!statusEl) return;
@@ -589,11 +589,14 @@ if (!selectedMatchId) return;
     btn.disabled = true;
     btn.innerText = "저장 중...";
 
-    // ⭐ updateData를 최상단에서 먼저 선언해야 아래의 if/else 블록에서 사용할 수 있습니다.
     const updateData = { status: status };
 
-    const detailCheckEl = document.getElementById('check-detail-record');
-    const isDetailChecked = detailCheckEl ? detailCheckEl.checked : false;
+    // ⭐ [수정 1] 분리된 체크박스를 최상단에서 읽어옵니다. (기존 detailCheckEl 삭제)
+    const checkScoreboardEl = document.getElementById('check-detail-scoreboard');
+    const checkLineupEl = document.getElementById('check-detail-lineup');
+    const isScoreboardChecked = checkScoreboardEl ? checkScoreboardEl.checked : false;
+    const isLineupChecked = checkLineupEl ? checkLineupEl.checked : false;
+
     const isSpecialStatus = ['no_record', 'rain_cancel', 'etc_cancel', 'rain_suspend', 'before'].includes(status);
 
     try {
@@ -602,28 +605,27 @@ if (!selectedMatchId) return;
             const nameHome = document.getElementById('name-home').textContent;
             const nameAway = document.getElementById('name-away').textContent;
             
-            const homeRun = Number(document.getElementById(`row-home`).querySelector('.r-val').value || 0);
-            const awayRun = Number(document.getElementById(`row-away`).querySelector('.r-val').value || 0);
+            // 문자열 그대로 가져와서 빈 칸인지 '0'인지 구분합니다.
+            const homeRunStr = document.getElementById(`row-home`).querySelector('.r-val').value.trim();
+            const awayRunStr = document.getElementById(`row-away`).querySelector('.r-val').value.trim();
+
+            const homeRun = Number(homeRunStr || 0);
+            const awayRun = Number(awayRunStr || 0);
 
             let ourScore = (nameHome === '청운대') ? homeRun : awayRun;
             let oppScore = (nameHome === '청운대') ? awayRun : homeRun;
 
-            // ⭐ [수정] 점수가 1점이라도 입력되었을 때만 검증 로직 작동 (0:0 이면 검증 패스)
-            const isScoreEntered = (homeRun > 0 || awayRun > 0);
+            // ⭐ [수정 2] 값 자체가 비어있지 않다면(즉, '0'을 직접 쳤다면) 검증을 통과하도록 수정
+            const isScoreEntered = (homeRunStr !== "" || awayRunStr !== "");
 
-           if (isScoreEntered) {
+            if (isScoreEntered) {
                 if (status === 'win' && ourScore <= oppScore) throw new Error("승리인데 점수가 낮거나 같습니다.");
                 if (status === 'loss' && ourScore >= oppScore) throw new Error("패배인데 점수가 높거나 같습니다.");
                 if (status === 'draw' && ourScore !== oppScore) throw new Error("무승부인데 점수가 다릅니다.");
             }
         }
 
-        const checkScoreboardEl = document.getElementById('check-detail-scoreboard');
-        const checkLineupEl = document.getElementById('check-detail-lineup');
-        const isScoreboardChecked = checkScoreboardEl ? checkScoreboardEl.checked : false;
-        const isLineupChecked = checkLineupEl ? checkLineupEl.checked : false;
-
-       // 3. [데이터 수집] - 분리된 로직
+        // 3. [데이터 수집] - 분리된 로직
         
         // (1) 상세 스코어보드 데이터 수집
         if (isSpecialStatus || !isScoreboardChecked) {
@@ -713,17 +715,10 @@ if (!selectedMatchId) return;
         }
 
         // 4. 공통 데이터 (총점수) 수집
-        // 총 점수는 체크 여부와 상관없이 항상 화면 값을 가져옴
         updateData['home-run'] = document.getElementById(`row-home`).querySelector('.r-val').value || "0";
         updateData['away-run'] = document.getElementById(`row-away`).querySelector('.r-val').value || "0";
         
-        // H, E, B는 상세 모드일 때만 화면 값 가져오고 아니면 "0"
-        updateData['home-hit'] = isDetailChecked ? (document.getElementById('h-home').value || "0") : "0";
-        updateData['home-error'] = isDetailChecked ? (document.getElementById('e-home').value || "0") : "0";
-        updateData['home-ball'] = isDetailChecked ? (document.getElementById('b-home').value || "0") : "0";
-        updateData['away-hit'] = isDetailChecked ? (document.getElementById('h-away').value || "0") : "0";
-        updateData['away-error'] = isDetailChecked ? (document.getElementById('e-away').value || "0") : "0";
-        updateData['away-ball'] = isDetailChecked ? (document.getElementById('b-away').value || "0") : "0";
+        // ⭐ [수정 3] 여기서 이전 값을 "0"으로 덮어씌우던 H, E, B 중복 코드를 완전히 제거했습니다!
 
         // 사진 처리 로직
         if (photosPendingDelete.length > 0) {

@@ -58,26 +58,15 @@ function renderMatchUI(data) {
 
 
     // --- 2. 스코어보드 ---
-    // ⭐ [추가 1] 점수-경기 상태 불일치 검증
-    const ourRun = data.homeAway === 'home' ? Number(data['home-run'] || 0) : Number(data['away-run'] || 0);
-    const oppRun = data.homeAway === 'home' ? Number(data['away-run'] || 0) : Number(data['home-run'] || 0);
     
-    let isMismatch = false;
-    // 승, 패, 무승부인데 점수가 논리적으로 맞지 않는 경우 (스코어 미입력 포함)
-    if (data.status === 'win' && ourRun <= oppRun) isMismatch = true;
-    if (data.status === 'loss' && ourRun >= oppRun) isMismatch = true;
-    if (data.status === 'draw' && ourRun !== oppRun) isMismatch = true;
-
-    // 특수 상태(취소, 중단, 경기전 등)인 경우도 점수 무효화
+    // ⭐ [수정 1] 승/패/무 논리 검증 삭제 
+    // (관리자 페이지에서 이미 검증하므로, 사용자 화면에서는 입력된 점수를 그대로 보여줍니다)
     const specialStatuses = ['no_record', 'rain_cancel', 'etc_cancel', 'rain_suspend', 'before'];
-    if (specialStatuses.includes(data.status)) isMismatch = true;
-
-    // ⭐ [추가 2] 이닝 배열이 모두 0으로만 채워져 있는지 확인 (단순 기록 모드 판별용)
-    const isAllZeros = (arr) => Array.isArray(arr) && arr.length > 0 && arr.every(val => val === "0" || val === 0 || val === "");
+    const isSpecialStatus = specialStatuses.includes(data.status);
 
     // 스코어 변수 초기화
-    let homeScoreArr = data['home-score'] || [];
-    let awayScoreArr = data['away-score'] || [];
+    let homeScoreArr = Array.isArray(data['home-score']) ? [...data['home-score']] : [];
+    let awayScoreArr = Array.isArray(data['away-score']) ? [...data['away-score']] : [];
     let homeR = data['home-run'] || 0;
     let awayR = data['away-run'] || 0;
     let homeH = data['home-hit'] || 0;
@@ -87,17 +76,49 @@ function renderMatchUI(data) {
     let homeB = data['home-ball'] || 0;
     let awayB = data['away-ball'] || 0;
 
-    if (isMismatch) {
-        // 불일치하거나 특수 상태면 모든 기록을 '-' 로 처리
+    // 이닝 배열이 모두 0으로만 채워져 있는지 확인 (단순 기록 모드 판별용)
+    const isAllZeros = (arr) => arr.length > 0 && arr.every(val => val === "0" || val === 0 || val === "");
+
+    if (isSpecialStatus) {
+        // 취소나 중단 같은 '특수 상태'일 때만 모든 기록을 '-' 로 처리
         homeScoreArr = []; awayScoreArr = [];
         homeR = '-'; awayR = '-';
         homeH = '-'; awayH = '-';
         homeE = '-'; awayE = '-';
         homeB = '-'; awayB = '-';
     } else {
-        // 정상 상태지만, 이닝 기록이 모두 0이면(상세 모드 미입력) 이닝만 '-' 표시
-        if (isAllZeros(homeScoreArr)) homeScoreArr = [];
-        if (isAllZeros(awayScoreArr)) awayScoreArr = [];
+        if (isAllZeros(homeScoreArr) && isAllZeros(awayScoreArr)) {
+            // 상세 스코어(이닝)를 적지 않은 경우 이닝 배열만 비우기 -> 테이블에 '-'로 표시됨
+            homeScoreArr = [];
+            awayScoreArr = [];
+        } else {
+            // ⭐ [수정 2] 연장전(10, 11, 12회) 점수가 없으면 '-' 처리 로직
+            let lastPlayed = 8; // 최소 9회(인덱스 8)까지는 진행했다고 기본 설정
+            
+            // 12회(인덱스 11)부터 10회(인덱스 9)까지 거꾸로 확인
+            for (let i = 11; i >= 9; i--) {
+                const hVal = String(homeScoreArr[i] || "0").trim();
+                const aVal = String(awayScoreArr[i] || "0").trim();
+                
+                // 홈이나 원정 중 하나라도 0이 아닌 득점이 있다면 그 이닝까지는 진행한 것 (0:0 연장전 포함)
+                if ((hVal !== "0" && hVal !== "") || (aVal !== "0" && aVal !== "")) {
+                    lastPlayed = Math.max(lastPlayed, i);
+                }
+            }
+
+            // 배열 정리
+            for (let i = 0; i < 12; i++) {
+                if (i > lastPlayed) {
+                    // 진행하지 않은 연장전 이닝은 '-' 로 변환
+                    homeScoreArr[i] = '-';
+                    awayScoreArr[i] = '-';
+                } else {
+                    // 진행한 이닝 중 입력값이 비어있으면 보기 좋게 '0'으로 채움
+                    if (homeScoreArr[i] === "" || homeScoreArr[i] === undefined) homeScoreArr[i] = "0";
+                    if (awayScoreArr[i] === "" || awayScoreArr[i] === undefined) awayScoreArr[i] = "0";
+                }
+            }
+        }
     }
 
     let topTeam = {}; 
@@ -127,7 +148,7 @@ function renderMatchUI(data) {
         };
     }
 
-    // 메인 스코어보드 (이제 '-'값도 정상적으로 들어갑니다)
+    // 메인 스코어보드 렌더링
     const sbMain = document.querySelector('.scoreboard-main');
     sbMain.querySelector('.away .team-name').textContent = topTeam.name;
     sbMain.querySelector('.home .team-name').textContent = btmTeam.name;
@@ -154,13 +175,14 @@ function renderMatchUI(data) {
         resLabel.style.display = 'none';
     }
 
-    // 상세 스코어 테이블
+    // 상세 스코어 테이블 렌더링
     const tableBody = document.querySelector('.score-table tbody');
     const rows = tableBody.querySelectorAll('tr'); 
     if (rows.length >= 2) {
         fillScoreRow(rows[0], topTeam);
         fillScoreRow(rows[1], btmTeam);
     }
+    
     // --- 3. 주요 기록 ---
     const statsContainer = document.querySelector('.match-key-stats');
     statsContainer.innerHTML = ''; 
