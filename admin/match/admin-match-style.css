@@ -406,3 +406,25 @@ input:disabled, select:disabled {
     min-width: 90px;
     box-sizing: border-box;
 }
+
+/* 삭제 버튼 스타일 (공통) */
+.btn-remove-row {
+    background: var(--bg-red);
+    color: var(--text-white);
+    border: none;
+    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    transition: 0.2s;
+}
+
+.btn-remove-row:hover {
+    background: var(--bg-red-light);
+    color: var(--text-red);
+}

@@ -174,88 +174,72 @@
             <div id="section-lineup" style="display: none;">
                 <hr class="divider">
                 <div class="lineup-section-wrapper">
-                    <div class="lineup-box">
-                        <h3 class="lineup-title">스타팅 라인업</h3>
-                        <table id="table-starting" class="lineup-table">
+                    <div class="lineup-box" style="overflow-x: auto;">
+                        <h3 class="lineup-title">타자 라인업 (이닝별 타석 결과)</h3>
+                        <table id="table-starting" class="lineup-table" style="min-width: 1300px;">
                             <thead>
                                 <tr>
-                                    <th width="10%">타순</th>
-                                    <th width="30%">선수명(배번) 검색</th>
-                                    <th width="20%">포지션</th>
-                                    <th width="20%">투타</th>
-                                    <th width="20%">결과 요약 (선택)</th>
+                                    <th width="60px">타순</th>
+                                    <th width="200px">선수명(배번)</th>
+                                    <th width="80px">포지션</th>
+                                    <th width="60px">투타</th>
+                                    <script>for (let i = 1; i <= 12; i++) document.write(`<th width="70px">${i}회</th>`);</script>
+                                    <th width="50px">삭제</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td><input type="text" class="input-field player-input"
-                                            placeholder="이름 입력 (예: 홍길동)"></td>
-                                    <td>
-                                        <select class="input-field pos-select">
-                                            <option value="">선택</option>
-                                            <option value="P">P (투수)</option>
-                                            <option value="C">C (포수)</option>
-                                            <option value="1B">1B (1루수)</option>
-                                            <option value="2B">2B (2루수)</option>
-                                            <option value="3B">3B (3루수)</option>
-                                            <option value="SS">SS (유격수)</option>
-                                            <option value="LF">LF (좌익수)</option>
-                                            <option value="CF">CF (중견수)</option>
-                                            <option value="RF">RF (우익수)</option>
-                                            <option value="DH">DH (지명타자)</option>
-                                        </select>
-                                    </td>
-                                    <td><input type="text" class="input-field type-input" placeholder="투타" readonly>
-                                    </td>
-                                    <td><input type="text" class="input-field stat-summary-input"
-                                            placeholder="예: 4타수 2안타"></td>
-                                </tr>
+                                <script>
+                                    for (let i = 1; i <= 9; i++) {
+                                        let inningInputs = "";
+                                        for (let j = 1; j <= 12; j++) inningInputs += `<td><input type="text" class="input-field inn-res-input"></td>`;
+                                        document.write(`
+                    <tr>
+                        <td><input type="text" class="input-field order-input" value="${i}" style="text-align:center;"></td> <td><input type="text" class="input-field player-input" placeholder="선수 검색"></td>
+                        <td>
+                            <select class="input-field pos-select">
+                                <option value="">선택</option>
+                                <option value="P">P</option><option value="C">C</option>
+                                <option value="1B">1B</option><option value="2B">2B</option>
+                                <option value="3B">3B</option><option value="SS">SS</option>
+                                <option value="LF">LF</option><option value="CF">CF</option>
+                                <option value="RF">RF</option><option value="DH">DH</option>
+                            </select>
+                        </td>
+                        <td><input type="text" class="input-field type-input" readonly></td>
+                        ${inningInputs}
+                        <td><button type="button" class="btn-remove-row" onclick="this.closest('tr').remove()">✕</button></td>
+                    </tr>
+                    `);
+                                    }
+                                </script>
                             </tbody>
                         </table>
+                        <button type="button" id="btn-add-batter" class="btn btn-register"
+                            style="margin-top: 10px; width: 100%;">+ 교체 타자 라인업 추가</button>
                     </div>
 
-                    <div class="lineup-box">
-                        <h3 class="lineup-title">투수 라인업</h3>
-                        <table id="table-pitcher" class="lineup-table">
+                    <div class="lineup-box" style="overflow-x: auto;">
+                        <h3 class="lineup-title">투수 기록 입력</h3>
+                        <table id="table-pitcher" class="lineup-table" style="min-width: 900px;">
                             <thead>
                                 <tr>
-                                    <th width="15%">등판순</th>
-                                    <th width="35%">선수명(배번) 검색</th>
-                                    <th width="25%">투구 이닝</th>
-                                    <th width="25%">결과 요약 (선택)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1 (선발)</td>
-                                    <td><input type="text" class="input-field player-input" placeholder="이름 입력"></td>
-                                    <td><input type="number" class="input-field" step="0.1" min="0"
-                                            placeholder="예: 5.1"></td>
-                                    <td><input type="text" class="input-field stat-summary-input"
-                                            placeholder="예: 5이닝 3K 무실점"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="lineup-box">
-                        <h3 class="lineup-title">교체 명단</h3>
-                        <table id="table-bench" class="lineup-table">
-                            <thead>
-                                <tr>
-                                    <th width="15%">이닝</th>
-                                    <th>IN 선수명(배번)</th>
-                                    <th width="20%">사유</th>
-                                    <th>OUT 선수명(배번)</th>
-                                    <th width="10%">삭제</th>
+                                    <th width="80px">순서</th>
+                                    <th width="200px">선수명(배번)</th>
+                                    <th width="80px">이닝</th>
+                                    <th width="60px">피안타</th>
+                                    <th width="60px">4사구</th>
+                                    <th width="60px">삼진</th>
+                                    <th width="60px">실점</th>
+                                    <th width="60px">자책</th>
+                                    <th>비고</th>
+                                    <th width="50px">삭제</th>
                                 </tr>
                             </thead>
                             <tbody>
                             </tbody>
                         </table>
-                        <button type="button" id="btn-add-bench" class="btn btn-register"
-                            style="margin-top: 10px; width: 100%; font-size: 0.9rem;">+ 교체 선수 추가</button>
+                        <button type="button" id="btn-add-pitcher" class="btn btn-register"
+                            style="margin-top: 10px; width: 100%;">+ 투수 추가</button>
                     </div>
                 </div>
             </div>
