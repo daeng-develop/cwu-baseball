@@ -399,3 +399,10 @@ input:disabled, select:disabled {
     cursor: not-allowed;
     border-color: var(--border-light) !important;
 }
+
+/* 새로 추가된 결과 요약 입력칸 */
+.stat-summary-input {
+    width: 100%;
+    min-width: 90px;
+    box-sizing: border-box;
+}

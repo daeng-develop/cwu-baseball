@@ -425,3 +425,24 @@ thead .b-col {
         margin-bottom: 10px;
     }
 }
+
+/* 타임라인 스타일 */
+.match-timeline-container { text-align: left; background: var(--bg-white); padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.timeline-inning-block { margin-bottom: 20px; border-left: 3px solid var(--main-clr); padding-left: 15px; position: relative; }
+.inning-badge { font-weight: bold; color: var(--main-clr); margin-bottom: 8px; font-size: 1.1rem; }
+.timeline-event { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--border-light); }
+.timeline-event:last-child { border-bottom: none; }
+.event-badge { padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; color: #fff; }
+.event-badge.pinch_hitter { background: #e67e22; }
+.event-badge.pinch_runner { background: #27ae60; }
+.event-badge.pitcher_change { background: #2980b9; }
+.event-badge.defense_change { background: #8e44ad; }
+.event-text { font-size: 0.95rem; color: var(--text-dark); }
+
+/* 선수별 기록 요약 스타일 */
+.player-stats-container { text-align: left; background: var(--bg-white); padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.sub-title { font-size: 1.2rem; color: var(--text-dark); margin-bottom: 10px; border-bottom: 2px solid var(--main-clr); padding-bottom: 5px; display: inline-block; }
+.stats-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; text-align: center; }
+.stats-table th { background: var(--bg-light-gray); padding: 10px; border-bottom: 1px solid var(--border-light); font-size: 0.9rem; }
+.stats-table td { padding: 10px; border-bottom: 1px solid var(--border-light); font-size: 0.95rem; }
+.badge-win { background: #d62828; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; }
