@@ -211,7 +211,7 @@ function renderMatchUI(data) {
                     <table class="stats-table" style="min-width: 800px;">
                         <thead>
                             <tr>
-                                <th>순서</th><th>이름</th><th>이닝</th><th>H</th><th>BB</th><th>K</th><th>R</th><th>ER</th><th>비고</th>
+                                <th>순서</th><th>이름</th><th>이닝</th><th>피안타</th><th>4사구</th><th>삼진</th><th>실점</th><th>자책</th><th>비고</th>
                             </tr>
                         </thead>
                         <tbody>
