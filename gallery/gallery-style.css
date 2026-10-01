@@ -1,0 +1,21 @@
+.gallery {
+  columns: 4 190px;
+  column-gap: 14px;
+}
+.gallery figure {
+  margin: 0 0 15px;
+  background: white;
+  border: 1px solid var(--line);
+  break-inside: avoid;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.gallery img {
+  width: 100%;
+  height: auto;
+}
+.gallery figcaption {
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--slate);
+}

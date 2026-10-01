@@ -1,0 +1,5 @@
+{
+  "firestore": { "rules": "common/firebase.rules" },
+  "storage": { "rules": "common/storage.rules" },
+  "functions": [{ "source": "functions", "codebase": "default" }]
+}

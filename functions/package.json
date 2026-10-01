@@ -1,0 +1,12 @@
+{
+  "name": "cwu-baseball-functions",
+  "private": true,
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-functions": "^6.1.0",
+    "cheerio": "^1.0.0"
+  }
+}

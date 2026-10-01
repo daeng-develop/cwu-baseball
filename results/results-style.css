@@ -1,0 +1,321 @@
+.result-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 22px;
+}
+.game-list {
+  align-self: start;
+  max-height: 650px;
+  overflow: auto;
+}
+.game-list button {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  text-align: left;
+  background: white;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--navy);
+}
+.game-list button.active {
+  border-left: 4px solid var(--green);
+  background: #edf4f8;
+}
+.game-list small {
+  display: block;
+  color: var(--slate);
+}
+.game-detail {
+  padding: 25px;
+  min-width: 0;
+}
+.score-head {
+  text-align: center;
+  padding: 20px 0;
+}
+.score-head h2 {
+  font-size: clamp(23px, 3vw, 32px);
+  margin: 8px 0;
+}
+.score-head .big-score {
+  font-size: clamp(32px, 5vw, 58px);
+  font-weight: 700;
+  color: var(--blue);
+}
+.scroll-table {
+  overflow-x: auto;
+}
+.data-table {
+  border-collapse: collapse;
+  min-width: 550px;
+  width: 100%;
+  font-size: 14px;
+}
+.data-table th,
+.data-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+}
+.data-table th:first-child,
+.data-table td:first-child {
+  text-align: left;
+  white-space: nowrap;
+}
+.data-table th {
+  background: #eff3f6;
+}
+.game-detail h3 {
+  margin: 35px 0 10px;
+}
+.masonry {
+  columns: 3 200px;
+  column-gap: 12px;
+}
+.masonry img {
+  width: 100%;
+  height: auto;
+  break-inside: avoid;
+  margin-bottom: 12px;
+  border-radius: 5px;
+}
+@media (max-width: 760px) {
+  .result-layout {
+    grid-template-columns: 1fr;
+  }
+  .game-list {
+    display: flex;
+    overflow: auto;
+    max-height: none;
+  }
+  .game-list button {
+    min-width: 145px;
+  }
+  .game-detail {
+    padding: 15px;
+  }
+  .masonry {
+    columns: 2 140px;
+  }
+}
+
+.detail-table {
+  min-width: 870px;
+}
+.detail-table td small {
+  display: block;
+  color: var(--slate);
+  font-size: 11px;
+}
+.substitute-row {
+  background: #f2f7fb;
+}
+.game-sidebar {
+  min-width: 0;
+  align-self: start;
+  overflow: hidden;
+}
+.game-sidebar label {
+  display: block;
+  padding: 16px 14px 6px;
+  color: var(--navy);
+  font-weight: 700;
+}
+.game-sidebar select {
+  display: block;
+  width: calc(100% - 28px);
+  margin: 0 14px 14px;
+  padding: 9px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--navy);
+  background: white;
+}
+.competition-group h2 {
+  margin: 0;
+  padding: 10px 14px;
+  background: #eaf1f6;
+  color: var(--blue);
+  font-size: 13px;
+}
+.game-list button span {
+  display: block;
+}
+.game-list button strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--blue);
+}
+.game-meta {
+  display: grid;
+  gap: 4px;
+  margin: 12px 0 18px;
+  color: var(--slate);
+  font-size: 14px;
+}
+.game-meta strong {
+  color: var(--navy);
+  font-size: 17px;
+}
+.data-table .score-r {
+  background: var(--blue);
+  color: white;
+  font-weight: 800;
+}
+.data-table .score-h {
+  background: #e7f0fa;
+  color: var(--navy);
+  font-weight: 800;
+}
+.data-table .score-e {
+  background: #fce9e8;
+  color: #b23b38;
+  font-weight: 800;
+}
+.data-table .score-b {
+  background: #e8f5eb;
+  color: #237a45;
+  font-weight: 800;
+}
+@media (max-width: 760px) {
+  .game-list {
+    display: block;
+    max-height: 220px;
+  }
+  .game-list button {
+    min-width: 0;
+  }
+  .game-meta {
+    font-size: 12px;
+  }
+}
+/* Calm game day presentation */
+.game-sidebar,
+.game-detail {
+  border-radius: 20px;
+  box-shadow: 0 8px 24px #163b5b10;
+}
+.game-detail {
+  background: #fff;
+  border: 1px solid #e3ebf0;
+}
+.game-sidebar select {
+  border-radius: 11px;
+  background: #f8fbfc;
+}
+.competition-group h2 {
+  background: #edf5f8;
+  border-left: 3px solid var(--green);
+  padding: 11px 14px;
+}
+.game-list {
+  padding: 5px;
+}
+.game-list button {
+  border: 1px solid transparent;
+  border-radius: 12px;
+  margin: 3px 0;
+  padding: 13px;
+}
+.game-list button:hover {
+  background: #f3f8fa;
+}
+.game-list button.active {
+  border: 1px solid #c8dfd0;
+  border-left: 4px solid var(--green);
+  background: #f0f8f3;
+}
+.score-head {
+  border-radius: 17px;
+  padding: 21px 12px;
+  background: linear-gradient(135deg, #edf5fb, #f1f8f1);
+}
+.score-head .big-score {
+  letter-spacing: 0.04em;
+}
+.game-meta {
+  padding: 3px 0;
+}
+.game-detail h3 {
+  color: var(--navy);
+  font-size: 18px;
+}
+.game-detail .scroll-table {
+  border: 1px solid #e3ebf0;
+  border-radius: 12px;
+}
+.game-detail .data-table th {
+  background: #edf4f8;
+  color: var(--navy);
+}
+.game-detail .data-table tbody tr:nth-child(even) {
+  background: #f8fafb;
+}
+.masonry img {
+  border-radius: 13px;
+  box-shadow: 0 6px 16px #173b621a;
+}
+@media (max-width: 760px) {
+  .game-detail {
+    padding: 15px;
+  }
+  .score-head {
+    padding: 17px 7px;
+  }
+  .game-list {
+    padding: 4px;
+  }
+}
+/* R/H/E/B are easy to distinguish in both header and totals. */
+.game-detail .data-table .score-r {
+  background: #294f87;
+  color: #fff;
+}
+.game-detail .data-table .score-h {
+  background: #e1eafc;
+  color: #244d91;
+}
+.game-detail .data-table .score-e {
+  background: #fde8e5;
+  color: #ab383c;
+}
+.game-detail .data-table .score-b {
+  background: #e1f5e7;
+  color: #236c42;
+}
+.game-detail .data-table thead .score-r {
+  background: #173e72;
+  color: #fff;
+}
+.game-detail .data-table thead .score-h {
+  background: #3e6cba;
+  color: #fff;
+}
+.game-detail .data-table thead .score-e {
+  background: #bd5658;
+  color: #fff;
+}
+.game-detail .data-table thead .score-b {
+  background: #368b5d;
+  color: #fff;
+}
+.game-detail .data-table tbody tr:first-child .score-r {
+  box-shadow: inset 0 2px #5f86b6;
+}
+.game-detail .data-table .score-r,
+.game-detail .data-table .score-h,
+.game-detail .data-table .score-e,
+.game-detail .data-table .score-b {
+  min-width: 38px;
+  border-left: 2px solid #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.result-selectors { display: grid; gap: 12px; padding: 15px; background: #f3f7fa; border: 1px solid #e0e8ef; border-radius: 16px; margin-bottom: 16px; }
+.result-select-field { display: grid; gap: 6px; margin: 0; }
+.result-select-field > span { color: #5c7288; font-size: 12px; font-weight: 700; padding-left: 3px; }
+.game-sidebar .result-select-field select { width: 100%; margin: 0; min-height: 44px; padding: 10px 34px 10px 13px; border: 1px solid #d3dfe9; border-radius: 12px; background-color: white; color: var(--navy); box-shadow: 0 2px 5px #15345408; font: inherit; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%235c7288' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E"); background-position: right 12px center; background-repeat: no-repeat; }
+.game-sidebar .result-select-field select:focus-visible { outline: 3px solid #bcdacb; outline-offset: 2px; border-color: #75a98d; }
+
+.fielding-positions { line-height: 1.65; white-space: nowrap; }

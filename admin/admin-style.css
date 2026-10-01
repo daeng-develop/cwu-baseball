@@ -1,0 +1,316 @@
+.admin-wrap {
+  max-width: 1100px;
+  margin: auto;
+}
+.login {
+  max-width: 420px;
+  margin: 50px auto;
+  padding: 28px;
+}
+.login h2 {
+  margin-top: 0;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 15px;
+}
+.form-grid .wide {
+  grid-column: 1/-1;
+}
+.tabs {
+  display: flex;
+  gap: 8px;
+  overflow: auto;
+  margin: 20px 0;
+}
+.tabs button.active {
+  background: var(--blue);
+  color: #fff;
+}
+.admin-panel {
+  padding: 23px;
+  margin-bottom: 24px;
+}
+.admin-panel h2 {
+  margin-top: 0;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 17px 0;
+}
+.admin-list {
+  display: grid;
+  gap: 8px;
+}
+.admin-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  padding: 12px 0;
+}
+.admin-item small {
+  color: var(--slate);
+}
+.admin-item .actions {
+  margin: 0;
+}
+.hint {
+  font-size: 13px;
+  color: var(--slate);
+}
+.desktop-only {
+  display: none;
+}
+@media (max-width: 900px), (pointer: coarse) {
+  #admin-app {
+    display: none;
+  }
+  .desktop-only {
+    display: block;
+    padding: 40px 0;
+  }
+}
+@media (max-width: 760px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.roster-preview-table {
+  overflow: auto;
+  max-height: 330px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: white;
+}
+.roster-preview-table table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 720px;
+  font-size: 13px;
+}
+.roster-preview-table th,
+.roster-preview-table td {
+  padding: 7px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.roster-preview-table th {
+  position: sticky;
+  top: 0;
+  background: #edf3f7;
+}
+.preview-warning {
+  padding: 14px 18px;
+  border: 1px solid #b48729;
+  border-radius: 6px;
+  background: #fff4d8;
+  color: #604611;
+  font-size: 14px;
+}
+.import-preview {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--green);
+  border-radius: 7px;
+  background: #f8fbff;
+  padding: 17px;
+  margin: 15px 0 23px;
+}
+.import-preview h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+.import-preview .hint {
+  margin: 0 0 12px;
+}
+.import-table-wrap {
+  overflow-x: auto;
+  max-height: 430px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+.import-table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 820px;
+  font-size: 13px;
+}
+.import-table th,
+.import-table td {
+  padding: 9px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.import-table th {
+  position: sticky;
+  top: 0;
+  background: #eaf1fb;
+}
+.import-table select {
+  width: 175px;
+  padding: 6px;
+  border: 1px solid var(--silver);
+  border-radius: 4px;
+  background: white;
+  color: var(--navy);
+}
+.local-import {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 12px 0;
+  padding: 14px;
+  border-radius: 6px;
+  background: #eef4fb;
+}
+.local-import .field {
+  flex: 1;
+  min-width: 260px;
+}
+.record-group {
+  border: 1px solid #dce8ec;
+  border-radius: 13px;
+  overflow: hidden;
+  background: #fff;
+}
+.record-group summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px 17px;
+  cursor: pointer;
+  background: #f5f9fa;
+  color: var(--slate);
+}
+.record-group[open] summary {
+  background: #eaf5ed;
+}
+.record-group summary strong {
+  color: var(--navy);
+}
+.record-group summary small {
+  margin-left: auto;
+  padding: 5px 9px;
+  background: #fff;
+  border-radius: 99px;
+  color: var(--green);
+  font-weight: 800;
+}
+.record-date {
+  color: var(--blue);
+  font-weight: 800;
+}
+.record-people {
+  padding: 3px 16px;
+}
+.history-import {
+  padding: 18px;
+  margin-bottom: 18px;
+  border-radius: 15px;
+  background: #f3f8fa;
+}
+.history-import h3 {
+  margin: 0 0 7px;
+  color: var(--navy);
+}
+.history-import .actions .field {
+  flex: 1;
+  min-width: 300px;
+}
+.game-records {
+  border: 1px solid #deeaec;
+  border-radius: 12px;
+  background: #f7fafb;
+  margin: 2px 0 12px;
+}
+.game-records summary {
+  cursor: pointer;
+  padding: 10px 14px;
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 800;
+}
+.game-records .record-people {
+  padding: 4px 14px 8px;
+  background: #fff;
+  border-radius: 0 0 12px 12px;
+}
+.record-editor {
+  border: 2px solid #aacdb8;
+}
+.record-edit-groups {
+  display: grid;
+  gap: 14px;
+}
+.record-edit-groups fieldset {
+  border: 1px solid #e0eaee;
+  border-radius: 13px;
+  padding: 16px;
+}
+.record-edit-groups legend {
+  padding: 0 8px;
+  color: var(--navy);
+  font-weight: 800;
+}
+.history-import-table {
+  min-width: 860px;
+}
+.history-import-table td {
+  vertical-align: middle;
+}
+.history-import-table td small {
+  display: block;
+  margin-top: 4px;
+  color: var(--slate);
+}
+.history-import-table td:first-child {
+  font-weight: 800;
+  color: var(--blue);
+}
+.history-import-table select {
+  width: 100%;
+  min-width: 220px;
+  border-radius: 9px;
+  padding: 9px;
+}
+.history-import-table tbody tr:hover {
+  background: #eef7f1;
+}
+.history-import-table tbody tr.history-name-match {
+  background: #edf8ef;
+}
+.history-import-table tbody tr.history-name-match td:first-child {
+  border-left: 4px solid #4a9b69;
+}
+.history-import-table tbody tr.history-name-match:hover {
+  background: #e3f3e8;
+}
+.name-match-badge {
+  display: inline-block;
+  margin: 3px 0 0 8px;
+  padding: 4px 8px;
+  border-radius: 99px;
+  background: #d7efdf;
+  color: #226840;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.import-table tbody tr.name-review { background: #fff4de; }
+.import-table tbody tr.name-review:hover { background: #ffebc1; }
+.import-table .name-review-badge { display: inline-block; margin-left: 6px; padding: 3px 7px; border-radius: 999px; background: #ffe1a0; color: #66400b; font-weight: 700; }
+.import-table select.name-review-select { border-color: #d69a2d; background: #fffaf0; box-shadow: 0 0 0 2px rgba(214,154,45,.13); }
+
+.record-update-tools { margin: 12px 0; }
+.record-update-tools > summary { width: fit-content; cursor: pointer; padding: 7px 10px; color: var(--navy); font-size: 13px; }
+.record-update-tools[open] > summary { margin-bottom: 8px; font-weight: 700; }

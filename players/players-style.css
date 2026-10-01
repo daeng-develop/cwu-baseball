@@ -1,0 +1,697 @@
+.filters {
+  display: flex;
+  align-items: end;
+  gap: 24px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  padding: 18px 20px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.season-control,
+.position-filter legend {
+  color: var(--slate);
+  font-size: 13px;
+  font-weight: 700;
+}
+.season-control {
+  display: grid;
+  gap: 7px;
+}
+.season-control select {
+  min-width: 112px;
+  border: 1px solid var(--silver);
+  border-radius: 7px;
+  padding: 9px 30px 9px 13px;
+  background: #fff;
+  color: var(--navy);
+  font-weight: 700;
+}
+.season-control select:focus-visible,
+.position-chip:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 2px;
+}
+.position-filter {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.position-filter legend {
+  padding: 0;
+  margin-bottom: 7px;
+}
+.position-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.position-chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f8fafc;
+  color: var(--navy);
+  padding: 8px 15px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+.position-chip:hover {
+  border-color: var(--green);
+  background: #eef9f0;
+}
+.position-chip.active {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #fff;
+  box-shadow: inset 0 -3px var(--green);
+}
+.player-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+.player-card {
+  text-align: left;
+  background: white;
+  border: 1px solid var(--line);
+  padding: 0;
+  border-radius: 7px;
+  overflow: hidden;
+  color: inherit;
+}
+.player-card:hover {
+  border-color: var(--green);
+  box-shadow: 0 10px 24px #183b6120;
+  transform: translateY(-2px);
+}
+.player-photo {
+  aspect-ratio: 4/5;
+  object-fit: cover;
+  width: 100%;
+  background: #e3e9ee;
+}
+.player-placeholder {
+  aspect-ratio: 4/5;
+  display: grid;
+  place-items: center;
+  background: #e3e9ee;
+  color: #8b9caf;
+  font-size: 40px;
+}
+.player-info {
+  padding: 13px 15px;
+}
+.player-info strong {
+  font-size: 25px;
+}
+.player-info p {
+  margin: 4px 0 0;
+  color: var(--slate);
+  font-size: 13px;
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 25px;
+}
+.detail-grid img {
+  width: 100%;
+  aspect-ratio: 4/5;
+  object-fit: cover;
+}
+.stat-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.stat-list div {
+  background: #f2f6f8;
+  padding: 10px;
+  border-radius: 5px;
+}
+@media (max-width: 760px) {
+  .filters {
+    gap: 15px;
+    padding: 14px;
+  }
+  .position-filter {
+    width: 100%;
+  }
+  .position-chip {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  .player-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .player-info {
+    padding: 10px;
+  }
+  .player-info strong {
+    font-size: 20px;
+  }
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .detail-grid img {
+    max-width: 160px;
+  }
+  .stat-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.modal {
+  width: min(1080px, calc(100vw - 24px));
+  max-width: 1080px;
+  max-height: 90vh;
+}
+.record-tabs {
+  display: flex;
+  gap: 5px;
+  margin-top: 24px;
+  border-bottom: 2px solid var(--blue);
+}
+.record-tabs button {
+  border: 0;
+  padding: 12px 28px;
+  background: #e9eef2;
+  color: var(--slate);
+  font-weight: 700;
+  cursor: pointer;
+}
+.record-tabs button[aria-selected='true'] {
+  color: white;
+  background: var(--blue);
+}
+.record-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 8px;
+}
+.record-summary div {
+  padding: 12px;
+  background: #f1f5f8;
+  border-radius: 5px;
+  display: grid;
+  gap: 4px;
+}
+.record-summary small {
+  color: var(--slate);
+}
+.record-summary strong {
+  color: var(--navy);
+  font-size: 18px;
+}
+#role-records h3 {
+  margin: 25px 0 10px;
+}
+#role-records .detail-table {
+  min-width: 750px;
+}
+@media (max-width: 760px) {
+  .record-tabs button {
+    flex: 1;
+    padding: 10px;
+  }
+  .modal {
+    width: calc(100vw - 16px);
+  }
+}
+/* Soft baseball card styling */
+.player-card {
+  border-radius: 18px;
+  box-shadow: 0 7px 22px #173b6210;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.player-info strong {
+  color: var(--navy);
+}
+.modal {
+  border: 1px solid #d9e6ed;
+  border-radius: 22px;
+  box-shadow: 0 25px 75px #102d4950;
+}
+.modal-body {
+  padding: clamp(18px, 3vw, 30px);
+}
+.detail-grid {
+  padding: 16px;
+  border-radius: 18px;
+  background: linear-gradient(120deg, #edf5f9, #f5faf5);
+  align-items: center;
+}
+.detail-grid img {
+  border-radius: 13px;
+}
+.profile-kicker {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  font-weight: 800;
+  color: var(--green);
+}
+.profile-position {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--navy);
+  margin: 8px 0 15px;
+}
+.profile-position span {
+  font-size: 14px;
+  color: var(--slate);
+}
+.profile-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.profile-badges span {
+  border-radius: 99px;
+  background: white;
+  padding: 7px 11px;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 700;
+}
+.record-scope {
+  display: flex;
+  gap: 7px;
+  margin-top: 25px;
+  padding: 5px;
+  background: #edf3f6;
+  border-radius: 15px;
+  width: fit-content;
+}
+.record-scope button {
+  border: 0;
+  border-radius: 11px;
+  padding: 9px 16px;
+  background: transparent;
+  color: var(--slate);
+  cursor: pointer;
+  font-weight: 700;
+}
+.record-scope button.active {
+  background: white;
+  color: var(--navy);
+  box-shadow: 0 2px 8px #143a591c;
+}
+.record-scope small {
+  color: var(--green);
+}
+.scope-note {
+  padding: 10px 14px;
+  background: #eff8ef;
+  border-radius: 10px;
+  color: #315b42;
+  font-size: 13px;
+}
+.record-tabs {
+  border: 0;
+  gap: 7px;
+  margin-top: 16px;
+}
+.record-tabs button {
+  border-radius: 11px;
+  padding: 10px 20px;
+  background: #f1f5f7;
+  cursor: pointer;
+}
+.record-tabs button[aria-selected='true'] {
+  border-radius: 11px;
+  background: var(--blue);
+}
+.record-summary div {
+  border-radius: 12px;
+  background: #f0f6f9;
+  border: 1px solid #e2ecf2;
+}
+#role-records h3 {
+  color: var(--navy);
+  font-size: 17px;
+}
+.detail-table th {
+  background: #e9f1f5;
+}
+.detail-table tbody tr:nth-child(even) {
+  background: #f8fbfc;
+}
+@media (max-width: 760px) {
+  .modal-body {
+    padding: 16px;
+  }
+  .detail-grid {
+    gap: 12px;
+  }
+  .profile-position {
+    font-size: 18px;
+  }
+  .record-scope {
+    width: 100%;
+  }
+  .record-scope button {
+    flex: 1;
+    padding: 9px 6px;
+    font-size: 12px;
+  }
+}
+/* Record filters and spacious summaries */
+.record-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+  margin-top: 22px;
+}
+.record-filter .record-scope {
+  margin: 0;
+}
+.record-dates:not([hidden]) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.record-dates label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--slate);
+}
+.record-dates input {
+  border: 1px solid #d9e7ec;
+  border-radius: 10px;
+  padding: 8px;
+  background: white;
+  color: var(--navy);
+  font: inherit;
+}
+#role-records h3 {
+  margin: 30px 0 12px;
+  padding-left: 11px;
+  border-left: 4px solid var(--green);
+}
+#role-records .scroll-table {
+  border: 1px solid #e2ebef;
+  border-radius: 15px;
+  background: white;
+  box-shadow: 0 6px 20px #173b620c;
+}
+#role-records .detail-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 870px;
+  font-size: 13px;
+}
+#role-records .detail-table th {
+  padding: 14px 12px;
+  white-space: nowrap;
+  border-bottom: 1px solid #dce8ed;
+}
+#role-records .detail-table td {
+  padding: 15px 12px;
+  line-height: 1.5;
+  border-bottom: 1px solid #edf1f3;
+  white-space: nowrap;
+}
+#role-records .detail-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+#role-records .detail-table tbody tr:hover {
+  background: #eff8f2;
+}
+#role-records .detail-table td:first-child {
+  white-space: normal;
+  min-width: 165px;
+  font-weight: 700;
+  color: var(--navy);
+}
+.table-date,
+.table-opponent {
+  display: block;
+}
+.table-date {
+  color: var(--blue);
+  font-weight: 700;
+}
+.table-opponent {
+  font-size: 12px;
+  color: var(--slate);
+}
+.record-summary {
+  gap: 10px;
+}
+.record-summary div {
+  padding: 15px 12px;
+}
+@media (max-width: 760px) {
+  .record-filter .record-scope {
+    width: 100%;
+  }
+  .record-filter .record-scope button {
+    font-size: 11px;
+  }
+  .record-dates {
+    width: 100%;
+  }
+  .record-dates label {
+    flex: 1;
+    min-width: 120px;
+  }
+  .record-dates input {
+    width: 100%;
+  }
+}
+.competition-stats {
+  display: grid;
+  gap: 14px;
+}
+.competition-stat {
+  border: 1px solid #e0e9ed;
+  border-radius: 16px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 7px 18px #173b620d;
+}
+.competition-stat-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 18px;
+  background: linear-gradient(100deg, #edf5fa, #f0f8f1);
+  color: var(--navy);
+}
+.competition-stat-head strong {
+  font-size: 15px;
+}
+.competition-stat-head span {
+  white-space: nowrap;
+  font-size: 12px;
+  color: var(--slate);
+}
+.competition-stat-head b {
+  color: var(--blue);
+  font-size: 16px;
+}
+.competition-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 1px;
+  background: #e9f0f3;
+  border-top: 1px solid #e9f0f3;
+}
+.competition-metrics div {
+  display: grid;
+  gap: 6px;
+  padding: 13px 12px;
+  background: #fff;
+  text-align: center;
+}
+.competition-metrics small {
+  color: var(--slate);
+  font-size: 11px;
+}
+.competition-metrics strong {
+  color: var(--navy);
+  font-size: 16px;
+}
+@media (max-width: 760px) {
+  .competition-stat-head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .competition-metrics {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+#role-records .scroll-table {
+  max-width: 100%;
+  overflow-x: auto;
+}
+@media (max-width: 760px) {
+  #role-records .scroll-table {
+    overflow: visible;
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+  }
+  #role-records .detail-table {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+  }
+  #role-records .detail-table thead {
+    display: none;
+  }
+  #role-records .detail-table tbody {
+    display: grid;
+    gap: 12px;
+  }
+  #role-records .detail-table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    border: 1px solid #e0eaee;
+    border-radius: 15px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 5px 17px #173b620e;
+  }
+  #role-records .detail-table tbody tr:nth-child(even) {
+    background: #fff;
+  }
+  #role-records .detail-table td,
+  #role-records .detail-table td:first-child {
+    display: grid;
+    align-content: start;
+    gap: 3px;
+    min-width: 0;
+    padding: 10px 12px;
+    border-right: 1px solid #edf1f3;
+    border-bottom: 1px solid #edf1f3;
+    white-space: normal;
+    text-align: left;
+    font-size: 13px;
+  }
+  #role-records .detail-table td:first-child {
+    grid-column: 1 / -1;
+    background: #eff6f9;
+  }
+  #role-records .detail-table td::before {
+    content: attr(data-label);
+    display: block;
+    color: #6d8294;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  #role-records .detail-table td:first-child::before {
+    display: none;
+  }
+  #role-records .detail-table .table-opponent {
+    font-size: 12px;
+  }
+  #role-records .detail-table tr.no-records td {
+    grid-column: 1 / -1;
+  }
+}
+.record-view-tabs {
+  display: flex;
+  gap: 7px;
+  margin: 18px 0 10px;
+  padding: 5px;
+  width: fit-content;
+  border: 1px solid #e1e9ee;
+  border-radius: 13px;
+  background: #f7fafb;
+}
+.record-view-tabs button {
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--slate);
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.record-view-tabs button[aria-selected='true'] {
+  background: #e3f1e8;
+  color: #216943;
+  box-shadow: 0 2px 7px #173b6212;
+}
+.record-view-tabs button:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+.modal {
+  scrollbar-width: thin;
+  scrollbar-color: #b7c9d5 transparent;
+}
+#role-records {
+  min-width: 0;
+}
+#role-records h3 {
+  margin-top: 18px;
+}
+@media (max-width: 760px) {
+  .record-view-tabs {
+    width: 100%;
+  }
+  .record-view-tabs button {
+    flex: 1;
+    padding: 9px 4px;
+    font-size: 11px;
+  }
+}
+
+.year-stats {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+.year-stat {
+  overflow: hidden;
+  border: 1px solid #deeaee;
+  border-radius: 12px;
+  background: #fff;
+}
+.year-stat summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 15px;
+  cursor: pointer;
+  color: var(--navy);
+  font-size: 13px;
+}
+.year-stat summary strong {
+  font-size: 15px;
+}
+.year-stat summary span {
+  color: var(--slate);
+}
+.year-stat summary b {
+  color: var(--blue);
+}
+.year-stat[open] summary {
+  background: #edf5f1;
+}
+.year-stat .competition-metrics {
+  border-top: 1px solid #e9f0f3;
+}

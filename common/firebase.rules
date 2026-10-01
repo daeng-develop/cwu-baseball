@@ -1,0 +1,29 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Browser-only password gates are not visible to Firestore Rules.
+    // These collections are publicly writable by anyone who knows the project ID.
+    match /games/{id} {
+      allow read, write: if true;
+    }
+    match /players/{id} {
+      allow read, write: if true;
+    }
+    match /playerGameStats/{id} {
+      allow read, write: if true;
+    }
+    match /playerHistoryStats/{id} {
+      allow read, write: if true;
+    }
+    match /events/{id} {
+      allow read, write: if true;
+    }
+    match /photos/{id} {
+      allow read, write: if true;
+    }
+    match /settings/{id} {
+      allow read, write: if true;
+    }
+  }
+}
