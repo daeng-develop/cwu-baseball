@@ -314,3 +314,8 @@
 .record-update-tools { margin: 12px 0; }
 .record-update-tools > summary { width: fit-content; cursor: pointer; padding: 7px 10px; color: var(--navy); font-size: 13px; }
 .record-update-tools[open] > summary { margin-bottom: 8px; font-weight: 700; }
+
+.history-record-filters { display: flex; flex-wrap: wrap; gap: 14px; align-items: end; margin: 18px 0 10px; }
+.history-record-filters .field { flex: 1 1 180px; margin: 0; }
+.history-record-filters select { width: 100%; min-height: 44px; border-radius: 12px; border: 1px solid #d9e2e0; background: #f8fbfa; padding: 10px 12px; color: #193e35; }
+.history-record-filters select:focus { outline: 2px solid #a6c9bb; outline-offset: 2px; }

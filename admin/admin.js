@@ -1,3 +1,4 @@
+import { recordCompetition, historyMatches } from '../common/record-competition.js';
 import { battingAdditionalStats } from '../common/batting-stats.js';
 import { pitchingDecisionCounts } from '../common/pitching-decision.js';
 import { parseKbsaHtml } from '../common/kbsa-local.js';
@@ -38,6 +39,7 @@ let tab = 'games',
 let pendingGameImport = null;
 let pendingHistoryImport = null;
 let recordEditing = '';
+const historyFilters = { school: '', year: '', competition: '' };
 const defs = {
   stats: [
     'gameId',
@@ -368,10 +370,11 @@ function drawBody() {
     ${tab === 'games' && recordEditing ? recordEditor() : ''}
     <div class="panel admin-panel">
       <h2>등록 목록</h2>
+      ${tab === 'history' ? historyFilterMarkup() : ''}
       <div class="admin-list">
         ${
           tab === 'stats' || tab === 'history'
-            ? groupedRecords(data, tab === 'history')
+            ? groupedRecords(tab === 'history' ? data.filter((record) => historyMatches(record, historyFilters)) : data, tab === 'history')
             : data.length
               ? data
                   .map(
@@ -412,6 +415,15 @@ function drawBody() {
       </div></div>`,
     );
   }
+  document.querySelectorAll('[data-history-filter]').forEach((select) => select.addEventListener('change', () => {
+    historyFilters[select.dataset.historyFilter] = select.value;
+    if (select.dataset.historyFilter === 'school') { historyFilters.year = ''; historyFilters.competition = ''; }
+    if (select.dataset.historyFilter === 'year') historyFilters.competition = '';
+    drawBody();
+  }));
+  document.getElementById('history-filter-reset')?.addEventListener('click', () => {
+    Object.keys(historyFilters).forEach((key) => historyFilters[key] = ''); drawBody();
+  });
   const photoTarget = document.querySelector('#entry-form select[name="photoTarget"]');
   photoTarget?.addEventListener('change', () => {
     const date = photoTarget.selectedOptions[0]?.dataset.date;
@@ -520,7 +532,7 @@ function groupedRecords(data, historical) {
   for (const record of data) {
     const game = historical ? record : games.find((g) => g.id === record.gameId) || {};
     const key = historical
-      ? `${record.sourceGameId || record.gameId || record.id}:${record.teamName || ''}`
+      ? JSON.stringify([recordCompetition(record).competitionKey, record.date || '', record.sourceGameId || record.gameId || record.id])
       : record.gameId;
     if (!groups.has(key)) groups.set(key, { game, records: [] });
     groups.get(key).records.push(record);
@@ -662,6 +674,7 @@ async function importHistory(fromHtml) {
               playerName: player.name,
               sourcePlayerName: r.playerName,
               sourceNumber: r.number || '',
+              ...recordCompetition(r, imported.game),
               date: imported.game.date,
               competition: imported.game.competition || '',
               opponent,
@@ -862,6 +875,7 @@ async function save(e) {
         };
     }
     if (tab === 'history') {
+      Object.assign(v, recordCompetition(v));
       const rosterPlayer = players.find((p) => p.id === v.playerId);
       v.playerName = rosterPlayer.name;
       if (pendingHistoryImport && !editing)
@@ -938,6 +952,7 @@ async function save(e) {
           doc(db, 'playerGameStats', select.dataset.savedId || `${id}_${rosterPlayer.id}`),
           {
             ...record,
+            ...recordCompetition(record, v),
             gameId: id,
             playerId: rosterPlayer.id,
             playerName: rosterPlayer.name,
@@ -1515,7 +1530,7 @@ async function saveRecordEdit(event) {
 
 function bulkPitchingMarkup() {
   return `<details class="record-update-tools"><summary>기록 업데이트 도구</summary><div class="panel admin-panel"><h2>선수 기록 일괄 업데이트</h2>
-    <p class="hint">등록된 ${tab === 'games' ? '청운대 경기' : '이전 소속 경기'} 저장된 타격 내용으로 전체 업데이트하거나 원본을 다시 읽어 타석·볼넷·사구와 투수 승·패·세이브·홀드를 갱신합니다. 선수 연결과 나머지 기록은 유지됩니다. 실패한 기록은 변경하지 않습니다.</p>
+    <p class="hint">등록된 ${tab === 'games' ? '청운대 경기' : '이전 소속 경기'} 학교·연도·대회 구분과 저장된 타격 내용으로 전체 업데이트하거나 원본을 다시 읽어 타석·볼넷·사구와 투수 승·패·세이브·홀드를 갱신합니다. 선수 연결과 나머지 기록은 유지됩니다. 실패한 기록은 변경하지 않습니다.</p>
     <div class="actions"><button type="button" class="btn green" id="bulk-stored-records">저장된 청운대·이전 기록 전체 업데이트</button><button type="button" class="btn secondary" id="bulk-pitching-url">등록된 경기 원본 다시 읽기</button>
     <label class="field">저장한 경기 HTML 여러 개<input id="bulk-pitching-files" type="file" multiple accept=".html,.htm,text/html" /></label>
     <button type="button" class="btn secondary" id="bulk-pitching-html">선택한 HTML로 일괄 업데이트</button></div>
@@ -1586,7 +1601,7 @@ async function bulkUpdatePitching(fromFiles) {
             (!historical || norm(source.teamName) === norm(record.teamName)));
           if (matches.length !== 1) { failures++; report(`${id} · ${record.playerName}: 원본 선수를 확정할 수 없어 기존 기록 유지`); continue; }
           const source = matches[0];
-          const patch = { updatedAt: serverTimestamp() };
+          const patch = { ...recordCompetition(record, imported.game), updatedAt: serverTimestamp() };
           if (source.batting && (record.batting || record.atBats != null) && !(Number(source.batting.order) > 9)) {
             const extra = battingAdditionalStats(source.batting);
             if (extra.plateAppearances != null) patch.batting = { ...(record.batting || Object.fromEntries(['atBats', 'hits', 'runs', 'rbi', 'homeRuns'].filter((key) => record[key] !== undefined).map((key) => [key, record[key]]))), ...extra };
@@ -1618,11 +1633,13 @@ async function updateStoredRecordFields() {
   results.replaceChildren();
   let updated = 0, unknown = 0, unchanged = 0;
   try {
+    const savedGames = await all('games');
     for (const collectionName of ['playerGameStats', 'playerHistoryStats']) {
       const records = await all(collectionName);
       let batch = writeBatch(db), pending = 0;
       for (const record of records) {
-        const patch = {};
+        const metadata = recordCompetition(record, collectionName === 'playerGameStats' ? savedGames.find((game) => game.id === record.gameId) || record : record);
+        const patch = Object.entries(metadata).some(([key, value]) => record[key] !== value) ? { ...metadata } : {};
         const batting = record.batting || (record.atBats != null ? Object.fromEntries(['atBats', 'hits', 'runs', 'rbi', 'homeRuns', 'events', 'plateAppearances', 'walks', 'hitByPitch', 'battingStatsVersion'].filter((key) => record[key] !== undefined).map((key) => [key, record[key]])) : null);
         if (batting && !(Number(batting.order) > 9)) {
           if (batting.battingStatsVersion !== 2) {
@@ -1649,8 +1666,22 @@ async function updateStoredRecordFields() {
     [stats, historyStats] = await Promise.all([all('playerGameStats'), all('playerHistoryStats')]);
     status.textContent = `완료 · ${updated}건 갱신 · ${unchanged}건 유지 · 타자 ${unknown}건 미확인`;
     const line = document.createElement('p');
-    line.textContent = '선수 연결과 기존 기록은 유지했습니다. 타격 내용이 없는 미확인 기록은 로컬 원본 다시 읽기 또는 HTML 일괄 업데이트로 보완해 주세요.';
+    line.textContent = '학교·연도·대회 구분을 갱신하고 선수 연결과 기존 기록은 유지했습니다. 타격 내용이 없는 미확인 기록은 로컬 원본 다시 읽기 또는 HTML 일괄 업데이트로 보완해 주세요.';
     results.append(line);
   } catch (error) { status.textContent = `업데이트 중단 · ${updated}건 완료: ${error.message} · 다시 실행하면 이어서 처리됩니다.`; }
   finally { controls.forEach((button) => button.disabled = false); }
+}
+
+function historyFilterMarkup() {
+  const schools = [...new Set(historyStats.map((record) => record.teamName || '학교 미등록'))].sort((a, b) => a.localeCompare(b, 'ko'));
+  const schoolRecords = historyStats.filter((record) => !historyFilters.school || (record.teamName || '학교 미등록') === historyFilters.school);
+  const years = [...new Set(schoolRecords.map((record) => recordCompetition(record).recordYear || '미등록'))].sort().reverse();
+  const yearRecords = schoolRecords.filter((record) => !historyFilters.year || (recordCompetition(record).recordYear || '미등록') === historyFilters.year);
+  const competitions = [...new Map(yearRecords.map((record) => {
+    const year = recordCompetition(record).recordYear;
+    const name = record.competition || '기타 대회';
+    return [JSON.stringify([year, name]), `${year ? year + '년' : '연도 미등록'} · ${name}`];
+  })).entries()].sort((a, b) => b[1].slice(0, 4).localeCompare(a[1].slice(0, 4)) || a[1].localeCompare(b[1], 'ko'));
+  const select = (key, label, options) => `<label class="field">${label}<select data-history-filter="${key}"><option value="">전체 ${label}</option>${options.map(([value, title]) => `<option value="${escapeHTML(value)}" ${historyFilters[key] === value ? 'selected' : ''}>${escapeHTML(title)}</option>`).join('')}</select></label>`;
+  return `<div class="history-record-filters">${select('school', '학교', schools.map((name) => [name, name]))}${select('year', '연도', years.map((year) => [year, year === '미등록' ? '연도 미등록' : year + '년']))}${select('competition', '대회', competitions)}<button type="button" id="history-filter-reset" class="btn secondary">초기화</button></div><p class="hint">${historyStats.filter((record) => historyMatches(record, historyFilters)).length} / ${historyStats.length}개 선수 기록 · 같은 대회 이름도 연도별로 구분합니다.</p>`;
 }

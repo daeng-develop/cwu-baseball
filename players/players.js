@@ -1,3 +1,4 @@
+import { recordCompetition } from '../common/record-competition.js';
 import { battingAdditionalStats } from '../common/batting-stats.js';
 import { pitchingDecisionCounts } from '../common/pitching-decision.js';
 import {
@@ -178,6 +179,7 @@ function show(p) {
       ...record,
       game: {
         date: record.date,
+        recordYear: record.recordYear,
         competition: `${record.teamName || '이전 소속'} · ${record.competition || '기타 대회'}`,
         opponent: record.opponent,
       },
@@ -394,11 +396,12 @@ function show(p) {
     );
     const competitions = [
       ...filtered.reduce((map, record) => {
-        const name = record.game.competition || '기타 대회';
+        const year = recordCompetition(record, record.game).recordYear;
+        const name = `${year ? year + '년' : '연도 미등록'} · ${record.game.competition || '기타 대회'}`;
         map.set(name, [...(map.get(name) || []), record]);
         return map;
       }, new Map()),
-    ].sort((a, b) => a[0].localeCompare(b[0], 'ko'));
+    ].sort((a, b) => b[0].slice(0, 4).localeCompare(a[0].slice(0, 4)) || a[0].localeCompare(b[0], 'ko'));
     const competitionCards = competitions.length
       ? competitions
           .map(
