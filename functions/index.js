@@ -15,19 +15,8 @@ exports.previewKbsaGame = onCall(
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CWUBaseballAdmin/1.0)' },
         signal: AbortSignal.timeout(25000),
       });
-       } catch (error) {
-      console.error('KBSA connection failed', {
-        gameIdx: id,
-        name: error.name,
-        message: error.message,
-        cause: error.cause?.message,
-        code: error.cause?.code,
-      });
-
-      throw new HttpsError(
-        'unavailable',
-        '협회 기록 페이지에 연결할 수 없습니다.',
-      );
+    } catch {
+      throw new HttpsError('unavailable', '협회 기록 페이지에 연결할 수 없습니다.');
     }
     if (!response.ok) throw new HttpsError('unavailable', `협회 페이지 응답: ${response.status}`);
     const html = await response.text();

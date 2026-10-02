@@ -1,3 +1,4 @@
+import { battingAdditionalStats } from '../common/batting-stats.js';
 import { pitchingDecisionCounts } from '../common/pitching-decision.js';
 import { parseKbsaHtml } from '../common/kbsa-local.js';
 import {
@@ -84,6 +85,7 @@ const defs = {
     'opponent',
     'playerId',
     'playerName',
+    'plateAppearances', 'walks', 'hitByPitch',
     'atBats',
     'hits',
     'rbi',
@@ -93,6 +95,7 @@ const defs = {
   ],
 };
 const labels = {
+  plateAppearances: '타석', walks: '볼넷', hitByPitch: '사구',
   wins: '승', losses: '패', saves: '세이브', holds: '홀드',
   playerId: '선수 ID (시즌-배번)',
   playerName: '선수 이름',
@@ -476,6 +479,7 @@ function drawBody() {
   });
   document.getElementById('roster-preview-button')?.addEventListener('click', rosterPreview);
   document.getElementById('save-roster-links')?.addEventListener('click', saveRosterLinks);
+  document.getElementById('bulk-stored-records')?.addEventListener('click', updateStoredRecordFields);
   document.getElementById('bulk-pitching-url')?.addEventListener('click', () => bulkUpdatePitching(false));
   document.getElementById('bulk-pitching-html')?.addEventListener('click', () => bulkUpdatePitching(true));
   document.getElementById('import')?.addEventListener('click', importGame);
@@ -816,6 +820,11 @@ async function save(e) {
       throw Error('등록된 경기와 현재 명단의 선수를 선택해 주세요.');
     for (let k of ['atBats', 'hits', 'rbi', 'homeRuns', 'strikeouts'])
       v[k] = v[k] === '' ? 0 : Number(v[k]);
+    for (const key of ['plateAppearances', 'walks', 'hitByPitch']) {
+      if (!(key in v)) continue;
+      v[key] = v[key] === '' ? null : Number(v[key]);
+      if (v[key] !== null && (!Number.isInteger(v[key]) || v[key] < 0)) throw Error('타석·볼넷·사구는 0 이상의 정수로 입력해 주세요.');
+    }
     v.inningsOuts = baseballInningsToOuts(v.inningsPitched);
     if (v.inningsOuts === null)
       throw Error('투구 이닝은 7, 2.1 또는 2 1/3 형식으로 입력해 주세요.');
@@ -866,6 +875,7 @@ async function save(e) {
         if (old.batting)
           v.batting = {
             ...old.batting,
+            plateAppearances: v.plateAppearances, walks: v.walks, hitByPitch: v.hitByPitch, battingStatsVersion: 2,
             atBats: v.atBats,
             hits: v.hits,
             rbi: v.rbi,
@@ -1401,6 +1411,7 @@ function gameRecordRows(game) {
   </div></details>`;
 }
 const recordFields = [
+  ['plateAppearances', '타석', 'batting'], ['walks', '볼넷', 'batting'], ['hitByPitch', '사구', 'batting'],
   ['atBats', '타수', 'batting'],
   ['hits', '안타', 'batting'],
   ['runs', '득점', 'batting'],
@@ -1423,6 +1434,7 @@ function recordEditor() {
   const record = stats.find((r) => r.id === recordEditing);
   if (!record) return '';
   const game = games.find((g) => g.id === record.gameId);
+  const battingValues = record.batting?.battingStatsVersion === 2 ? record.batting : { ...record.batting, ...battingAdditionalStats(record.batting || record) };
   const pitchingValues = record.pitching?.decisionStatsVersion === 2 ? record.pitching : { ...record.pitching, ...pitchingDecisionCounts(record.pitching?.decision) };
   const roles = ['batting', 'pitching'].filter((role) =>
     role === 'batting'
@@ -1441,7 +1453,7 @@ function recordEditor() {
         .filter(([, , group]) => group === role)
         .map(
           ([key, label]) =>
-            `<label class="field">${label}<input name="${key}" type="text" inputmode="${key === 'inningsPitched' ? 'decimal' : 'numeric'}" value="${escapeHTML((role === 'pitching' ? pitchingValues[key] : record[role]?.[key]) ?? record[key] ?? '')}" /></label>`,
+            `<label class="field">${label}<input name="${key}" type="text" inputmode="${key === 'inningsPitched' ? 'decimal' : 'numeric'}" value="${escapeHTML((role === 'pitching' ? pitchingValues[key] : battingValues[key]) ?? record[key] ?? '')}" /></label>`,
         )
         .join('')}
     </div></fieldset>`,
@@ -1458,6 +1470,7 @@ async function saveRecordEdit(event) {
   if (!previous) return;
   const values = new FormData(form);
   const next = { ...previous, ...(previous.pitching ? { pitching: previous.pitching.decisionStatsVersion === 2 ? { ...previous.pitching } : { ...previous.pitching, ...pitchingDecisionCounts(previous.pitching.decision) } } : {}) };
+  if (previous.batting) next.batting = previous.batting.battingStatsVersion === 2 ? { ...previous.batting } : { ...previous.batting, ...battingAdditionalStats(previous.batting) };
   try {
     for (const [key, label, role] of recordFields) {
       const raw = String(values.get(key) || '').trim();
@@ -1484,6 +1497,7 @@ async function saveRecordEdit(event) {
         Number(next.pitching.inningsOuts)
       ).toFixed(2);
     await act(form, async () => {
+      if (next.batting) next.batting.battingStatsVersion = 2;
       if (next.pitching) next.pitching.decisionStatsVersion = 2;
       const { id, ...recordData } = next;
       await setDoc(
@@ -1500,9 +1514,9 @@ async function saveRecordEdit(event) {
 }
 
 function bulkPitchingMarkup() {
-  return `<details class="record-update-tools"><summary>기록 업데이트 도구</summary><div class="panel admin-panel"><h2>투수 승·패·세이브·홀드 일괄 업데이트</h2>
-    <p class="hint">등록된 ${tab === 'games' ? '청운대 경기' : '이전 소속 경기'} 원본을 다시 읽어 네 항목만 갱신합니다. 선수 연결과 나머지 기록은 유지됩니다. 실패한 기록은 변경하지 않습니다.</p>
-    <div class="actions"><button type="button" class="btn secondary" id="bulk-pitching-url">등록된 경기 원본 다시 읽기</button>
+  return `<details class="record-update-tools"><summary>기록 업데이트 도구</summary><div class="panel admin-panel"><h2>선수 기록 일괄 업데이트</h2>
+    <p class="hint">등록된 ${tab === 'games' ? '청운대 경기' : '이전 소속 경기'} 저장된 타격 내용으로 전체 업데이트하거나 원본을 다시 읽어 타석·볼넷·사구와 투수 승·패·세이브·홀드를 갱신합니다. 선수 연결과 나머지 기록은 유지됩니다. 실패한 기록은 변경하지 않습니다.</p>
+    <div class="actions"><button type="button" class="btn green" id="bulk-stored-records">저장된 청운대·이전 기록 전체 업데이트</button><button type="button" class="btn secondary" id="bulk-pitching-url">등록된 경기 원본 다시 읽기</button>
     <label class="field">저장한 경기 HTML 여러 개<input id="bulk-pitching-files" type="file" multiple accept=".html,.htm,text/html" /></label>
     <button type="button" class="btn secondary" id="bulk-pitching-html">선택한 HTML로 일괄 업데이트</button></div>
     <p id="bulk-pitching-status" class="status" aria-live="polite"></p><div id="bulk-pitching-results"></div></div></details>`;
@@ -1526,7 +1540,7 @@ async function bulkUpdatePitching(fromFiles) {
   const collectionName = historical ? 'playerHistoryStats' : 'playerGameStats';
   const status = document.getElementById('bulk-pitching-status');
   const results = document.getElementById('bulk-pitching-results');
-  const controls = [...document.querySelectorAll('#bulk-pitching-url, #bulk-pitching-html, [data-tab]')];
+  const controls = [...document.querySelectorAll('#bulk-stored-records, #bulk-pitching-url, #bulk-pitching-html, [data-tab]')];
   const files = [...(document.getElementById('bulk-pitching-files').files || [])];
   if (fromFiles && !files.length) { status.textContent = 'HTML 파일을 선택해 주세요.'; return; }
   controls.forEach((button) => button.disabled = true);
@@ -1538,7 +1552,7 @@ async function bulkUpdatePitching(fromFiles) {
   try {
     const [savedRecords, savedGames] = await Promise.all([all(collectionName), all('games')]);
     const groups = new Map();
-    for (const record of savedRecords.filter((record) => record.pitching)) {
+    for (const record of savedRecords.filter((record) => record.pitching || record.batting)) {
       const game = historical ? record : savedGames.find((game) => game.id === record.gameId);
       const id = String(record.sourceGameId || game?.sourceGameId ||
         (record.sourceUrl || game?.sourceUrl || '').match(/game_idx=(\d+)/)?.[1] || '');
@@ -1547,7 +1561,7 @@ async function bulkUpdatePitching(fromFiles) {
       groups.get(id).push({ record, date: game?.date || record.date });
     }
     const tasks = fromFiles ? files : [...groups.keys()];
-    if (!tasks.length) { status.textContent = '갱신할 등록 투수 기록이 없습니다.'; return; }
+    if (!tasks.length) { status.textContent = '갱신할 등록 선수 기록이 없습니다.'; return; }
     for (let index = 0; index < tasks.length; index++) {
       const task = tasks[index];
       status.textContent = `${index + 1}/${tasks.length} 처리 중 · ${updated}건 갱신`;
@@ -1560,24 +1574,29 @@ async function bulkUpdatePitching(fromFiles) {
           if (!id) throw Error('HTML에서 game_idx를 찾지 못했습니다. 원본 전체 페이지로 저장해 주세요.');
           imported = parseKbsaHtml(html, id, { includeAllTeams: historical });
         } else { id = task; imported = await readBulkGame(id, historical); }
-        if (!groups.has(id)) throw Error(`경기 ${id}에 연결된 등록 투수 기록이 없습니다.`);
+        if (!groups.has(id)) throw Error(`경기 ${id}에 연결된 등록 선수 기록이 없습니다.`);
         const batch = writeBatch(db);
         let count = 0;
         for (const { record, date } of groups.get(id)) {
           if (date && date !== imported.game?.date) { failures++; report(`${id} · ${record.playerName}: 원본 날짜 불일치, 기존 기록 유지`); continue; }
           const norm = (value) => String(value || '').normalize('NFC').replace(/\s+/g, '');
-          const matches = imported.records.filter((source) => source.pitching &&
+          const matches = imported.records.filter((source) => (source.pitching || source.batting) &&
             norm(source.playerName) === norm(record.sourcePlayerName || record.playerName) &&
             String(source.number || '') === String(record.sourceNumber ?? record.number ?? '') &&
             (!historical || norm(source.teamName) === norm(record.teamName)));
           if (matches.length !== 1) { failures++; report(`${id} · ${record.playerName}: 원본 선수를 확정할 수 없어 기존 기록 유지`); continue; }
-          const source = matches[0].pitching;
-          const counts = pitchingDecisionCounts(source.decision);
-          if (Object.values(counts).some((value) => value === null)) { failures++; report(`${id} · ${record.playerName}: 승패 결과 해석 불가, 기존 기록 유지`); continue; }
-          batch.set(doc(db, collectionName, record.id), {
-            pitching: { ...record.pitching, ...counts, decision: source.decision, decisionStatsVersion: 2 },
-            updatedAt: serverTimestamp(),
-          }, { merge: true });
+          const source = matches[0];
+          const patch = { updatedAt: serverTimestamp() };
+          if (source.batting && (record.batting || record.atBats != null) && !(Number(source.batting.order) > 9)) {
+            const extra = battingAdditionalStats(source.batting);
+            if (extra.plateAppearances != null) patch.batting = { ...(record.batting || Object.fromEntries(['atBats', 'hits', 'runs', 'rbi', 'homeRuns'].filter((key) => record[key] !== undefined).map((key) => [key, record[key]]))), ...extra };
+          }
+          if (source.pitching && record.pitching) {
+            const counts = pitchingDecisionCounts(source.pitching.decision);
+            if (!Object.values(counts).some((value) => value === null)) patch.pitching = { ...record.pitching, ...counts, decision: source.pitching.decision, decisionStatsVersion: 2 };
+          }
+          if (!patch.batting && !patch.pitching) { failures++; report(`${id} · ${record.playerName}: 추가 항목 미확인, 기존 기록 유지`); continue; }
+          batch.set(doc(db, collectionName, record.id), patch, { merge: true });
           count++;
         }
         if (count) { await batch.commit(); updated += count; }
@@ -1588,5 +1607,50 @@ async function bulkUpdatePitching(fromFiles) {
     else stats = await all(collectionName);
     status.textContent = `완료 · ${updated}건 갱신 · ${failures}건 실패/미확인 (기존 기록 유지)`;
   } catch (error) { status.textContent = '업데이트 실패: ' + error.message; }
+  finally { controls.forEach((button) => button.disabled = false); }
+}
+
+async function updateStoredRecordFields() {
+  const status = document.getElementById('bulk-pitching-status');
+  const results = document.getElementById('bulk-pitching-results');
+  const controls = [...document.querySelectorAll('#bulk-stored-records, #bulk-pitching-url, #bulk-pitching-html, [data-tab]')];
+  controls.forEach((button) => button.disabled = true);
+  results.replaceChildren();
+  let updated = 0, unknown = 0, unchanged = 0;
+  try {
+    for (const collectionName of ['playerGameStats', 'playerHistoryStats']) {
+      const records = await all(collectionName);
+      let batch = writeBatch(db), pending = 0;
+      for (const record of records) {
+        const patch = {};
+        const batting = record.batting || (record.atBats != null ? Object.fromEntries(['atBats', 'hits', 'runs', 'rbi', 'homeRuns', 'events', 'plateAppearances', 'walks', 'hitByPitch', 'battingStatsVersion'].filter((key) => record[key] !== undefined).map((key) => [key, record[key]])) : null);
+        if (batting && !(Number(batting.order) > 9)) {
+          if (batting.battingStatsVersion !== 2) {
+            const extra = battingAdditionalStats(batting);
+            patch.batting = { ...batting, ...extra };
+          }
+          const values = patch.batting || batting;
+          if (['plateAppearances', 'walks', 'hitByPitch'].some((key) => values[key] == null)) unknown++;
+        }
+        if (record.pitching && record.pitching.decisionStatsVersion !== 2) {
+          const counts = pitchingDecisionCounts(record.pitching.decision);
+          if (!Object.values(counts).some((value) => value === null)) patch.pitching = { ...record.pitching, ...counts, decisionStatsVersion: 2 };
+        }
+        if (!Object.keys(patch).length) { unchanged++; continue; }
+        batch.set(doc(db, collectionName, record.id), { ...patch, updatedAt: serverTimestamp() }, { merge: true });
+        pending++;
+        if (pending === 400) {
+          await batch.commit(); updated += pending; pending = 0; batch = writeBatch(db);
+          status.textContent = `${updated}건 갱신 중`;
+        }
+      }
+      if (pending) { await batch.commit(); updated += pending; }
+    }
+    [stats, historyStats] = await Promise.all([all('playerGameStats'), all('playerHistoryStats')]);
+    status.textContent = `완료 · ${updated}건 갱신 · ${unchanged}건 유지 · 타자 ${unknown}건 미확인`;
+    const line = document.createElement('p');
+    line.textContent = '선수 연결과 기존 기록은 유지했습니다. 타격 내용이 없는 미확인 기록은 로컬 원본 다시 읽기 또는 HTML 일괄 업데이트로 보완해 주세요.';
+    results.append(line);
+  } catch (error) { status.textContent = `업데이트 중단 · ${updated}건 완료: ${error.message} · 다시 실행하면 이어서 처리됩니다.`; }
   finally { controls.forEach((button) => button.disabled = false); }
 }

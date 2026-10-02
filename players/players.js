@@ -1,3 +1,4 @@
+import { battingAdditionalStats } from '../common/batting-stats.js';
 import { pitchingDecisionCounts } from '../common/pitching-decision.js';
 import {
   mountShell,
@@ -271,13 +272,19 @@ function show(p) {
     );
     const get = (r) => {
       const values = role === 'batting' ? r.batting || r : r.pitching || r;
+      if (role === 'batting') {
+        const extra = values.battingStatsVersion === 2 ? values : battingAdditionalStats(values);
+        return { ...values, ...extra, walksAndHitByPitch: extra.walks == null || extra.hitByPitch == null ? null : Number(extra.walks) + Number(extra.hitByPitch) };
+      }
       return role === 'pitching' && values.decisionStatsVersion !== 2
         ? { ...values, ...pitchingDecisionCounts(values.decision) } : values;
     };
     const columns =
       role === 'batting'
         ? [
+            ['plateAppearances', '타석'],
             ['atBats', '타수'],
+            ['walks', '볼넷'], ['hitByPitch', '사구'],
             ['hits', '안타'],
             ['runs', '득점'],
             ['rbi', '타점'],
@@ -316,9 +323,9 @@ function show(p) {
         : outs(group)
           ? ((total(group, 'earnedRuns') * 27) / outs(group)).toFixed(2)
           : '—';
-    const summary = (group) =>
-      columns.map(([key]) => {
-        if (['wins', 'losses', 'saves', 'holds'].includes(key)) {
+    const summary = (group, selectedColumns = columns) =>
+      selectedColumns.map(([key]) => {
+        if (['wins', 'losses', 'saves', 'holds', 'walks', 'hitByPitch', 'plateAppearances', 'walksAndHitByPitch'].includes(key)) {
           const unknown = group.some((r) => get(r)[key] === null || get(r)[key] === undefined);
           const known = group.filter((r) => get(r)[key] !== null && get(r)[key] !== undefined);
           return unknown ? (known.length ? `${total(known, key)} + 미확인` : '미확인') : total(group, key);
@@ -429,10 +436,11 @@ function show(p) {
           )
           .join('')
       : '<p class="empty">연도별 기록이 없습니다.</p>';
+    const overallColumns = role === 'batting' ? columns.filter(([key]) => !['walks', 'hitByPitch'].includes(key)).concat([['walksAndHitByPitch', '4사구']]) : columns;
     const summaryView = `<h3>${heading} 기록 합계</h3><div class="record-summary">
       <div><small>출장</small><strong>${filtered.length}</strong></div>
       <div><small>${role === 'batting' ? '타율' : '평균자책점'}</small><strong>${rate(filtered)}</strong></div>
-      ${columns.map(([key, label], index) => `<div><small>${label}</small><strong>${summary(filtered)[index]}</strong></div>`).join('')}
+      ${overallColumns.map(([key, label], index) => `<div><small>${label}</small><strong>${summary(filtered, overallColumns)[index]}</strong></div>`).join('')}
     </div>${selectedScope === 'all' ? `<h3>연도별 기록</h3><div class="year-stats">${yearCards}</div>` : ''}`;
     const recentView = `<h3>${heading} 최근 5경기</h3>${table(sorted.slice(0, 5))}`;
     const competitionView = `<h3>${heading} 대회별 기록</h3><div class="competition-stats">${competitionCards}</div>`;

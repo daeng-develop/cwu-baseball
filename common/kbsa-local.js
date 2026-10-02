@@ -1,3 +1,4 @@
+import { battingAdditionalStats } from './batting-stats.js';
 import { pitchingDecisionCounts } from './pitching-decision.js';
 const clean = (value) =>
   String(value ?? '')
@@ -191,7 +192,7 @@ export function parseKbsaHtml(html, gameIdx, options = {}) {
           replacedPlayerName: battingRecord.replacedPlayerName,
         });
         record.position = headers[1] || record.position;
-        record.batting = battingRecord;
+        record.batting = { ...battingRecord, ...battingAdditionalStats(battingRecord) };
         record.atBats += atBats;
         record.hits += hits;
         record.rbi += rbi;

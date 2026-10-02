@@ -1,3 +1,4 @@
+import { battingAdditionalStats } from '../common/batting-stats.js';
 import { pitchingDecisionCounts } from '../common/pitching-decision.js';
 import { mountShell, all, escapeHTML, dateText } from '../common/common.js';
 mountShell();
@@ -216,7 +217,7 @@ function render() {
             <th>타순</th>
             <th>선수</th>
             <th>수비</th>
-            <th>타수</th>
+            <th>타석</th><th>볼넷</th><th>사구</th><th>타수</th>
             <th>안타</th>
             <th>타점</th>
             <th>득점</th>
@@ -229,7 +230,8 @@ function render() {
             batters.length
               ? batters
                   .map((s) => {
-                    const b = s.batting || s;
+                    const original = s.batting || s;
+                    const b = original.battingStatsVersion === 2 ? original : { ...original, ...battingAdditionalStats(original) };
                     return /* HTML */ `<tr
                       class="${b.entryType && b.entryType !== '선발' ? 'substitute-row' : ''}"
                     >
@@ -238,6 +240,7 @@ function render() {
                         ${escapeHTML(s.playerName || '')}${b.entryType && b.entryType !== '선발' ? /* HTML */ `<small>↳ ${escapeHTML(b.entryType)}${b.replacedPlayerName ? `` : ''}</small>` : ''}
                       </td>
                       <td class="fielding-positions">${positionMarkup(b.position || s.position)}</td>
+                      <td>${escapeHTML(b.plateAppearances ?? '—')}</td><td>${escapeHTML(b.walks ?? '—')}</td><td>${escapeHTML(b.hitByPitch ?? '—')}</td>
                       <td>${escapeHTML(b.atBats ?? '—')}</td>
                       <td>${escapeHTML(b.hits ?? '—')}</td>
                       <td>${escapeHTML(b.rbi ?? '—')}</td>
@@ -249,7 +252,7 @@ function render() {
                     </tr>`;
                   })
                   .join('')
-              : '<tr><td colspan="9">등록된 타자 기록이 없습니다.</td></tr>'
+              : '<tr><td colspan="12">등록된 타자 기록이 없습니다.</td></tr>'
           }
         </tbody>
       </table>
@@ -268,7 +271,7 @@ function render() {
             <th>이닝</th>
             <th>타자</th>
             <th>투구수</th>
-            <th>타수</th>
+            <th>타석</th><th>볼넷</th><th>사구</th><th>타수</th>
             <th>피안타</th>
             <th>피홈런</th>
             <th>4사구</th>
