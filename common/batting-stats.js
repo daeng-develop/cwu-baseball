@@ -16,3 +16,14 @@ export function battingAdditionalStats(batting) {
     plateAppearances: Number.isFinite(atBats) && atBats >= 0 ? atBats + walks + hitByPitch + sacrificeBunts + sacrificeFlies + interference : null,
     battingStatsVersion: 2 };
 }
+
+// Imported pitcher rows also contain zero-valued flat batting totals.
+export function hasBattingRecord(record) {
+  const batting = record.batting;
+  const counts = ['atBats', 'hits', 'rbi', 'runs', 'homeRuns', 'plateAppearances', 'walks', 'hitByPitch'];
+  if (batting && Number(batting.order) > 9) return false;
+  if (counts.some((key) => Number(batting?.[key] ?? record[key]) > 0)) return true;
+  if (!batting) return false;
+  if (Number(batting.order) >= 1 && Number(batting.order) <= 9 || batting.entryType || batting.lineupSequence != null || batting.events?.length) return true;
+  return !record.pitching;
+}

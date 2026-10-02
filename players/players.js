@@ -1,5 +1,5 @@
 import { recordCompetition } from '../common/record-competition.js';
-import { battingAdditionalStats } from '../common/batting-stats.js';
+import { battingAdditionalStats, hasBattingRecord } from '../common/batting-stats.js';
 import { pitchingDecisionCounts } from '../common/pitching-decision.js';
 import {
   mountShell,
@@ -262,16 +262,7 @@ function show(p) {
       .forEach((button) =>
         button.setAttribute('aria-selected', String(button.dataset.role === role)),
       );
-    const filtered = activeRecords.filter((r) => role !== 'batting' || !(Number(r.batting?.order) > 9)).filter((r) =>
-      role === 'batting'
-        ? r.batting ||
-          Number(r.atBats) ||
-          Number(r.hits) ||
-          Number(r.rbi) ||
-          Number(r.runs) ||
-          Number(r.homeRuns)
-        : r.pitching || Number(r.inningsOuts) || r.inningsPitched,
-    );
+    const filtered = activeRecords.filter((r) => role === 'batting' ? hasBattingRecord(r) : r.pitching || Number(r.inningsOuts) || r.inningsPitched);
     const get = (r) => {
       const values = role === 'batting' ? r.batting || r : r.pitching || r;
       if (role === 'batting') {

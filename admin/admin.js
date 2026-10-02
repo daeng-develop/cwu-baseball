@@ -1,5 +1,5 @@
 import { recordCompetition, historyMatches } from '../common/record-competition.js';
-import { battingAdditionalStats } from '../common/batting-stats.js';
+import { battingAdditionalStats, hasBattingRecord } from '../common/batting-stats.js';
 import { pitchingDecisionCounts } from '../common/pitching-decision.js';
 import { parseKbsaHtml } from '../common/kbsa-local.js';
 import {
@@ -1640,7 +1640,8 @@ async function updateStoredRecordFields() {
       for (const record of records) {
         const metadata = recordCompetition(record, collectionName === 'playerGameStats' ? savedGames.find((game) => game.id === record.gameId) || record : record);
         const patch = Object.entries(metadata).some(([key, value]) => record[key] !== value) ? { ...metadata } : {};
-        const batting = record.batting || (record.atBats != null ? Object.fromEntries(['atBats', 'hits', 'runs', 'rbi', 'homeRuns', 'events', 'plateAppearances', 'walks', 'hitByPitch', 'battingStatsVersion'].filter((key) => record[key] !== undefined).map((key) => [key, record[key]])) : null);
+        if (record.batting && record.pitching && !hasBattingRecord(record)) patch.batting = null;
+        const batting = hasBattingRecord(record) ? record.batting || (record.atBats != null ? Object.fromEntries(['atBats', 'hits', 'runs', 'rbi', 'homeRuns', 'events', 'plateAppearances', 'walks', 'hitByPitch', 'battingStatsVersion'].filter((key) => record[key] !== undefined).map((key) => [key, record[key]])) : null) : null;
         if (batting && !(Number(batting.order) > 9)) {
           if (batting.battingStatsVersion !== 2) {
             const extra = battingAdditionalStats(batting);
